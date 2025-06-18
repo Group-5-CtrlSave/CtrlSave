@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: #f0f4f8;
     color: #333;
     min-height: 100vh;
@@ -15,7 +15,7 @@ body {
 }
 
 .bg-green-custom {
-    background: #77d19b;
+    background: #77d09A;
     border-radius: 0;
     width: 100%;
     min-height: 100vh;
@@ -68,7 +68,7 @@ body {
 label {
     font-size: clamp(0.65rem, 2.8vw, 0.7rem);
     font-weight: 600;
-    color: #ffd859;
+    color: #f6d25b;
 }
 
 input[type="text"],
@@ -120,7 +120,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 #gender.form-control {
     color: #ffffff;
-    background-color: #77d19b;
+    background-color: #77d09A;
 }
 
 select {
@@ -159,7 +159,7 @@ select::-ms-expand {
 
 .btn.logout,
 .btn.change-password {
-    background: #f6cd4a;
+    background: #f6d25b;
     color: #1a1a1a;
     text-transform: uppercase;
     font-weight: 700;
@@ -175,11 +175,11 @@ select::-ms-expand {
 }
 
 .btn.logout:hover {
-    background: #e3bb34;
+    background: #f6d25b;
 }
 
 .btn.change-password {
-    background: #418d5a;
+    background: #44b87d;
     color: white;
 }
 
