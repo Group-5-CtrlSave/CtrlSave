@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+body {
+    font-family: "Roboto", sans-serif;
+}
+
+.mainContainer {
+    background-color: #77D09A;
+    height: 100dvh;
+}
+
+.title {
+    color: #F3F3F3;
+}
+
+.allButton{
+    border-radius: 20px 0px 0px 20px;
+}
+.incomeButton{
+    border-radius: 0px;
+}
+.expenseButton{
+    border-radius: 0px 20px 20px 0px;
+}
+
+.sortButton {
+    border-color: #F3F3F3 !important;
+    border-style: solid;
+    color:#F3F3F3 !important;
+    min-width: 80px;
+}
+
+.sortButton.selected {
+    background-color: #F3F3F3 !important;
+    color: #FFD858 !important;
+}
+
+.scroll-Container{
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.ieContainer {
+    border-radius: 20px;
+    background-color: #F3F3F3;
+    height: 100px;
+}
+
+.categoryImgContainer {
+    text-align: center;
+}
+
+.notes {
+    color: #B5C0BB;
+}
+
+.iePriceContainer {
+    text-align: end;
+}
+
+.price {
+    color: #FFD858;
+}
+
+.time {
+    color: #4C8F6D;
+}
