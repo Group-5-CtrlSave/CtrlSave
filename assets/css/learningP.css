@@ -1,0 +1,148 @@
+   body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #77d19b);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: #44b87c;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p.tagline {
+            font-size: 1.5em;
+            font-style: italic;
+            margin: 10px 0 0;
+            color: #e1f5fe;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #f5d15b;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #80deea;
+            display: inline-block;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-caption {
+            text-align: center;
+            font-size: 1em;
+            color: #77d19b;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .resource-card:hover {
+            background: #e0f7fa;
+        }
+
+        .resource-card a {
+            color: #77d19b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .resource-card a:hover {
+            text-decoration: underline;
+        }
+
+        .resource-card p {
+            margin: 10px 0 0;
+            color: #666;
+        }
+
+
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            header p.tagline {
+                font-size: 1.2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .video-container {
+                max-width: 100%;
+            }
+
+            .video-caption {
+                font-size: 0.95em;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .video-container {
+                max-width: 80%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
