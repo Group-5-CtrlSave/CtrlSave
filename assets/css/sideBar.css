@@ -1,15 +1,3 @@
-body {
-      background-color: #f3f4f6;
-    }
-
-    .bg-green-custom {
-      background-color: #44B87D;
-    }
-
-    .bg-yellow-custom {
-      background-color: #F6D25B;
-    }
-
     .hover-bg-green:hover {
       background-color: #3aa76e !important;
     }
