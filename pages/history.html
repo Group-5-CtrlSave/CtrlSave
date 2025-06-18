@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <link rel="stylesheet" href="../assets/css/sideBar.css">
+    <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #77D09A;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: "Roboto", Arial, sans-serif;
+        }
+        .header {
+            text-align: left;
+            color: white;
+            padding: 30px;
+            width: 80%;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .days {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .entry {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 2px solid #FFC107;
+        }
+        .entry .time {
+            color: #666;
+            font-size: 10px; 
+            align-self: flex-end; 
+            margin-bottom: 5px; 
+        }
+        .entry .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .entry .icon {
+            font-size: 20px;
+            margin-right: 10px;
+            line-height: 20px;
+        }
+        .entry .text {
+            flex-grow: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        .entry .amount {
+            color: #FFD858;
+            font-size: 16px;
+        }
+        .hover-bg-green:hover {
+            background-color: #5cb87a;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow">
+        <button class="fs-2 d-md-none text-success border-0 bg-transparent" data-bs-toggle="offcanvas"
+            data-bs-target="#sidebar" aria-controls="sidebar">☰</button>
+        <div class="d-flex align-items-center gap-2">
+            <img src="../assets/imgs/ctrlsaveIcon.png" alt="App Icon" style="width: 40px; height: 40px;" />
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+        <div class="offcanvas-body p-0" style="background-color: #77D09A;">
+            <!-- Sidebar content -->
+            <div class="p-4 border-bottom bg-light shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
+                        style="width: 48px; height: 48px; font-size: 1.25rem;">
+                        JD
+                    </div>
+                    <div>
+                        <p class="text-dark fw-semibold mb-0">John Doe</p>
+                        <p class="text-muted small mb-0">john@example.com</p>
+                    </div>
+                </div>
+                <p class="small text-dark fw-medium mb-1">Level 0</p>
+                <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height: 8px;">
+                    <div class="bg-warning rounded-pill" style="width: 40%; height: 8px;"></div>
+                </div>
+                <p class="text-muted mt-1 mb-3 small">40 XP / 100 XP</p>
+                <button class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
+            </div>
+            <ul class="list-unstyled m-0 p-3">
+                <li><a href="index.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/homeIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Home</span></a></li>
+                <li><a href="IncomeExpense.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/i&eIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Income & Expense</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/savingsIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Savings</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/cointrolIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Cointrol</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/strategiesIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Saving Strategies</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/historyIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>History</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/notificationIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Notifications</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/challengesIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Challenge</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/profileIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Profile</span></a></li>
+                <li><a href="#"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
+                        <img src="../assets/imgs/settingsIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <span>Settings</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1><strong>History</strong></h1>
+        <div class="days">Last 30 Days</div>
+    </div>
+    <div class="entry">
+        <span class="time">1 hour ago</span>
+        <div class="content">
+            <span class="icon">☕</span>
+            <span class="text">Coffee</span>
+            <span class="amount">-P150</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">2 hours ago</span>
+        <div class="content">
+            <span class="icon">🍽️</span>
+            <span class="text">Dining</span>
+            <span class="amount">+P500</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">Yesterday</span>
+        <div class="content">
+            <span class="icon">🛒</span>
+            <span class="text">Shopping</span>
+            <span class="amount">-P1200</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">Yesterday</span>
+        <div class="content">
+            <span class="icon">🛍️</span>
+            <span class="text">Groceries</span>
+            <span class="amount">-P2500</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">3 days ago</span>
+        <div class="content">
+            <span class="icon">⛽</span>
+            <span class="text">Fuel</span>
+            <span class="amount">-P800</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">5 days ago</span>
+        <div class="content">
+            <span class="icon">💡</span>
+            <span class="text">Utilities</span>
+            <span class="amount">-P1800</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">1 week ago</span>
+        <div class="content">
+            <span class="icon">💸</span>
+            <span class="text">Salary</span>
+            <span class="amount">+P15000</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">10 days ago</span>
+        <div class="content">
+            <span class="icon">🎬</span>
+            <span class="text">Entertainment</span>
+            <span class="amount">-P600</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">15 days ago</span>
+        <div class="content">
+            <span class="icon">📱</span>
+            <span class="text">Phone Bill</span>
+            <span class="amount">-P1000</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">20 days ago</span>
+        <div class="content">
+            <span class="icon">💰</span>
+            <span class="text">Freelance Work</span>
+            <span class="amount">+P5000</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">25 days ago</span>
+        <div class="content">
+            <span class="icon">🏠</span>
+            <span class="text">Rent</span>
+            <span class="amount">-P8000</span>
+        </div>
+    </div>
+    <div class="entry">
+        <span class="time">30 days ago</span>
+        <div class="content">
+            <span class="icon">🎁</span>
+            <span class="text">Gift</span>
+            <span class="amount">-P500</span>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+</body>
+</html>

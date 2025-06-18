@@ -1,0 +1,228 @@
+/* Landing Page - Kissy */
+
+body {
+    min-height: 100vh;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    font-family: Roboto, sans-serif;
+}
+
+.wave.top {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 38%;
+    background: url('../img/landingPage/topImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.wave.bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 35%;
+    background: url('../img/landingPage/bottomImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.logo {
+    width: 150px;
+    height: 150px;
+    margin-right: 20px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+}
+
+.text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+h1 {
+    color: #2e7d32;
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+p {
+    color: #ffca28;
+    font-size: 1.2rem;
+    font-style: italic;
+    margin: 0;
+}
+
+@media (max-width: 428px) {
+
+    .wave.top,
+    .wave.bottom {
+        height: 20%;
+    }
+
+    .content {
+        flex-direction: column;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .logo {
+        width: 120px;
+        height: 120px;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .text-content {
+        align-items: center;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+}
+
+
+
+/* ADS */
+.wave {
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    background: url('../img/landingPage/centerImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    z-index: 1;
+}
+
+.woman-img {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 50px;
+    margin-top: -40px;
+    text-align: center;
+}
+
+.woman-img img {
+    width: 300px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.step-text {
+    font-size: 60px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #ffffff;
+    margin-top: -40px;
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 5px;
+    max-width: 80%;
+    margin-top: -15px;
+}
+
+.next-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #F6D25B;
+    color: #000000;
+    border: none;
+    padding: 10px 60px;
+    font-size: 1.2rem;
+    border-radius: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 2;
+}
+
+.next-btn:hover {
+    background-color: #e0b11c;
+}
+
+@media (max-width: 428px) {
+    .content {
+        justify-content: center;
+    }
+
+    .woman-img {
+        margin-top: -30px;
+    }
+
+    .woman-img img {
+        width: 250px;
+    }
+
+    .step-text {
+        font-size: 1.6rem;
+        margin-top: -40px;
+        margin-bottom: 30px;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        margin-top: -7px;
+        margin-bottom: 12px;
+    }
+
+    .next-btn {
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        bottom: 15px;
+    }
+}
+
+@media (min-width: 429px) and (max-width: 768px) {
+    .content {
+        justify-content: center;
+    }
+
+    .woman-img {
+        margin-top: -35px;
+    }
+
+    .woman-img img {
+        width: 280px;
+    }
+
+    .step-text {
+        font-size: 1.8rem;
+        margin-top: -45px;
+        margin-bottom: 40px;
+    }
+
+    .description {
+        font-size: 1rem;
+        margin-top: -5px;
+        margin-bottom: 32px;
+    }
+
+    .next-btn {
+        font-size: 1.2rem;
+    }
+}
