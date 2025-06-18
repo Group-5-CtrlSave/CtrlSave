@@ -1,0 +1,154 @@
+    * {
+    font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+    }
+
+    .bg-green-custom {
+      background-color: #44B87D;
+    }
+
+    .bg-yellow-custom {
+      background-color: #F6D25B;
+    }
+
+    .hover-bg-green:hover {
+      background-color: #3aa76e !important;
+    }
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background-color: white;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1050;
+    }
+
+    #sidebar.show {
+      transform: translateX(0%) !important;
+    }
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+      transition: opacity 0.3s ease;
+    }
+
+    .balance-card {
+      background-color: #F3FEF5;
+      border-radius: 15px;
+      padding: 1rem;
+      margin: 1rem auto;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      height: 100px;
+      position: relative;
+    }
+
+    .balance-card div {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      margin: 0;
+      background: none; 
+      border-radius: 0;
+    }
+
+    .balance-card div:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background-color: #44B87D;
+    }
+
+    .summary-card {
+      background-color: #F3FEF5;
+      border-radius: 15px;
+      padding: 1rem 1.5rem;
+      max-width: 600px;
+      height: 100px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .vertical-divider {
+      width: 2px;
+      height: 50px;
+      background-color: #44B87D;
+      border-radius: 1px;
+    }
+
+    .today-text {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 500;
+      text-align: start;
+      margin-top: 10px;
+    }
+
+    .recommendation-card {
+      width: 392px;
+      height: 143px;
+      background-color: #F3FEF5;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 90px;
+      background-color: white;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+    }
+
+    .tab-item {
+      flex: 1;
+      padding-top: 20px;
+    }
+
+    .tab-icon {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 5px;
+    }
+
+    .tab-label {
+      font-size: 14px;
+      color: #000;
+    }
+
+    .tab-center {
+      position: relative;
+      top: -30px;
+    }
+
+    .tab-add-btn {
+      width: 70px;
+      height: 70px;
+      background-color: #F6D25B;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
