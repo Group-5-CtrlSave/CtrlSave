@@ -66,3 +66,16 @@ body {
 .time {
     color: #4C8F6D;
 }
+
+.addIncomebtn{
+    border-radius: 20px;
+    background-color:#4C8F6D !important;
+    color: #F3F3F3 !important;
+   
+}
+
+.addExpensebtn{
+    border-radius: 20px;
+    background-color:#FFD858 !important;
+    color: #4C8F6D !important;
+}
