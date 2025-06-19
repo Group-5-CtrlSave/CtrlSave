@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,78 +19,86 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             font-family: "Roboto", Arial, sans-serif;
         }
+
         .header {
             text-align: left;
             color: white;
             padding: 30px;
             width: 80%;
+            max-width: 800px;
         }
+
         .header h1 {
             margin: 0;
             font-size: 24px;
         }
+
         .header .days {
             margin: 5px 0;
             font-size: 14px;
         }
+
         .entry {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             width: 80%;
+            max-width: 800px;
             padding: 10px;
-            margin: 10px 0;
+            margin: 10px auto;
             display: flex;
-            flex-direction: column; 
+            flex-direction: column;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             border: 2px solid #FFC107;
         }
+
         .entry .time {
             color: #666;
-            font-size: 10px; 
-            align-self: flex-end; 
-            margin-bottom: 5px; 
+            font-size: 10px;
+            align-self: flex-end;
+            margin-bottom: 5px;
         }
+
         .entry .content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .entry .icon {
             font-size: 20px;
             margin-right: 10px;
             line-height: 20px;
         }
+
         .entry .text {
             flex-grow: 1;
             font-size: 16px;
             color: #333;
         }
+
         .entry .amount {
             color: #FFD858;
             font-size: 16px;
         }
-        .hover-bg-green:hover {
-            background-color: #5cb87a;
-        }
     </style>
 </head>
+
 <body>
     <!-- Navigation Bar -->
-    <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow">
+    <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow sticky-top">
         <button class="fs-2 d-md-none text-success border-0 bg-transparent" data-bs-toggle="offcanvas"
             data-bs-target="#sidebar" aria-controls="sidebar">☰</button>
         <div class="d-flex align-items-center gap-2">
-            <img src="../assets/imgs/ctrlsaveIcon.png" alt="App Icon" style="width: 40px; height: 40px;" />
+            <img src="../assets/imgs/ctrlsaveIcon.png" alt="App Icon" />
         </div>
     </nav>
 
-    <!-- Sidebar -->
+    <!-- Side bar -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
         <div class="offcanvas-body p-0" style="background-color: #77D09A;">
-            <!-- Sidebar content -->
+            <!-- Side bar content -->
             <div class="p-4 border-bottom bg-light shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
@@ -108,12 +117,13 @@
                 <p class="text-muted mt-1 mb-3 small">40 XP / 100 XP</p>
                 <button class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
             </div>
+
             <ul class="list-unstyled m-0 p-3">
                 <li><a href="index.html"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
                         <img src="../assets/imgs/homeIcon.png" class="me-2" style="width: 20px; height: 20px;" />
                         <span>Home</span></a></li>
-                <li><a href="IncomeExpense.html"
+                <li><a href="incomeExpense.html"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
                         <img src="../assets/imgs/i&eIcon.png" class="me-2" style="width: 20px; height: 20px;" />
                         <span>Income & Expense</span></a></li>
@@ -129,13 +139,14 @@
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
                         <img src="../assets/imgs/strategiesIcon.png" class="me-2" style="width: 20px; height: 20px;" />
                         <span>Saving Strategies</span></a></li>
-                <li><a href="#"
+                <li><a href="history.html"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
                         <img src="../assets/imgs/historyIcon.png" class="me-2" style="width: 20px; height: 20px;" />
                         <span>History</span></a></li>
-                <li><a href="#"
+                <li><a href="notification.html"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-                        <img src="../assets/imgs/notificationIcon.png" class="me-2" style="width: 20px; height: 20px;" />
+                        <img src="../assets/imgs/notificationIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
                         <span>Notifications</span></a></li>
                 <li><a href="#"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
@@ -262,4 +273,5 @@
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
 </body>
+
 </html>
