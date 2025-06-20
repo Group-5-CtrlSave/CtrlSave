@@ -2,26 +2,78 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login to CtrlSave</title>
-    <link rel="stylesheet" type="text/css" href="../assets/css/sideBar.css">
-    <link rel="icon" href="Imgs/ ">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CtrlSave</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nanum+Myeongjo&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-        body {
+        body,
+        html {
             background-color: #44B87D;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            /* prevent page scroll */
         }
 
         h2 {
-            font-family: "Roboto", sans-serif;
-            font-weight: 500;
-            font-size: clamp(2rem, 1vw, 1rem);
-            color: #ffff;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
             text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        nav {
+            background-color: white;
+            padding: 1rem;
+        }
+
+        .main-container {
+            height: calc(100vh - 120px);
+            /* full height minus nav + buttons */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .expense-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 15px;
+        }
+
+        .expense-option {
+            background-color: white;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid #ccc;
+        }
+
+        .expense-option input[type="checkbox"] {
+            accent-color: #F6D25B;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .expense-label {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .expense-icon {
+            width: 24px;
+            height: 20px;
         }
 
         .btn {
@@ -35,8 +87,26 @@
             border-radius: 8px;
             margin-top: 40px;
         }
-    </style>
 
+        .btn:hover {
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        .bottom-actions {
+            padding-bottom: 20px;
+        }
+
+        @media screen and (max-width: 480px) {
+            h2 {
+                font-size: 2rem;
+            }
+
+            .expense-icon {
+                width: 38px;
+                height: 32px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -44,28 +114,62 @@
     <!-- Navigation Bar -->
     <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow">
         <div class="d-flex align-items-center gap-2 mt-4">
-            <a href="../pages/signUp.html"><img src="../assets/img/loginSignup/Back.png" alt="App Icon" /></a>
+            <a href="../pages/balance.html"><img src="../assets/img/loginSignup/Back.png" alt="App Icon" /></a>
         </div>
     </nav>
 
-    <!-- Cash Balance -->
-    <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5">
-        <div class="row main-row">
+    <!-- Main Content -->
+    <div class="container-fluid d-flex flex-column justify-content-between main-container">
 
+        <div class="row">
             <div class="col-12 title">
-                <h2>Set up your cash<br>balance</h2>
+                <h2>What are your<br>expenses right now?</h2>
             </div>
-
-
-            <div class="col-12 btNext mt-5 d-flex justify-content-center align-items-center">
-                <a href="../pages/pickExpense.html"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
-            </div>
-
-            <div class="col-12 mb-3 noAccount d-flex justify-content-center align-items-center">
-                <a href="../pages/pickExpense.html" class="signupLink" style="color: #141313;">Skip</a>
-            </div>
-
         </div>
+
+        <!-- Scrollable Expense Section -->
+        <div class="row expense-scroll">
+            <div class="col-12">
+                <div class="expense-option">
+                    <label class="expense-label"><input type="checkbox" /> Dining Out</label>
+                    <img src="../assets/img/loginSignup/dining_Icon.png" alt="Dining" class="expense-icon" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="expense-option">
+                    <label class="expense-label"><input type="checkbox" /> Electricity</label>
+                    <img src="../assets/img/loginSignup/electricity_Icon.png" alt="Electricity" class="expense-icon" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="expense-option">
+                    <label class="expense-label"><input type="checkbox" /> Groceries</label>
+                    <img src="../assets/img/loginSignup/grocery_Icon.png" alt="Groceries" class="expense-icon" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="expense-option">
+                    <label class="expense-label"><input type="checkbox" /> Rent</label>
+                    <img src="../assets/img/loginSignup/rent_Icon.png" alt="Rent" class="expense-icon" />
+                </div>
+            </div>
+
+            <div class="col-12">
+
+                <div class="expense-option justify-content-start">
+                    <a href="" style="color: #44B87D"><span class="expense-label">Add more...</span></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons at Bottom -->
+        <div class="col-12 d-flex justify-content-center">
+           <a href=""><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
