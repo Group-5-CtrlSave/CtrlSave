@@ -16,9 +16,55 @@
             background-color: #77D09A;
         }
 
-        h5 {
-            margin-top: 20px;
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: white;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .tab-buttons button {
+            padding: 8px 16px;
+            border: 2px solid #FFC727;
+            border-radius: 20px;
+            background-color: white;
+            color: #FFC727;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-buttons button.active {
+            background-color: #FFC727;
+            color: white;
+            border-color: #FFC727;
+        }
+
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .challenge-item {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 
@@ -103,81 +149,64 @@
         </div>
     </div>
 
-    <div class="container-fluid">
-        <div class="row main-row">
-
-            <!-- Categories -->
-            <div class="col-12">
-                <div class="d-flex justify-content-center gap-2 py-3">
-                    <button class="btn btn-warning fw-bold rounded-pill px-3">Daily & Weekly</button>
-                    <button class="btn btn-outline-warning fw-bold rounded-pill px-3">Saving Challenge</button>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="col-12">
-                <div class="container px-3 pb-4">
-                    <!-- Daily Saving Challenge -->
-                    <h5 class="fw-bold text-white">Daily Saving Challenge</h5>
-                    <div class="bg-white rounded-4 p-3 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Login to CtrlSave</span>
-                            <button class="btn btn-warning btn-sm fw-bold rounded-pill px-3">Claim</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Save ₱5 to saving challenge</span>
-                            <button class="btn btn-warning btn-sm fw-bold rounded-pill px-3">Claim</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>No-coffee spend day</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Save ₱40 to saving challenge</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>1-day no fast-food spend</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>Read financial tip for today</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Saving Challenge -->
-                    <h5 class="fw-bold text-white">Weekly Saving Challenge</h5>
-                    <div class="bg-white rounded-4 p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Save 500 for the week</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Log 5 expenses</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Login to CtrlSave for a week</span>
-                            <button class="btn btn-warning btn-sm fw-bold rounded-pill px-3">Claim</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>Complete one row in saving challenge</span>
-                            <button class="btn btn-outline-warning btn-sm fw-bold rounded-pill px-3">In
-                                Progress</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    <header>
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="daily">Daily & Weekly</button>
+            <button class="tab-btn" data-tab="saving">Saving Challenge</button>
         </div>
-    </div>
+    </header>
+
+    <!-- Daily & Weekly Section -->
+    <section id="daily" class="tab-content active">
+        <h3>Daily Saving Challenge</h3>
+        <div class="challenge-item">Login to CtrlSave <button>Claim</button></div>
+        <div class="challenge-item">Save ₱5 to saving challenge <button>In Progress</button></div>
+        <div class="challenge-item">No-coffee spend day <button>In Progress</button></div>
+        <div class="challenge-item">Save ₱40 to saving challenge <button>In Progress</button></div>
+        <div class="challenge-item">1-day no fast-food spend <button>In Progress</button></div>
+        <div class="challenge-item">Read financial tip for today <button>In Progress</button></div>
+
+        <h3>Weekly Saving Challenge</h3>
+        <div class="challenge-item">Save 500 for the week <button>In Progress</button></div>
+        <div class="challenge-item">Log 5 expenses <button>In Progress</button></div>
+        <div class="challenge-item">Login to CtrlSave for a week <button>Claim</button></div>
+        <div class="challenge-item">Complete one row in saving challenge <button>In Progress</button></div>
+    </section>
+
+    <!-- Saving Challenge Section -->
+    <section id="saving" class="tab-content">
+        <h3>Saving Challenge</h3>
+        <div style="text-align: center;">
+            <div style="font-size: 50px;">🪙</div>
+            <div>5/200</div>
+            <div>Lvl. 1</div>
+            <p>Click the circle to mark</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center;">
+            <button>5</button> <button>10</button> <button>20</button> <button>10</button> <button>5</button>
+            <button>20</button> <button>5</button> <button>10</button> <button>5</button> <button>20</button>
+            <button>10</button> <button>5</button> <button>20</button> <button>10</button> <button>5</button>
+        </div>
+    </section>
+
+    <script>
+        const buttons = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all buttons
+                buttons.forEach(b => b.classList.remove('active'));
+                // Hide all sections
+                contents.forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked button
+                btn.classList.add('active');
+                // Show corresponding section
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
