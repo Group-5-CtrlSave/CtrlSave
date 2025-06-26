@@ -1,0 +1,235 @@
+/* Landing Page - Kissy */
+
+body {
+    min-height: 100vh;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    font-family: Roboto, sans-serif;
+}
+
+.wave.top {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 38%;
+    background: url('../img/landing&ads/topImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.wave.bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 35%;
+    background: url('../img/landing&ads/bottomImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.logo {
+    width: 300px;
+    height: auto;
+    margin-right: 0;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+}
+
+.content img[src="assets\img\landing&ads\iconTitle.png"] {
+    max-width: 200px;
+    height: auto;
+    margin: 0 20px;
+}
+
+@media (max-width: 428px) {
+
+    .wave.top,
+    .wave.bottom {
+        height: 38%;
+    }
+
+    .content {
+        flex-direction: column;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .logo {
+        width: 120px;
+        height: 120px;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .content img[src="assets\img\landing&ads\iconTitle.png"] {
+        max-width: 100px;
+        margin: 0 10px;
+    }
+}
+
+/* Samsung Galaxy S8+ */
+@media (width: 360px) and (height: 740px) {
+    .wave.top {
+        height: 40%;
+    }
+
+    .wave.bottom {
+        height: 35%;
+    }
+
+    .content {
+        padding: 0 15px;
+    }
+
+    .logo {
+        width: 100px;
+        height: auto;
+    }
+
+    .content img[src="assets/imgs/iconTitle.png"] {
+        max-width: 180px;
+        margin: 0 20px;
+    }
+}
+
+/* ADS */
+.wave {
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    background: url('../img/landing&ads/centerImg.png') no-repeat center;
+    background-size: cover;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    z-index: 1;
+}
+
+.woman-img {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 50px;
+    margin-top: -40px;
+    text-align: center;
+}
+
+.woman-img img {
+    width: 300px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.step-text {
+    font-size: 60px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #ffffff;
+    margin-top: -40px;
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 5px;
+    max-width: 80%;
+    margin-top: -15px;
+}
+
+.next-btn {
+    background-color: #F6D25B;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: black;
+    text-align: center;
+    width: 150px;
+    font-size: clamp(1.5rem, 2vw, 1rem);
+    font-weight: bold;
+    font-family: "Roboto", sans-serif;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 40px;
+    z-index: 2;
+    text-decoration: none;
+    border: none;
+}
+
+.next-btn:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+@media (max-width: 428px) {
+    .content {
+        justify-content: center;
+    }
+
+    .woman-img {
+        margin-top: -30px;
+    }
+
+    .woman-img img {
+        width: 250px;
+    }
+
+    .step-text {
+        font-size: 1.6rem;
+        margin-top: -40px;
+        margin-bottom: 30px;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        margin-top: -7px;
+        margin-bottom: 12px;
+    }
+
+    .next-btn {
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        bottom: 15px;
+    }
+}
+
+@media (min-width: 429px) and (max-width: 768px) {
+    .content {
+        justify-content: center;
+    }
+
+    .woman-img {
+        margin-top: -35px;
+    }
+
+    .woman-img img {
+        width: 280px;
+    }
+
+    .step-text {
+        font-size: 1.8rem;
+        margin-top: -45px;
+        margin-bottom: 40px;
+    }
+
+    .description {
+        font-size: 1rem;
+        margin-top: -5px;
+        margin-bottom: 32px;
+    }
+
+    .next-btn {
+        font-size: 1.2rem;
+    }
+}
