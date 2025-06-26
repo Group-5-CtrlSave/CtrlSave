@@ -7,79 +7,105 @@
   <title>Home Page</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/home.css">
-  <link rel="stylesheet" href="../assets/css/sideBar.css">
-  <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
+  <link rel="stylesheet" href="../../assets/css/home.css">
+  <link rel="stylesheet" href="../../assets/css/sideBar.css">
+  <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
 </head>
 
 <body>
-
-  <!-- Navigation Bar -->
-  <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow">
-    <button class="fs-2 d-md-none text-success border-0 bg-transparent" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">&#9776;</button>
-    <div class="d-flex align-items-center gap-2">
-      <img src="../assets/imgs/ctrlsaveIcon.png" alt="App Icon" />
-    </div>
-  </nav>
-
-    <!-- Side bar -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
-    <div class="offcanvas-body p-0" style="background-color: #77D09A;">
-
-      <!-- Side bar content -->
-      <div class="p-4 border-bottom bg-light shadow-sm">
-        <div class="d-flex align-items-center gap-3 mb-2">
-          <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
-            style="width: 48px; height: 48px; font-size: 1.25rem;">
-            JD
-          </div>
-          <div>
-            <p class="text-dark fw-semibold mb-0">John Doe</p>
-            <p class="text-muted small mb-0">john@example.com</p>
-          </div>
+ <!-- Navigation Bar -->
+    <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow sticky-top">
+        <button class="fs-2 d-md-none text-success border-0 bg-transparent" data-bs-toggle="offcanvas"
+            data-bs-target="#sidebar" aria-controls="sidebar">☰</button>
+        <div class="d-flex align-items-center gap-2">
+            <img src="../../assets/img/shared/navbar/ctrlsaveIcon.png" alt="App Icon" />
         </div>
-        <p class="small text-dark fw-medium mb-1">Level 0</p>
-        <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height: 8px;">
-          <div class="bg-warning rounded-pill" style="width: 40%; height: 8px;"></div>
-        </div>
-        <p class="text-muted mt-1 mb-3 small">40 XP / 100 XP</p>
-        <button class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
-      </div>
+    </nav>
 
-      <ul class="list-unstyled m-0 p-3">
-        <li><a href="index.html" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/homeIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Home</span></a></li>
-        <li><a href="IncomeExpense.html" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/i&eIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Income & Expense</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/savingsIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Savings</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/cointrolIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Cointrol</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/strategiesIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Saving Strategies</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/historyIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>History</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/notificationIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Notifications</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/challengesIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Challenge</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/profileIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Profile</span></a></li>
-        <li><a href="#" class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded hover-bg-green">
-          <img src="../assets/imgs/settingsIcon.png" class="me-2" style="width: 20px; height: 20px;" />
-          <span>Settings</span></a></li>
-      </ul>
+    <!-- Sidebar content-->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+        <div class="offcanvas-body p-0" style="background-color: #77D09A;">
+            <!-- Side bar content -->
+            <div class="p-4 border-bottom bg-light shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
+                        style="width: 48px; height: 48px; font-size: 1.25rem;">JD</div>
+                    <div>
+                        <p class="text-dark fw-semibold mb-0">John Doe</p>
+                        <p class="text-muted small mb-0">john@example.com</p>
+                    </div>
+                </div>
+                <p class="small text-dark fw-medium mb-1">Level 1</p>
+                <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height: 8px;">
+                    <div class="bg-warning rounded-pill" style="width: 30%; height: 8px;"></div>
+                </div>
+                <p class="text-muted mt-1 mb-3 small">30 XP / 100 XP</p>
+                <button class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
+            </div>
+
+            <ul class="list-unstyled m-0 p-3">
+                <li><a href="../../pages/home/home.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/homeIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Home</span></a></li>
+
+                <li><a href="../../pages/income&expenses/income&expenses.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/i&eIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Income & Expense</span></a></li>
+
+                <li><a href="../../pages/savings/saving1.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/savingsIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Savings</span></a></li>
+
+                <li><a href="../../pages/cointrol/cointrol.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/cointrolIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Cointrol</span></a></li>
+
+                <li><a href="../../pages/savingstrategies/savingstrat.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/strategiesIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Saving Strategies</span></a></li>
+
+                <li><a href="../../pages/history/history.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/historyIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>History</span></a></li>
+
+                <li><a href="../../pages/notification/notification.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/notificationIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Notifications</span></a></li>
+
+                <li><a href="../../pages/challenge/challengeMain.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/challengesIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Challenge</span></a></li>
+
+                <li><a href="../../pages/profile/profile.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/profileIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Profile</span></a></li>
+
+                <li><a href="../../pages/settings/settings.html"
+                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
+                        <img src="../../assets/img/shared/Sidebar/settingsIcon.png" class="me-2"
+                            style="width: 20px; height: 20px;" />
+                        <span>Settings</span></a></li>
+            </ul>
+        </div>
     </div>
-  </div>
 
   <!-- Page Background -->
   <div class="bg-green-custom min-vh-100 position-relative">
@@ -132,9 +158,9 @@
 
         <!-- Allowance Card -->
         <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 rounded shadow-sm"
-          style="width: 377px; height: 84px; background-color: #F3FEF5;">
+           style="width: 100%; max-width: 335px; height: 84px; background-color: #F3FEF5;">
           <div class="d-flex align-items-center">
-            <img src="../assets/imgs/allowance.png" alt="Allowance" style="width: 40px; height: 40px;" class="me-3">
+            <img src="../../assets/img/home/allowance.png" alt="Allowance" style="width: 40px; height: 40px;" class="me-3">
             <div>
               <div class="fw-semibold text-dark">Allowance</div>
               <div style="font-size: 0.85rem; color: #CCCCCC;">Note: Thanks mama</div>
@@ -148,9 +174,9 @@
 
         <!-- Electricity Card -->
         <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 rounded shadow-sm"
-          style="width: 377px; height: 84px; background-color: #F3FEF5;">
+           style="width: 100%; max-width: 335px; height: 84px; background-color: #F3FEF5;">
           <div class="d-flex align-items-center">
-            <img src="../assets/imgs/electricity.png" alt="Electricity" style="width: 40px; height: 40px;" class="me-3">
+            <img src="../../assets/img/home/electricity.png" alt="Electricity" style="width: 40px; height: 40px;" class="me-3">
             <div>
               <div class="fw-semibold text-dark">Electricity</div>
               <div style="font-size: 0.85rem; color: #CCCCCC;">Note: Meralco Bill Batangas</div>
@@ -164,9 +190,9 @@
 
         <!-- Dining Out Card -->
         <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 rounded shadow-sm"
-          style="width: 377px; height: 84px; background-color: #F3FEF5;">
+           style="width: 100%; max-width: 335px; height: 84px; background-color: #F3FEF5;">
           <div class="d-flex align-items-center">
-            <img src="../assets/imgs/dining-out.png" alt="Dining Out" style="width: 40px; height: 40px;" class="me-3">
+            <img src="../../assets/img/home/dining-out.png" alt="Dining Out" style="width: 40px; height: 40px;" class="me-3">
             <div>
               <div class="fw-semibold text-dark">Dining Out</div>
               <div style="font-size: 0.85rem; color: #CCCCCC;">Note: Eat in Jollibee</div>
@@ -180,9 +206,9 @@
 
         <!-- Transportation Card -->
         <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 rounded shadow-sm"
-          style="width: 377px; height: 84px; background-color: #F3FEF5;">
+           style="width: 100%; max-width: 335px; height: 84px; background-color: #F3FEF5;">
           <div class="d-flex align-items-center">
-            <img src="../assets/imgs/bus.png" alt="Transportation" style="width: 40px; height: 40px;" class="me-3">
+            <img src="../../assets/img/home/bus.png" alt="Transportation" style="width: 40px; height: 40px;" class="me-3">
             <div>
               <div class="fw-semibold text-dark">Transportation</div>
               <div style="font-size: 0.85rem; color: #CCCCCC;">Note: Pamasahe otw Manila</div>
@@ -196,9 +222,9 @@
 
         <!-- Scholarship Card -->
         <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 rounded shadow-sm"
-          style="width: 377px; height: 84px; background-color: #F3FEF5;">
+           style="width: 100%; max-width: 335px; height: 84px; background-color: #F3FEF5;">
           <div class="d-flex align-items-center">
-            <img src="../assets/imgs/scholar.png" alt="Scholarship" style="width: 40px; height: 40px;" class="me-3">
+            <img src="../../assets/img/home/scholar.png" alt="Scholarship" style="width: 40px; height: 40px;" class="me-3">
             <div>
               <div class="fw-semibold text-dark">Scholarship</div>
               <div style="font-size: 0.85rem; color: #CCCCCC;">Note: Thank you DOST</div>
@@ -227,7 +253,7 @@
       <div class="d-flex justify-content-center mt-4">
         <div class="recommendation-card p-3 position-relative">
           <div class="fw-semibold mb-2" style="color: #44B87D;">Recommendation</div>
-          <img src="../assets/imgs/InsiteBg.png" alt="Recommendation Image"
+          <img src="../../assets/img/home/InsiteBg.png" alt="Recommendation Image"
             style="width: 335px; height: 85px; border-radius: 10px;">
         </div>
       </div>
@@ -238,7 +264,7 @@
   <!-- Bottom Tab Navigation -->
   <div class="tab-bar d-flex justify-content-around align-items-center">
     <div class="tab-item text-center">
-      <img src="../assets/imgs/calculator.png" alt="Calculator" class="tab-icon">
+      <img src="../../assets/img/home/calculator.png" alt="Calculator" class="tab-icon">
       <div class="tab-label fw-bold">Calculator</div>
     </div>
 
@@ -249,7 +275,7 @@
     </div>
 
     <div class="tab-item text-center">
-      <img src="../assets/imgs/calendar.png" alt="Calendar" class="tab-icon">
+      <img src="../../assets/img/home/calendar.png" alt="Calendar" class="tab-icon">
       <div class="tab-label fw-bold">Calendar</div>
     </div>
   </div>
