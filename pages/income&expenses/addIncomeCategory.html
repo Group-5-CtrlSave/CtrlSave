@@ -64,44 +64,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        function categoryButton(catButton) {
-            const buttons = document.querySelectorAll('.categoryButton');
-
-            buttons.forEach(btn => btn.classList.remove('selected-category'));
-            catButton.classList.add('selected-category');
-
-            const incomeForm = document.getElementById('incomeForm')
-            incomeForm.classList.remove('d-none');
-            incomeForm.classList.add('d-block')
-
-            incomeForm.setAttribute('data-visible', 'true')
-        }
-
-        // Hide form when clicking outside of it or buttons
-        document.addEventListener('click', function (event) {
-            const form = document.getElementById('incomeForm');
-            const isFormVisible = form.getAttribute('data-visible') === 'true';
-
-            if (!isFormVisible) return;
-
-            const clickedInsideForm = document.getElementById('formContent').contains(event.target);
-            const clickedCategoryButton = event.target.closest('.categoryButton');
-
-            if (!clickedInsideForm && !clickedCategoryButton) {
-                form.classList.remove('d-block');
-                form.classList.add('d-none');
-                form.setAttribute('data-visible', 'false');
-
-                // Optional: remove selected-category from all buttons
-                document.querySelectorAll('.categoryButton').forEach(btn =>
-                    btn.classList.remove('selected-category')
-                );
-            }
-        });
-
-    </script>
-
+   
 </body>
 
 </html>

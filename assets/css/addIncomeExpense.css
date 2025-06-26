@@ -12,13 +12,12 @@ body {
 
 .categoryButton{
     border: none;
-    width: 120px;
+   
 }
 
 .categoryButton.selected-category{
     border-color: #FFD858 !important;
     border-style: solid;
-    border-radius: 20px;
     border-width: 3px;
 }
 .categoryPic{
