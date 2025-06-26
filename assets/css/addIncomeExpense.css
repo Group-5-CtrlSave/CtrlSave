@@ -6,5 +6,21 @@ body {
 
 .mainContainer {
     background-color: #F3F3F3;
-    height: 100dvh;
+    min-height: 100%;
+}
+
+.categoryPic{
+    width: 70px;
+    height: 100%;
+   
+}
+
+.categoryName{
+    font-size: 13px;
+    color: #44B87D;
+}
+
+.inputHover{
+    height: 430px;
+    background-color: #77D09A;
 }
