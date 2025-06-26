@@ -1,3 +1,7 @@
+body {
+     font-family: 'Roboto', sans-serif;
+}
+
 .bg-green-custom {
             background-color: #77D09A !important;
         }
