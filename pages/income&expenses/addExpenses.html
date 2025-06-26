@@ -66,7 +66,7 @@
                 </button>
             </div>
             <div class="col-4 d-flex justify-content-center align-items-center">
-                <a style="text-decoration: none;" href="addIncomeCategory.html">
+                <a style="text-decoration: none;" href="addExpensesCategory.html">
                     <div class="container p-0 mt-2 text-center">
                         <img class="img-fluid categoryPic" src="../../assets/img/income&expense/addIcon.png">
                         <p class="categoryName py-2"><b>Add More</b></p>
@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <div class="container-fluid d-flex flex-column justify-content-end align-items-end flex-grow-1 p-0 m-0 d-none"
+    <div class="container-fluid d-flex flex-column justify-content-end align-items-end p-0 m-0 d-none"
         id="incomeForm">
         <div class="container-fluid inputHover" id="formContent">
             <div class="container py-2">
@@ -106,7 +106,7 @@
             </div>
 
 
-            <div class="container py-5 text-center">
+            <div class="container py-2 text-center">
                 <button class="btn btn-lg btnSave"><b>Save</b></button>
             </div>
 
@@ -130,6 +130,8 @@
             const incomeForm = document.getElementById('incomeForm')
             incomeForm.classList.remove('d-none');
             incomeForm.classList.add('d-block')
+            incomeForm.classList.add('flex-grow-1')
+            incomeForm.classList.remove('flex-grow-1')
 
             incomeForm.setAttribute('data-visible', 'true')
         }

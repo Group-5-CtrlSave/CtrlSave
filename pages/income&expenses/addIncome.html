@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="stylesheet" href="../../assets/css/addIncomeExpense.css">
-    <link rel="icon" href="../../assets/imgs/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
 </head>
 
 <body>
@@ -115,6 +115,8 @@
             const incomeForm = document.getElementById('incomeForm')
             incomeForm.classList.remove('d-none');
             incomeForm.classList.add('d-block')
+            incomeForm.classList.add('flex-grow-1')
+            incomeForm.classList.remove('flex-grow-1')
 
             incomeForm.setAttribute('data-visible', 'true')
         }
