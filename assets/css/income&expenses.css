@@ -3,11 +3,12 @@
 
 body {
     font-family: "Roboto", sans-serif;
+    background-color: #77D09A !important;
 }
 
 .mainContainer {
     background-color: #77D09A;
-    height: 100dvh;
+    height: 90dvh;
 }
 
 .title {
