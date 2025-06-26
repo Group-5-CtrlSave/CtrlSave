@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    font-family: "Roboto", sans-serif;
+    color: #44B87D;
+
+}
+
+.mainContainer {
+    background-color: #F3F3F3;
+    height: 90dvh;
+}
+
+.btnSave{
+    background-color: #FFD858 !important;
+    border-radius: 20px;
+    min-width: 163px;
+}
+
+.forms{
+    border-color: #FFD858;
+}
