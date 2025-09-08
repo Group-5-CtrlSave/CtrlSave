@@ -55,7 +55,7 @@
                             style="width: 20px; height: 20px;" />
                         <span>History</span></a></li>
 
-                <li><a href="../../pages/notification/notification.html"
+                <li><a href="../../pages/notification/notification.php"
                         class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
                         <img src="../../assets/img/shared/sidebar/Notif_SB.png" class="me-2"
                             style="width: 20px; height: 20px;" />
