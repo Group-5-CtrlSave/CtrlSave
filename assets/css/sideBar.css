@@ -1,7 +1,3 @@
-.hover-bg-green:hover {
-  background-color: #3aa76e !important;
-}
-
 .bg-green-custom {
   background-color: #77D09A;
   width: 100%;
@@ -27,7 +23,12 @@ html, body {
   background-color: #77D09A;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
-  z-index: 1050;
+  z-index: 1;
+
+}
+ul li a:hover {
+  background-color: #3aa76e !important;
+  color: #fff !important;
 }
 
 #sidebar.show {
@@ -80,3 +81,4 @@ html, body {
   font-weight: bold;
   width: 100%;
 }
+
