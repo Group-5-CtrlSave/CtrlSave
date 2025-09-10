@@ -76,37 +76,37 @@
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/car.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/expense/Car.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/Money.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/income/Money.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/Rent.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/expense/Rent.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/phone.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/expense/Gift.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/clothes.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/expense/Clothes.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/Shopping.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/expense/Shopping.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
         <div class="col text-center">
           <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
-            <img src="../../assets/img/savings/savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
       </div>

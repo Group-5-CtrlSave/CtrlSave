@@ -31,7 +31,7 @@
 
         <div class="bg-white rounded-circle mx-auto mb-3 d-flex justify-content-center align-items-center position-relative"
             style="width: 140px; height: 140px;">
-            <img src="../../assets/img/savings/savings.png" alt="Piggy" style="width: 100px;">
+            <img src="../../assets/img/shared/categoriesup/Savings.png" alt="Piggy" style="width: 100px;">
             <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #F6D25B;">50%</div>
         </div>
 

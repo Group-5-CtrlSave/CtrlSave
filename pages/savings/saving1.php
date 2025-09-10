@@ -26,7 +26,7 @@
         <div class="d-flex align-items-center w-100">
           <div class="me-3 d-flex align-items-center justify-content-center rounded-circle"
             style="background-color: #F0f1f6; width: 50px; height: 50px;">
-            <img src="../../assets/img/savings/savings.png" alt="Piggy Bank" style="width: 30px; height: 30px;">
+            <img src="../../assets/img/shared/categories/Savings.png" alt="Piggy Bank" style="width: 30px; height: 30px;">
           </div>
           <div class="flex-grow-1">
             <p class="mb-0 fw-semibold text-dark text-truncate">Ipon ka gurl</p>
@@ -48,7 +48,7 @@
         <div class="d-flex align-items-center w-100">
           <div class="me-3 d-flex align-items-center justify-content-center rounded-circle"
             style="background-color: #F0f1f6; width: 50px; height: 50px;">
-            <img src="../../assets/img/savings/car.png" alt="House" style="width: 30px; height: 30px;">
+            <img src="../../assets/img/shared/categories/expense/Car.png" alt="House" style="width: 30px; height: 30px;">
           </div>
           <div class="flex-grow-1">
             <p class="mb-0 fw-semibold text-dark text-truncate">Car</p>
