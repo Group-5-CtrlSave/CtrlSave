@@ -74,7 +74,7 @@
             <a href="viewExpense.html" style="text-decoration: none; color:black"><div class="col-12">
                 <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
                     <div class="container categoryImgContainer p-1">
-                        <img class="img-fluid" src="../../assets/img/income&expense/diningIcon.png">
+                        <img class="img-fluid" src="../../assets/img/shared/categories/expense/Dining Out.png">
                     </div>
                     <div class="container categoryTextContainer p-1">
                         <p class="category m-0"><b>Dining Out</b></p>
@@ -94,7 +94,7 @@
             <div class="col-12">
                 <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
                     <div class="container categoryImgContainer p-1">
-                        <img class="img-fluid" src="../../assets/img/income&expense/transportationIcon.png">
+                        <img class="img-fluid" src="../../assets/img/shared/categories/expense/Transportation.png">
                     </div>
                     <div class="container categoryTextContainer p-1">
                         <p class="category m-0"><b>Transportation</b></p>
@@ -114,7 +114,7 @@
             <div class="col-12">
                 <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
                     <div class="container categoryImgContainer p-1">
-                        <img class="img-fluid" src="../../assets/img/income&expense/allowanceIcon.png">
+                        <img class="img-fluid" src="../../assets/img/shared/categories/income/Allowance.png">
                     </div>
                     <div class="container categoryTextContainer p-1">
                         <p class="category m-0"><b>Allowance</b></p>
