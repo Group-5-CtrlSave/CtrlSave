@@ -21,7 +21,6 @@
 
 /* === Profile Header === */
 .profile-header {
-    display: flex;
     align-items: center;
     gap: 1rem;
     width: 100%;
@@ -31,9 +30,8 @@
 .profile-image {
     width: clamp(3rem, 20%, 8rem);
     height: clamp(3rem, 20%, 8rem);
-    max-width: 6rem;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible;
     border: 0.125rem solid #2a622a;
     background: #aed9a2;
     flex: 0 0 auto;
@@ -196,28 +194,58 @@ select::-ms-expand {
 .btn.change-password:hover {
     background: #3a7f50;
 }
+
+@media (max-width: 480px) {
+    .profile-header {
+        flex-direction: row; 
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .profile-image {
+        width: 9rem !important;   
+        height: 9rem !important;
+        max-width: none !important;
+        flex-shrink: 0; 
+    }
+
+    .profile-names {
+        flex: 1; 
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: left;
+    }
+
+    .profile-names .form-group input,
+    .profile-names .form-group label {
+        font-size: 0.9rem; 
+    }
+}
 @media (max-width: 375px) {
    .profile-header {
         flex-direction: row; 
         align-items: center;
-        gap: 1.5rem;
+        gap: 1rem;
     }
+
     .profile-image {
-        width: 8rem !important;  
-        height: 8rem !important; 
-        max-width: none;
-        border-width: 0.2rem;
+        width: 9rem !important;   
+        height: 9rem !important;
+        max-width: none !important;
         flex-shrink: 0; 
     }
+
     .profile-names {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.25rem;
         text-align: left;
     }
+
     .profile-names .form-group input,
     .profile-names .form-group label {
-        font-size: 1rem;
+        font-size: 0.9rem; 
     }
 }

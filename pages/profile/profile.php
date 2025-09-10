@@ -27,27 +27,44 @@
         <div class="flex-grow-1 p-4">
             <h2 class="fs-2 fw-bold mb-4 text-white">User Profile</h2>
           <form aria-label="User profile form" novalidate onsubmit="handleFormSubmit(event)">
-                <section class="profile-header mb-3" aria-label="User information">
-                    <div class="profile-image" role="img" aria-label="profile">
-                        <img
-                            src= "../../assets/img/shared/profile_Pic.png"/>
-                    </div>
+           <section class="profile-header mb-3 row align-items-center flex-nowrap" aria-label="User information">
+<div class="col-5 col-sm-6 d-flex justify-content-center" style="margin-top: -140px; position: relative;">
+    <!-- Profile Image -->
+    <div class="profile-image text-center" role="img" aria-label="profile">
+        <img src="../../assets/img/shared/profile_Pic.png" 
+             class="img-fluid rounded-circle" 
+             alt="Profile picture" 
+             style="max-width: 180px; height: auto;"/>     
+    </div>
+
+    <!-- Badge (centered under profile image) -->
+    <div class="profile-badge" style="position: absolute; top: 150px; left: 50%; transform: translateX(-50%);">
+        <span class="badge bg-success px-3 py-2">Achievements:</span>
+        <div style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%)">
+        <img src="../../assets/img/challenge/sample badge.png" alt=" Badge" 
+             style="width: 50px; height: 70px;">
+    </div>
+    </div>
+</div>
+
+
+    <!-- Profile Names (Right side) -->
+    <div class="col-7 col-sm-6">
+        <div class="form-group mb-2">
+            <label for="firstName">First Name</label>
+            <input id="firstName" type="text" value="Cassy" autocomplete="given-name" required class="form-control form-control-sm" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" type="text" value="Mondragon" autocomplete="family-name" required class="form-control form-control-sm" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="userName">User Name</label>
+            <input id="userName" type="text" value="Casseyy" autocomplete="username" required class="form-control form-control-sm" />
+        </div>
+    </div>
+</section>
                     
-                    <div class="profile-names">
-                        <div class="form-group">
-                            <label for="firstName">First Name</label>
-                            <input id="firstName" type="text" value="Cassy" autocomplete="given-name" aria-required="true" required class="form-control" />
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name</label>
-                            <input id="lastName" type="text" value="Mondragon" autocomplete="family-name" aria-required="true" required class="form-control" />
-                        </div>
-                        <div class="form-group">
-                            <label for="userName">User Name</label>
-                            <input id="userName" type="text" value="Casseyy" autocomplete="username" aria-required="true" required class="form-control" />
-                        </div>
-                    </div>
-                </section>
 
                 <div class="form-group mb-3">
                     <label for="email">Email</label>
