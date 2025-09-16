@@ -13,22 +13,20 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: #ffffff;
+            background: white;
             position: relative;
             overflow: hidden;
-            font-family: Roboto, sans-serif;
         }
 
         .header {
             position: absolute;
-            top: 20px;
+            top: 50px;
             left: 0;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2;
-            background: rgba(255, 255, 255, 0.8);
         }
 
         .logo {
@@ -56,7 +54,6 @@
             height: 100vh;
             z-index: 2;
             padding: 0 20px;
-            color: #ffffff;
             top: 100px;
         }
 
@@ -64,15 +61,8 @@
             margin-top: 310px;
         }
 
-        .signUpWord {
-            font-family: "Roboto", sans-serif;
-            font-weight: 700;
-            font-size: clamp(1.5rem, 2vw, 1rem);
-            color: #ffffff;
-        }
-
         .label {
-            font-family: "Roboto", sans-serif;
+            font-family: "Poppins", sans-serif;
             font-weight: 500;
             font-size: clamp(1.3rem, 1vw, 1rem);
             color: #ffff;
@@ -81,6 +71,8 @@
         .form-control {
             border-color: #F6D25B;
             height: 50px;
+            font-family: "Roboto", sans-serif;
+            background-color: #F0F1F6;
         }
 
         .btn {
@@ -88,48 +80,64 @@
             color: black;
             text-align: center;
             width: 150px;
-            font-size: clamp(1.5rem, 2vw, 1rem);
+            font-size: clamp(1.3rem, 2vw, 1rem);
             font-weight: bold;
-            font-family: "Roboto", sans-serif;
+            font-family: "Poppins", sans-serif;
             border-radius: 30px;
+            cursor: pointer;
+            z-index: 2;
+            text-decoration: none;
+            border: none;
         }
 
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
-        .signupLink:hover {
-            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        .signupLink {
+            color: black;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            padding-bottom: 5px;
         }
+
     </style>
 </head>
 
 <body>
+    <!-- Logo -->
     <div class="header">
-        <img class="img-fluid" src="../../assets/img/login&signup/logo_big.png" alt="CtrlSave Logo" class="logo">
+        <img class="img-fluid" src="../../assets/img/shared/logoName_L.png" alt="CtrlSave Logo" class="logo">
     </div>
+
+    <!-- Bg Design -->
     <div class="wave"></div>
+
+    <!-- Content -->
     <div class="content">
         <div class="container-fluid formContent">
 
+            <!-- Email -->
             <div class="col-12 email mt-3">
-                <h5 class="label">Email/Username</h5>
+                <h5 class="label" style="font-family: Poppins, sans-serif;">Email/Username</h5>
                 <input type="text" class="form-control" placeholder="Email/Username" required>
             </div>
 
+            <!-- Password -->
             <div class="col-12 password mt-3 mb-3">
-                <h5 class="label">Password</h5>
+                <h5 class="label" style="font-family: Poppins, sans-serif;">Password</h5>
                 <input type="text" class="form-control" placeholder="Password" required>
             </div>
 
+            <!-- Button -->
             <div class="col-12 btnLogin mt-4 mb-2 d-flex justify-content-center align-items-center">
-                <a href="../../pages/home/home.html"><button type="submit"
-                        class="btn btn-warning mb-3">Login</button></a>
+                <a href="../home/home.php"><button type="submit" class="btn btn-warning mb-3">Login</button></a>
             </div>
 
+            <!-- Sign Up -->
             <div class="col-12 noAccount mt-1 d-flex justify-content-center align-items-center">
-                <h5 style="color: #ffff;">Don't have an account?</h5>&nbsp;<a href="signUp.html"
-                    class="signupLink" style="color: #141313;">Sign Up</a>
+                <h5 style="color: #ffff;">Don't have an account?</h5>&nbsp;<a href="../landing&ads/firstAd.html" class="signupLink"
+                    style="color: black;">Sign Up</a>
             </div>
 
         </div>

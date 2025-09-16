@@ -51,14 +51,18 @@
             margin-bottom: 40px;
             color: #ffffff;
             margin-top: -40px;
+            font-family: "Poppins", sans-serif;
+            font-size: clamp(2rem, 1vw, 1rem);
         }
 
         .description {
-            font-size: 0.9rem;
+            font-family: "Roboto", sans-serif;
+            font-size: clamp(1.3rem, 1vw, 1rem);
             color: #ffffff;
             margin-bottom: 5px;
             max-width: 80%;
-            margin-top: -15px;
+            margin-bottom: 30px;
+            margin-top: -30px;
         }
 
         .btn {
@@ -66,40 +70,20 @@
             color: black;
             text-align: center;
             width: 150px;
-            font-size: clamp(1.5rem, 2vw, 1rem);
+            font-size: clamp(1.3rem, 2vw, 1rem);
             font-weight: bold;
-            font-family: "Roboto", sans-serif;
+            font-family: "Poppins", sans-serif;
             border-radius: 30px;
-            margin-top: 3px;
+            cursor: pointer;
+            z-index: 2;
+            text-decoration: none;
+            border: none;
         }
 
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
-        @media (max-width: 428px) {
-            .content {
-                justify-content: center;
-            }
-
-            .step-text {
-                font-size: 1.6rem;
-                margin-top: -40px;
-                margin-bottom: 30px;
-            }
-
-            .description {
-                font-size: 0.9rem;
-                margin-top: -7px;
-                margin-bottom: 12px;
-            }
-
-            .next-btn {
-                font-size: 1.1rem;
-                padding: 8px 16px;
-                bottom: 15px;
-            }
-        }
     </style>
 </head>
 
@@ -110,10 +94,10 @@
             <img src="../../assets/img/login&signup/allset.png" alt="allset">
         </div>
         <div class="step-text">You're all set!</div>
-        <div class="description">Start your saving journey now</div>
+        <div class="description">You can now start your saving journey.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
-        <a href="../../pages/home/home.html"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+        <a href="../home/home.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
