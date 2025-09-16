@@ -12,8 +12,7 @@
 
     <style>
         body {
-            background-color: #77D09A;
-            font-family: "Roboto", sans-serif;
+            background-color: #44B87D;
         }
 
         header {
@@ -29,6 +28,7 @@
             justify-content: center;
             margin: 20px 0;
             align-items: center;
+            font-family: "Poppins", sans-serif;
         }
 
         .tab-buttons button {
@@ -36,15 +36,16 @@
             border: 2px solid #FFC727;
             border-radius: 20px;
             background-color: white;
-            color: #FFC727;
+            color: #000000ff;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease, transform 0.1s ease;
+            font-family: "Poppins", sans-serif;
         }
 
         .tab-buttons button.active {
             background-color: #FFC727;
-            color: white;
+            color: black;
             border-color: #FFC727;
         }
 
@@ -62,17 +63,20 @@
         }
 
         .challenge-card {
-            background: white;
+            background: #F0F1F6;
             border-radius: 15px;
             padding: 20px;
             margin: -15px 0;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 250px;
         }
 
         .challenge-card h3 {
             margin-bottom: 15px;
             color: #333;
             font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            font-size: clamp(1.2rem, 1vw, 1rem);
         }
 
         .challenge-item {
@@ -80,19 +84,23 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            background: #f5f5f5;
+            background: #ffff;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 10px;
             color: #44B87D;
             font-weight: bold;
+            border: 2px solid #F6D25B;
+            height: 80px;
+            font-weight: 600;
         }
 
         .challenge-item button.claim-btn {
             border: none;
             background-color: #ffc107;
-            color: white;
+            color: black;
+            font-weight: bold;
             padding: 5px 10px;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             transition: transform 0.1s ease, background-color 0.3s ease;
             width: 75px;
@@ -103,14 +111,15 @@
         }
 
         .challenge-item button.in-progress {
-            background-color: white;
-            color: #ffc107;
+            background-color: #F0F1F6;
+            color: black;
+            font-weight: 500;
             border: 2px solid #ffc107;
             cursor: default;
             font-size: 15px;
             width: 75px;
             text-align: center;
-            border-radius: 5px;
+            border-radius: 10px;
         }
     </style>
 
@@ -136,24 +145,21 @@
         <!-- Daily Saving Challenge Card -->
         <div class="challenge-card">
             <h3>Daily Saving Challenge</h3>
-            <div class="challenge-item">Login to CtrlSave <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">Save ₱5 to saving challenge <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">No-coffee spend day <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Save ₱40 to saving challenge <button class="in-progress">In Progress</button>
-            </div>
-            <div class="challenge-item">1-day no fast-food spend <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Read financial tip for today <button class="in-progress">In Progress</button>
+            <div class="row" style="overflow-x: scroll; height: 160px;">
+                <div class="challenge-item">Login to CtrlSave <button class="claim-btn">Claim</button></div>
+                <div class="challenge-item">Add ₱5 to saving challenge <button class="claim-btn">Claim</button></div>
+                <div class="challenge-item">No-coffee spend day <button class="in-progress">In Progress</button></div>
             </div>
         </div>
 
         <!-- Weekly Saving Challenge Card -->
-        <div class="challenge-card mt-5">
+        <div class="challenge-card mt-4">
             <h3>Weekly Saving Challenge</h3>
-            <div class="challenge-item">Save 500 this week <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Log 5 expenses <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Login to CtrlSave for a week <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">Complete one row in saving challenge <button class="in-progress">In
-                    Progress</button></div>
+            <div class="row" style="overflow-x: scroll; height: 160px;">
+                <div class="challenge-item">Save 500 this week <button class="in-progress">In Progress</button></div>
+                <div class="challenge-item">Log 5 expenses <button class="in-progress">In Progress</button></div>
+                <div class="challenge-item">Login to CtrlSave for a week <button class="claim-btn">Claim</button></div>
+            </div>
         </div>
     </section>
 
@@ -227,8 +233,8 @@
         });
 
         // Saving Challenge Logic
-        const savingAmounts = [5, 10, 20, 10, 5, 20, 5, 10, 5, 20, 10, 5, 20, 10, 5];
-        const targetAmount = 200;
+        const savingAmounts = [5, 10, 5, 10, 5, 20, 5, 10, 20, 10];
+        const targetAmount = 100;
         let totalSaved = 0;
 
         const grid = document.getElementById('savingGrid');
@@ -258,10 +264,10 @@
             const isClicked = savedState.clicked[index];
             if (isClicked) {
                 btn.style.backgroundColor = '#FFC727';
-                btn.style.color = 'white';
+                btn.style.color = 'black';
             } else {
                 btn.style.backgroundColor = 'white';
-                btn.style.color = '#333';
+                btn.style.color = 'black';
             }
 
             btn.addEventListener('click', () => {
@@ -272,12 +278,12 @@
                     totalSaved -= amt;
                     savedState.clicked[index] = false;
                     btn.style.backgroundColor = 'white';
-                    btn.style.color = '#333';
+                    btn.style.color = 'black';
                 } else {
                     totalSaved += amt;
                     savedState.clicked[index] = true;
                     btn.style.backgroundColor = '#FFC727';
-                    btn.style.color = 'white';
+                    btn.style.color = 'black';
                 }
 
                 savedState.total = totalSaved;
