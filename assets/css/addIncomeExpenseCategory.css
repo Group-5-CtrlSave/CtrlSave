@@ -6,17 +6,23 @@ body {
 
 }
 
+
+.navigationBarTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+}
+
 .mainContainer {
     background-color: #F3F3F3;
     height: 90dvh;
 }
 
 .btnSave{
-    background-color: #FFD858 !important;
+    background-color: #F6D25B !important;
     border-radius: 20px;
     min-width: 163px;
 }
 
 .forms{
-    border-color: #FFD858;
+    border-color: #F6D25B;
 }

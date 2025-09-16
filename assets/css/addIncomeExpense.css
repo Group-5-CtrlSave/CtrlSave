@@ -2,29 +2,37 @@
 
 body {
     font-family: "Roboto", sans-serif;
+    background-color: #F0F1F6;
     
 }
 
+.navigationBarTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+}
+
 .mainContainer {
-    background-color: #F3F3F3;
-    height: 90dvh;
+    background-color: #F0F1F6;
 }
 
-.categoryButton{
-    border: none;
-   
+.scrollable-container{
+    height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.categoryButton.selected-category{
-    border-color: #FFD858 !important;
-    border-style: solid;
-    border-width: 3px;
-}
 .categoryPic{
-    width: 70px;
-    height: 100%;
+    border: none;
+    max-height: 70px;
    
 }
+
+.categoryPic.selected-category{
+    border-color: #F6D25B !important;
+    border-style: solid;
+    border-radius: 40px;
+}
+
 
 .categoryName{
     font-size: 13px;
@@ -32,9 +40,20 @@ body {
 }
 
 .inputHover{
-    background-color: #77D09A;
-    height: 400px;
+    background-color: #44B87D;
+    max-height: 400px;
     border-radius: 22px 22px 0px 0px;
+}
+
+.checkBox{
+    accent-color: #F6D25B;
+    height: 20px;
+    width: 20px;
+}
+.checkBoxLabel{
+    color: #F0F1F6;
+    font-weight: 700;
+    font-size: 20px;
 }
 
 .label{
@@ -43,7 +62,7 @@ body {
 }
 
 .btnSave{
-    background-color: #FFD858 !important;
+    background-color: #F6D25B !important;
     border-radius: 20px;
     min-width: 163px;
 }
