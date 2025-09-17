@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: #44B87D !important;
+
+}
+
+.navigationBarTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+}
+
+
+.mainContainer {
+    background-color: #44B87D;
+    min-height: 75dvh;
+
+}
+
+.categoryImage {
+    height: 100px;
+}
+
+.detailsContainer {
+    background-color: #f3f3f3;
+    border-radius: 20px;
+}
+
+.yesButton {
+    background-color: #F6D25B !important;
+    color: black !important;
+}
+
+
+.details {
+    color: #44B87D;
+    font-size: 24px;
+    font-weight: 600;
+}

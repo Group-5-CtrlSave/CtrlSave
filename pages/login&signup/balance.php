@@ -17,8 +17,8 @@
         }
 
         h2 {
-            font-family: "Roboto", sans-serif;
-            font-weight: 500;
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
             font-size: clamp(2rem, 1vw, 1rem);
             color: #ffff;
             text-align: center;
@@ -26,19 +26,18 @@
 
         .desc {
             font-family: "Roboto", sans-serif;
-            font-weight: 300;
-            font-size: clamp(1rem, 1vw, 1rem);
+            font-size: clamp(1.3rem, 1vw, 1rem);
             color: #ffff;
             text-align: center;
         }
 
         .form-control {
-            border-color: #F6D25B;
+            border: 2px solid #F6D25B;
             height: 60px;
-            width: 200px;
+            width: 230px;
             text-align: center;
             font-size: clamp(1.5rem, 1vw, 1rem);
-            color: #44B87D;
+            background-color: #F0F1F6;
         }
 
         .btn {
@@ -46,17 +45,26 @@
             color: black;
             text-align: center;
             width: 150px;
-            font-size: clamp(1.5rem, 2vw, 1rem);
+            font-size: clamp(1.3rem, 2vw, 1rem);
             font-weight: bold;
-            font-family: "Roboto", sans-serif;
+            font-family: "Poppins", sans-serif;
             border-radius: 30px;
-            margin-top: 40px;
+            cursor: pointer;
+            z-index: 2;
+            text-decoration: none;
+            border: none;
         }
 
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
+        .skipLink {
+            color: black;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            padding-bottom: 5px;
+        }
 
     </style>
 
@@ -64,36 +72,45 @@
 
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative"
-    style="height: 72px;">
-    <a href="currencyLanguage.html" class="text-decoration-none">
-      <img src="../../assets/img/savings/backIcon.png" alt="Back" style="width: 32px;">
-    </a>
-  </nav>
+    <!-- No Logo Navigation Bar -->
+    <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative shadow"
+        style="height: 72px;">
+        <a href="currencyLanguage.php" class="text-decoration-none">
+            <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 32px;">
+        </a>
+        <h5 class="position-absolute start-50 translate-middle-x m-0 fw-bold text-dark"
+            style="font-family: Poppins, sans-serif;">
+            Set Balance
+        </h5>
+    </nav>
 
     <!-- Cash Balance -->
     <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5">
         <div class="row main-row">
 
+            <!-- Title -->
             <div class="col-12 title">
                 <h2>Set up your cash<br>balance</h2>
             </div>
 
+            <!-- Description -->
             <div class="col-12 desc mt-3 mb-4">
                 <p>How much cash do you have in<br>your wallet right now?</p>
             </div>
-
+            
+            <!-- Form -->
             <div class="col-12 amount mt-5 mb-5 d-flex justify-content-center align-items-center">
-                <input type="number" placeholder="&#8369" class="form-control" style="color: #44B87D">
+                <input type="number" placeholder="&#8369" class="form-control" style="color: #000000">
             </div>
 
+            <!-- Button -->
             <div class="col-12 btNext mt-5 d-flex justify-content-center align-items-center">
-                <a href="pickExpense.html"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+                <a href="pickExpense.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
             </div>
 
+            <!-- Skip Button -->
             <div class="col-12 mb-3 noAccount d-flex justify-content-center align-items-center">
-                <a href="pickExpense.html" class="signupLink" style="color: #141313;">Skip</a>
+                <a href="pickExpense.php" class="skipLink" style="color: #141313;">Skip</a>
             </div>
 
         </div>

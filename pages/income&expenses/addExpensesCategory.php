@@ -4,44 +4,61 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CtrlSave | Add Income Category</title>
+    <title>CtrlSave | Add Expense Category</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="stylesheet" href="../../assets/css/addIncomeExpenseCategory.css">
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
 </head>
 
 <body>
-    <!-- Navigation Bar -->
+     <!-- Navigation Bar -->
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
-                <a href="addIncome.html">
-                    <img class="img-fluid" src="../../assets/img/income&expense/back.png" alt="Back"
+                <a href="income&expenses.php">
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
                         style="height: 24px;" />
                 </a>
             </div>
 
 
             <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center">Add Category</h2>
+                <h2 class="m-0 text-center">Add Expense Category</h2>
             </div>
 
         </div>
-
-
     </nav>
 
     <!-- Content -->
 
     <div class="container-fluid mainContainer">
         <div class="container text-center py-3">
-            <h4 class="title"><b>Add more income category</b></h4>
+            <h4 class="title"><b>Add more expenses category</b></h4>
         </div>
         <div class="container my-3 ">
             <label class="form-check-label" for="categoryName"><b>Enter Category Name:</b></label>
             <input type="text" class="form-control form-control-lg forms" id="categoryName" placeholder="e.g Entertainment">
         </div>
+        <div class="container my-3 ">
+            <label class="form-check-label" for="percentage"><b>Target Limit:</b></label>
+            <input type="text" class="form-control form-control-lg forms" id="targetlimit" placeholder="e.g 25% / 2,000 PHP">
+        </div>
+        <div class="container my-3">
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="category" id="needs" value="needs">
+                <label class="form-check-label" for="needs">
+                    Needs
+                </label>
+            </div>
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="category" id="wants" value="wants">
+                <label class="form-check-label" for="wants">
+                    Wants
+                </label>
+            </div>
+        </div>
+
         <div class="container my-3">
             <label class="form-check-label" for="icon">Choose Icon</label>
             <select class="form-select form-select-lg forms">
@@ -64,7 +81,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-   
+    
+
 </body>
 
 </html>

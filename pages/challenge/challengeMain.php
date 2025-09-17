@@ -12,8 +12,7 @@
 
     <style>
         body {
-            background-color: #77D09A;
-            font-family: "Roboto", sans-serif;
+            background-color: #44B87D;
         }
 
         header {
@@ -29,6 +28,7 @@
             justify-content: center;
             margin: 20px 0;
             align-items: center;
+            font-family: "Poppins", sans-serif;
         }
 
         .tab-buttons button {
@@ -36,15 +36,16 @@
             border: 2px solid #FFC727;
             border-radius: 20px;
             background-color: white;
-            color: #FFC727;
+            color: #000000ff;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease, transform 0.1s ease;
+            font-family: "Poppins", sans-serif;
         }
 
         .tab-buttons button.active {
             background-color: #FFC727;
-            color: white;
+            color: black;
             border-color: #FFC727;
         }
 
@@ -62,17 +63,20 @@
         }
 
         .challenge-card {
-            background: white;
+            background: #F0F1F6;
             border-radius: 15px;
             padding: 20px;
             margin: -15px 0;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 250px;
         }
 
         .challenge-card h3 {
             margin-bottom: 15px;
             color: #333;
             font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            font-size: clamp(1.2rem, 1vw, 1rem);
         }
 
         .challenge-item {
@@ -80,19 +84,23 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            background: #f5f5f5;
+            background: #ffff;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 10px;
             color: #44B87D;
             font-weight: bold;
+            border: 2px solid #F6D25B;
+            height: 80px;
+            font-weight: 600;
         }
 
         .challenge-item button.claim-btn {
             border: none;
             background-color: #ffc107;
-            color: white;
+            color: black;
+            font-weight: bold;
             padding: 5px 10px;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             transition: transform 0.1s ease, background-color 0.3s ease;
             width: 75px;
@@ -103,14 +111,15 @@
         }
 
         .challenge-item button.in-progress {
-            background-color: white;
-            color: #ffc107;
+            background-color: #F0F1F6;
+            color: black;
+            font-weight: 500;
             border: 2px solid #ffc107;
             cursor: default;
             font-size: 15px;
             width: 75px;
             text-align: center;
-            border-radius: 5px;
+            border-radius: 10px;
         }
     </style>
 
@@ -118,98 +127,10 @@
 
 <body>
     <!-- Navigation Bar -->
-     <nav class="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow" style="height: 72px;">
-     <button class="fs-2 d-md-none text-success border-0 bg-transparent" data-bs-toggle="offcanvas"
-      data-bs-target="#sidebar" aria-controls="sidebar">☰</button>
-    <div class="d-flex align-items-center gap-2">
-      <img src="../../assets/img/shared/ctrlsaveLogo.png" style="width: 40px;" alt="App Icon" />
-    </div>
-  </nav>
-
+    <?php include("../../assets/shared/navigationBar.php") ?>
     <!-- Sidebar content-->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
-        <div class="offcanvas-body p-0" style="background-color: #77D09A;">
-            <!-- Side bar content -->
-            <div class="p-4 border-bottom bg-light shadow-sm">
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
-                        style="width: 48px; height: 48px; font-size: 1.25rem;">JD</div>
-                    <div>
-                        <p class="text-dark fw-semibold mb-0">John Doe</p>
-                        <p class="text-muted small mb-0">john@example.com</p>
-                    </div>
-                </div>
-                <p class="small text-dark fw-medium mb-1">Level 1</p>
-                <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height: 8px;">
-                    <div class="bg-warning rounded-pill" style="width: 30%; height: 8px;"></div>
-                </div>
-                <p class="text-muted mt-1 mb-3 small">30 XP / 100 XP</p>
-                <button onclick="location.href='../login&signup/login.html'" class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
-            </div>
+    <?php include("../../assets/shared/sideBar.php") ?>
 
-            <ul class="list-unstyled m-0 p-3">
-                <li><a href="../../pages/home/home.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/homeIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Home</span></a></li>
-
-                <li><a href="../../pages/income&expenses/income&expenses.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/i&eIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Income & Expense</span></a></li>
-
-                <li><a href="../../pages/savings/saving1.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/savingsIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Savings</span></a></li>
-
-                <li><a href="../../pages/cointrol/cointrol.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/cointrolIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Cointrol</span></a></li>
-
-                <li><a href="../../pages/savingstrategies/savingstrat.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/strategiesIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Saving Strategies</span></a></li>
-
-                <li><a href="../../pages/history/history.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/historyIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>History</span></a></li>
-
-                <li><a href="../../pages/notification/notification.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/notificationIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Notifications</span></a></li>
-
-                <li><a href="../../pages/challenge/challengeMain.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/challengesIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Challenge</span></a></li>
-
-                <li><a href="../../pages/profile/profile.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/profileIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Profile</span></a></li>
-
-                <li><a href="../../pages/settings/settings.html"
-                        class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded">
-                        <img src="../../assets/img/shared/Sidebar/settingsIcon.png" class="me-2"
-                            style="width: 20px; height: 20px;" />
-                        <span>Settings</span></a></li>
-            </ul>
-        </div>
-    </div>
 
     <!-- Categories -->
     <header>
@@ -224,24 +145,21 @@
         <!-- Daily Saving Challenge Card -->
         <div class="challenge-card">
             <h3>Daily Saving Challenge</h3>
-            <div class="challenge-item">Login to CtrlSave <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">Save ₱5 to saving challenge <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">No-coffee spend day <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Save ₱40 to saving challenge <button class="in-progress">In Progress</button>
-            </div>
-            <div class="challenge-item">1-day no fast-food spend <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Read financial tip for today <button class="in-progress">In Progress</button>
+            <div class="row" style="overflow-x: scroll; height: 160px;">
+                <div class="challenge-item">Login to CtrlSave <button class="claim-btn">Claim</button></div>
+                <div class="challenge-item">Add ₱5 to saving challenge <button class="claim-btn">Claim</button></div>
+                <div class="challenge-item">No-coffee spend day <button class="in-progress">In Progress</button></div>
             </div>
         </div>
 
         <!-- Weekly Saving Challenge Card -->
-        <div class="challenge-card mt-5">
+        <div class="challenge-card mt-4">
             <h3>Weekly Saving Challenge</h3>
-            <div class="challenge-item">Save 500 this week <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Log 5 expenses <button class="in-progress">In Progress</button></div>
-            <div class="challenge-item">Login to CtrlSave for a week <button class="claim-btn">Claim</button></div>
-            <div class="challenge-item">Complete one row in saving challenge <button class="in-progress">In
-                    Progress</button></div>
+            <div class="row" style="overflow-x: scroll; height: 160px;">
+                <div class="challenge-item">Save 500 this week <button class="in-progress">In Progress</button></div>
+                <div class="challenge-item">Log 5 expenses <button class="in-progress">In Progress</button></div>
+                <div class="challenge-item">Login to CtrlSave for a week <button class="claim-btn">Claim</button></div>
+            </div>
         </div>
     </section>
 
@@ -315,8 +233,8 @@
         });
 
         // Saving Challenge Logic
-        const savingAmounts = [5, 10, 20, 10, 5, 20, 5, 10, 5, 20, 10, 5, 20, 10, 5];
-        const targetAmount = 200;
+        const savingAmounts = [5, 10, 5, 10, 5, 20, 5, 10, 20, 10];
+        const targetAmount = 100;
         let totalSaved = 0;
 
         const grid = document.getElementById('savingGrid');
@@ -346,10 +264,10 @@
             const isClicked = savedState.clicked[index];
             if (isClicked) {
                 btn.style.backgroundColor = '#FFC727';
-                btn.style.color = 'white';
+                btn.style.color = 'black';
             } else {
                 btn.style.backgroundColor = 'white';
-                btn.style.color = '#333';
+                btn.style.color = 'black';
             }
 
             btn.addEventListener('click', () => {
@@ -360,12 +278,12 @@
                     totalSaved -= amt;
                     savedState.clicked[index] = false;
                     btn.style.backgroundColor = 'white';
-                    btn.style.color = '#333';
+                    btn.style.color = 'black';
                 } else {
                     totalSaved += amt;
                     savedState.clicked[index] = true;
                     btn.style.backgroundColor = '#FFC727';
-                    btn.style.color = 'white';
+                    btn.style.color = 'black';
                 }
 
                 savedState.total = totalSaved;
