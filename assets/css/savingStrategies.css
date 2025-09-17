@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    background:  #77D09A;
+    background:  #44B87D;
     color: #333;
     line-height: 1.6;
     justify-content: center; 
@@ -25,7 +25,7 @@ header p.tagline {
     font-size: 1.5em;
     font-style: italic;
     margin: 10px 0 0;
-    color: #e1f5fe;
+    color: #ffffff;
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
 }
@@ -52,10 +52,10 @@ header p.tagline {
 }
 
 .section h2 {
-    color: #f5d15b;
+    color: #F6D25B;
     font-size: 1.8em;
     margin-bottom: 15px;
-    border-bottom: 2px solid #80deea;
+    border-bottom: 2px solid #44B87D;
     display: inline-block;
 }
 
@@ -81,7 +81,7 @@ header p.tagline {
 .video-caption {
     text-align: center;
     font-size: 1em;
-    color: #77D09A;
+    color: #44B87D;
     margin-top: 5px;
     margin-bottom: 15px;
     font-weight: bold;
@@ -108,7 +108,7 @@ header p.tagline {
 }
 
 .resource-card a {
-    color: #77D09A;
+    color: #44B87D;
     text-decoration: none;
     font-weight: bold;
 }
