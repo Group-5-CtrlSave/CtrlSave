@@ -6,7 +6,7 @@
 
 /* === Layout Background === */
 .bg-green-custom {
-    background: #77D09A;
+    background:#44B87D;
     border-radius: 0;
     width: 100%;
     min-height: 100vh;
@@ -138,7 +138,7 @@ select::-ms-expand {
 
 /* === Password Section === */
 .password-change-section {
-    border-top: 0.0625rem solid #a6d9a7;
+    border-top: 0.0625rem solid #ffffff;
     padding-top: 1rem;
     margin-bottom: 1rem;
 }
@@ -178,7 +178,7 @@ select::-ms-expand {
 }
 
 .btn.logout {
-    background: #f6cd4a;
+    background: #F6D25B;
     color: #1a1a1a;
 }
 
