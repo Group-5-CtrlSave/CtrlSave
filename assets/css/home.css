@@ -3,7 +3,7 @@
     }
 
     body {
-      background-color: #f3f4f6;
+      background-color: #F0F1F6;
     }
 
     .bg-green-custom {
@@ -15,7 +15,7 @@
     }
 
     .hover-bg-green:hover {
-      background-color: #3aa76e !important;
+      background-color: #44B87D !important;
     }
     #sidebar {
       position: fixed;
@@ -44,7 +44,7 @@
     }
 
     .balance-card {
-      background-color: #F3FEF5;
+      background-color: #F0F1F6;
       border-radius: 15px;
       padding: 1rem;
       margin: 1rem auto;
@@ -78,7 +78,7 @@
     }
 
     .summary-card {
-      background-color: #F3FEF5;
+      background-color: #F0F1F6;
       border-radius: 15px;
       padding: 1rem 1.5rem;
       max-width: 600px;
@@ -104,7 +104,7 @@
     .recommendation-card {
       width: 392px;
       height: 143px;
-      background-color: #F3FEF5;
+      background-color: #F0F1F6;
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
