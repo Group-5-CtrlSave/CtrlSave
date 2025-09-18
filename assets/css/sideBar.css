@@ -1,5 +1,5 @@
 .bg-green-custom {
-  background-color: #77D09A;
+  background-color: #44B87D;
   width: 100%;
 }
 
@@ -20,7 +20,7 @@ html, body {
   left: 0;
   width: 250px;
   height: 100vh;
-  background-color: #77D09A;
+  background-color: #44B87D;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   z-index: 1050;

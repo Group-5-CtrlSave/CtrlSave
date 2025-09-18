@@ -23,7 +23,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="bg-green-custom min-vh-100 p-3" style="background-color: #77D09A;">
+    <div class="bg-green-custom min-vh-100 p-3" style="background-color: #44B87D;">
         <div class="text-center mb-3">
             <h2 class="fs-5 fw-bold text-white">Car</h2>
             <p class="text-white mb-2">P 225,000 / P 225,000</p>
@@ -32,7 +32,7 @@
         <div class="bg-white rounded-circle mx-auto mb-3 d-flex justify-content-center align-items-center position-relative"
             style="width: 140px; height: 140px;">
             <img src="../../assets/img/shared/categories/expense/Car.png" alt="House" style="width: 100px;">
-        <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #F6D25B;">100%</div>
+        <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #000000ff;">100%</div>
         </div>
 
         <div class="text-center mb-4">
@@ -86,7 +86,7 @@
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow-lg" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4 border-0 shadow-lg" style="background-color: #44B87D;">
 
                 <!-- Modal Header -->
                 <div
@@ -133,7 +133,7 @@
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4" style="background-color: #44B87D;">
                 <div class="modal-header border-0 bg-white rounded-top">
                     <h5 class="modal-title fw-bold mx-auto" id="confirmDeleteModalLabel">Delete Goal</h5>
                 </div>
