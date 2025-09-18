@@ -44,7 +44,7 @@
   </style>
 </head>
 
-<body class="m-0 overflow-hidden" style="background-color: #77D09A; height: 100vh;">
+<body class="m-0 overflow-hidden" style="background-color: #44B87D; height: 100vh;">
   <!-- Navbar -->
   <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative"
     style="height: 72px;">
@@ -127,7 +127,7 @@
 <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-     <div class="modal-content rounded-4" style="background-color: #77D09A;">
+     <div class="modal-content rounded-4" style="background-color: #44B87D;">
 
       <!-- Modal Header -->
       <div class="modal-header bg-white">

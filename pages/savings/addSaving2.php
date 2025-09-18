@@ -9,7 +9,7 @@
   <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
   <style>
     body {
-      background-color: #77D09A;
+      background-color: #44B87D;
     }
 
     .input-wrapper {

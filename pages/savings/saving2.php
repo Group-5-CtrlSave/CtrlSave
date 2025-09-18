@@ -23,7 +23,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="bg-green-custom min-vh-100 p-3" style="background-color: #77D09A;">
+    <div class="bg-green-custom min-vh-100 p-3" style="background-color: #44B87D;">
         <div class="text-center mb-3">
             <h2 class="fs-5 fw-bold text-white">Ipon ka gurl</h2>
             <p class="text-white mb-2">P 12,500 / P 25,000</p>
@@ -32,7 +32,7 @@
         <div class="bg-white rounded-circle mx-auto mb-3 d-flex justify-content-center align-items-center position-relative"
             style="width: 140px; height: 140px;">
             <img src="../../assets/img/shared/categories/Savings.png" alt="Piggy" style="width: 100px;">
-            <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #F6D25B;">50%</div>
+            <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #000000ff;">50%</div>
         </div>
 
         <!-- Action Buttons -->
@@ -107,7 +107,7 @@
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow-lg" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4 border-0 shadow-lg" style="background-color: #44B87D;">
 
                 <!-- Modal Header -->
                 <div
@@ -153,7 +153,7 @@
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4" style="background-color: #44B87D;">
                 <div class="modal-header border-0 bg-white rounded-top">
                     <h5 class="modal-title fw-bold mx-auto" id="confirmDeleteModalLabel">Delete Goal</h5>
                 </div>
@@ -173,7 +173,7 @@
     <!-- Deposit Modal -->
     <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4" style="background-color: #44B87D;">
                 <div class="modal-header border-0 bg-white rounded-top">
                     <button type="button" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">
                     <img src="../../assets/img/shared/backArrow.png" alt="Back"  style="width: 24px; height: 24px;">
@@ -209,7 +209,7 @@
     <div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4" style="background-color: #77D09A;">
+            <div class="modal-content rounded-4" style="background-color: #44B87D;">
                 <div class="modal-header border-0 bg-white rounded-top">
                     <button type="button" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">
                     <img src="../../assets/img/shared/backArrow.png" alt="Back"  style="width: 24px; height: 24px;">
