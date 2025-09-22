@@ -1,0 +1,119 @@
+
+   body {
+      font-family: 'Poppins', sans-serif;
+      background:#44B87D;
+    }
+
+    .profile-card {
+      background: #faf9f6;
+      border-radius: 20px;
+      padding: 30px 20px;
+      max-width: 450px;
+      width: 95%;
+      margin: 30px auto 15px auto;
+      border: 2px solid #F6D25B; 
+    }
+
+    .profile-name {
+      font-weight: 700;
+      color: #2c2c2c;
+      margin-bottom: 15px;
+    }
+
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+
+    .profile-username {
+      color: #000;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .profile-bio {
+      color: #44B87D ;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+
+    .bio-label {
+      color: gray;
+      font-size: 0.8rem;
+    }
+
+    .profile-section {
+      margin-bottom: 15px;
+    }
+
+    .profile-label {
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 3px;
+    }
+
+    .profile-answer {
+      color: #44B87D;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .badge-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 5px;
+    }
+
+    .edit-btn {
+      background: #F6D25B;
+      color: black;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 10px 20px;
+      width: 250px;
+      max-width: 90%;
+      transition: 0.3s;
+    }
+
+    .edit-btn:hover {
+      background: #f5c32d;
+    }
+
+    .logout-btn {
+      background: #E63946;
+      color: #fff;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 10px 20px;
+      width: 250px;
+      max-width: 90%;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #e04343;
+    }
+    .button-wrapper {
+      margin-bottom: 30px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .profile-card {
+        max-width: 95%;
+        padding: 20px;
+      }
+
+      .profile-img {
+        width: 85px;
+        height: 85px;
+      }
+
+      .edit-btn,
+      .logout-btn {
+        width: 200px;
+      }
+    }
