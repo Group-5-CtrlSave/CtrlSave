@@ -1,0 +1,86 @@
+ body {
+      background-color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .page-title {
+      font-weight: 700;
+      color: #F6D25B;
+    }
+
+    .subtitle {
+      color: black;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: black;
+    }
+
+    .form-select,
+    .form-control {
+      background-color: #44B87D;
+      border: none;
+      border-radius: 15px;
+      color: #fff;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-select option {
+      color: black;
+    }
+
+    .form-control::placeholder {
+      color: #e6e6e6;
+    }
+
+    .btn-add {
+      background-color: #F6D25B;
+      color: black;
+      font-weight: 600;
+      width: 50%;
+      border-radius: 50px;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s;
+      margin: 0 auto;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    .btn-add:hover {
+      background-color: #ffe369;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 1rem;
+    }
+
+    .add-content-label {
+      color: #F6D25B;
+      font-weight: 600;
+    }
+
+    .main-container {
+      margin-top: 200px; 
+    }
+
+    @media (max-width: 576px) {
+      .page-title {
+        font-size: 1.2rem;
+      }
+
+      .btn-add {
+        padding: 0.65rem;
+        font-size: 1rem;
+      }
+
+      .main-container {
+        margin-top: 100px; 
+      }
+    }
