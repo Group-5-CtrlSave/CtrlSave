@@ -1,166 +1,205 @@
+/* General styles */
 body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background:  #44B87D;
-    color: #333;
-    line-height: 1.6;
-    justify-content: center; 
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #44B87D;
+  color: #333;
+  line-height: 1.6;
+  justify-content: center;
 }
 
 header {
-    text-align: center;
-    color: white;
+  position: fixed;
+  top: 100px; 
+  left: 0;
+  width: 100%;
+  background: #44B87D;
+  text-align: center;
+  color: white;
+  padding: 20px 10px;
+  z-index: 1000;
 }
 
 header h1 {
-    font-size: 2.5em;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
+  font-size: 2.2em;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
 }
 
 header p.tagline {
-    font-size: 1.5em;
-    font-style: italic;
-    margin: 10px 0 0;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
+  font-size: 1.2em;
+  font-style: italic;
+  margin-top: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  color: #fff;
 }
 
-.container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px;
-    width: 100%; 
+.content-scroll {
+  height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 50px;
+}
+
+
+.main-content {
+  margin-top: 50px; 
+  max-width: 1200px;
+  padding: 10px;
+  width: 100%;
 }
 
 .section {
-    background: white;
-    border-radius: 10px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
-    margin: 0 auto 30px auto;
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
 }
 
 .section:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .section h2 {
-    color: #F6D25B;
-    font-size: 1.8em;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #44B87D;
-    display: inline-block;
+  color: #F6D25B;
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #44B87D;
+  display: inline-block;
 }
 
 .video-container {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-    max-width: 100%;
-    background: #000;
-    border-radius: 8px;
-    margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  background: #000;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 .video-caption {
-    text-align: center;
-    font-size: 1em;
-    color: #44B87D;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+  color: #44B87D;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  font-weight: bold;
 }
 
+/* Resource cards */
 .resources {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
 }
 
 .resource-card {
-    background: #f0f1f5;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    margin: 0 auto;   
-     margin: 0 auto;   
+  background: #f0f1f5;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: background 0.3s;
 }
 
 .resource-card:hover {
-    background: #e0f7fa;
+  background: #e0f7fa;
 }
 
 .resource-card a {
-    color: #44B87D;
-    text-decoration: none;
-    font-weight: bold;
+  color: #44B87D;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .resource-card a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .resource-card p {
-    margin: 10px 0 0;
-    color: #666;
+  margin: 10px 0 0;
+  color: #666;
+}
+
+@media (max-width: 992px) {
+  header h1 {
+    font-size: 1.9em;
+  }
+  header p.tagline {
+    font-size: 1.1em;
+  }
+  .section {
+    padding: 25px;
+  }
 }
 
 @media (max-width: 768px) {
-    header h1 {
-        font-size: 2em;
-    }
+  header {
+    top: 70px;
+    padding: 15px 8px;
+  }
 
-    header p.tagline {
-        font-size: 1.2em;
-    }
+  header h1 {
+    font-size: 1.6em;
+  }
 
-    .section {
-        padding: 20px;
-    }
+  header p.tagline {
+    font-size: 0.95em;
+  }
 
-    .video-container {
-        max-width: 100%;
-    }
+  .main-content {
+    margin-top: 180px;
+    padding: 15px;
+  }
 
-    .video-caption {
-        font-size: 0.95em;
-    }
+  .section {
+    padding: 20px;
+  }
+
+  .video-caption {
+    font-size: 0.9em;
+  }
 }
 
-@media (min-width: 769px) {
-    .video-container {
-        max-width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.4em;
+  }
 
-@media (max-width: 400px) {
-    .container {
-        width: 95%;        
-        margin: 0 auto;    
-        padding: 15px;     
-    }
+  header p.tagline {
+    font-size: 0.85em;
+  }
 
-    .section {
-        width: 100%;
-        margin: 0 auto 20px auto; /
-    }
+  .main-content {
+    margin-top: 100px;
+    padding: 10px;
+  }
+
+  .section {
+    padding: 15px;
+  }
+
+  .resource-card {
+    padding: 15px;
+  }
+
+  .resource-card p {
+    font-size: 0.9em;
+  }
 }

@@ -1,0 +1,118 @@
+body {
+  background: #44B87D;
+  font-family: 'Poppins', sans-serif;
+}
+
+.container-box {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.profile-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.profile-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.profile-overlay i {
+  color: #fff;
+  font-size: 28px;
+}
+
+.achievements-btn {
+  background: #eee;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.form-label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 10px;
+  color: #fff;
+}
+
+.form-control,
+.form-select {
+  border-radius: 10px;
+  padding: 10px;
+  border: 2px solid #F6D25B !important;
+  background-color: white;
+  color: black;
+}
+
+.btn-save {
+  background: #F6D25B;
+  font-weight: bold;
+  color: #000;
+  border: none;
+  border-radius: 50px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.btn-save:hover {
+  background: #e0a800;
+}
+
+.password-section {
+  margin-top: 20px;
+  color: #fff;
+}
+
+.btn-password {
+  background: #E63946;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.btn-password:hover {
+  background: #b02a37;
+}
+
+.icon-option:hover img {
+  transform: scale(1.1);
+}
+
+.icon-option.selected {
+  border: 3px solid #F6D25B !important;
+}
+
+.badge-preview-container img {
+  margin-right: 5px;
+}
