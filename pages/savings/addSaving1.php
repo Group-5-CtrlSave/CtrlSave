@@ -41,6 +41,20 @@
     transform: scale(1.05);
   }
 
+  .icon-list::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  .icon-list {
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+
+  .icon-list::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  
   </style>
 </head>
 
@@ -56,16 +70,17 @@
     </h5>
   </nav>
 
-  <!-- Main Content -->
-  <div class="d-flex flex-column justify-content-between" style="height: calc(100vh - 72px);">
-    <div class="px-4 py-3 overflow-auto">
-      <p class="fw-bold text-white fs-5 mb-2">What’s your saving goal?</p>
-      <input type="text" class="form-control mb-4 rounded-3" placeholder="e.g. House"
-        style="height: 50px; font-size: 16px;">
+<!-- Main Content -->
+<div class="d-flex flex-column justify-content-between" style="height: calc(100vh - 72px); overflow: hidden;">
+  <div class="px-4 py-3" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+    <p class="fw-bold text-white fs-5 mb-2">What’s your saving goal?</p>
+    <input type="text" class="form-control mb-4 rounded-3" placeholder="e.g. House"
+      style="height: 50px; font-size: 16px;">
 
-      <p class="fw-bold text-white fs-5 mb-3">Pick an icon for your goal</p>
+    <p class="fw-bold text-white fs-5 mb-4">Pick an icon for your goal</p>
+    <div class="icon-list row row-cols-3 g-3 flex-grow-1 overflow-auto"
+     style="max-height: 100%; padding-bottom: 120px;">
 
-      <div class="row row-cols-3 g-3 icon-container">
         <div class="col text-center">
          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" 
             style="width: 80px; height: 80px; cursor: pointer;" 
@@ -109,6 +124,41 @@
             <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
           </div>
         </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col text-center">
+          <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;">
+            <img src="../../assets/img/shared/categories/Savings.png" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -122,7 +172,7 @@
       </a>
     </div>
   </div>
-  </div>
+</div>
    <!-- upload modal Modal -->
 <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel"
      aria-hidden="true">
