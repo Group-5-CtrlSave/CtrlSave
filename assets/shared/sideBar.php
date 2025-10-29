@@ -8,6 +8,13 @@
         <div>
           <p class="text-dark fw-semibold mb-0">John Doe</p>
           <p class="text-muted small mb-0">john@example.com</p>
+          <img src="../../assets/img/challenge/sample title.png" alt="User Badge" style="width: 50px; height: auto;">
+           <img src="../../assets/img/challenge/sample badge.png" alt="Starter Badge"
+             style="width: 16px; height: 16px; object-fit: contain;">
+          <img src="../../assets/img/challenge/sample badge2.png" alt="Saver Badge"
+              style="width: 16px; height: 16px; object-fit: contain;">
+          <img src="../../assets/img/challenge/sample badge3.png" alt="Goal Getter Badge"
+              style="width: 16px; height: 16px; object-fit: contain;">
         </div>
       </div>
       <p class="small text-dark fw-medium mb-1">Level 1</p>
