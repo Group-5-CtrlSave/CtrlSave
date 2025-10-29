@@ -5,133 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CtrlSave | Edit Profile</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/css/sideBar.css">
+  <link rel="stylesheet" href="../../assets/css/editProfile.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
-  <style>
-    body {
-      background: #44B87D;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .container-box {
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-    
-    .profile-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    .profile-pic {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #fff;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
-    }
-
-    /* Overlay Effect */
-    .profile-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 1;
-      transition: opacity 0.3s ease-in-out;
-      cursor: pointer;
-    }
-
-    .profile-overlay i {
-      color: #fff;
-      font-size: 28px;
-    }
-
-    .achievements-btn {
-      background: #eee;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      margin: 10px 0;
-      cursor: pointer;
-    }
-
-    .form-label {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 10px;
-      color: #fff;
-    }
-
-    .form-control,
-    .form-select {
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .form-control,
-    textarea.form-control,
-    select.form-control {
-      border: 2px solid #F6D25B !important;
-      border-radius: 10px;
-      background-color: white;
-      color: black;
-    }
-
-    .form-select {
-      border: 2px solid #F6D25B !important;
-      border-radius: 8px;
-      background-color: white;
-      color: black;
-    }
-
-    .btn-save {
-      background: #F6D25B;
-      font-weight: bold;
-      color: #000;
-      border: none;
-      border-radius: 50px;
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-    }
-
-    .btn-save:hover {
-      background: #e0a800;
-    }
-
-    .password-section {
-      margin-top: 20px;
-      color: #fff;
-    }
-
-    .btn-password {
-      background: #E63946;
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      border-radius: 50px;
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-    }
-
-    .btn-password:hover {
-      background: #b02a37;
-    }
-  </style>
 </head>
 
 <body>
@@ -155,9 +34,9 @@
     <form>
       <div class="row g-3 align-items-center">
         <div class="col-6 text-center">
-          <!-- Profile Image with Overlay -->
+          <!-- Profile Image -->
           <div class="profile-wrapper">
-            <img src="../../assets/img/shared/profile_Pic.png" alt="Profile" class="profile-pic">
+            <img id="profilePreview" src="../../assets/img/shared/profile_Pic.png" alt="Profile" class="profile-pic">
             <div class="profile-overlay" data-bs-toggle="modal" data-bs-target="#profileImageModal">
               <i class="bi bi-pencil-fill"></i>
             </div>
@@ -165,15 +44,17 @@
 
           <!-- Achievements -->
           <div>
-            <button class="achievements-btn" type="button" data-bs-toggle="modal"
-              data-bs-target="#badgeModal">Achievements</button>
-            <div class="mt-2">
+            <button class="achievements-btn" type="button" data-bs-toggle="modal" data-bs-target="#badgeModal">
+              Achievements
+            </button>
+            <div id="badgePreviewContainer" class="badge-preview-container mt-2 d-flex justify-content-center">
               <img src="../../assets/img/challenge/sample badge.png" alt="Badge" width="40" height="40">
+              <img src="../../assets/img/challenge/sample badge2.png" alt="Badge" width="40" height="40">
+              <img src="../../assets/img/challenge/sample badge3.png" alt="Badge" width="40" height="40">
             </div>
           </div>
         </div>
 
-       
         <div class="col-6">
           <div class="text-start">
             <label class="form-label">First name</label>
@@ -190,25 +71,16 @@
         </div>
       </div>
 
-      <!-- Bio -->
-      <div class="text-start">
-        <label class="form-label">Bio</label>
-        <textarea class="form-control" rows="2">21 | Money is life.</textarea>
-      </div>
-
-      <!-- Email -->
       <div class="text-start">
         <label class="form-label">Email</label>
         <input type="email" class="form-control" value="cassymondragon@gmail.com">
       </div>
 
-      <!-- Date of Birth -->
       <div class="text-start">
         <label class="form-label">Date of Birth</label>
         <input type="date" class="form-control" value="2003-10-20">
       </div>
 
-      <!-- Gender -->
       <div class="text-start">
         <label class="form-label">Gender</label>
         <select class="form-select">
@@ -219,10 +91,8 @@
         </select>
       </div>
 
-      <!-- Save Button -->
       <button type="submit" class="btn-save">Save Changes</button>
 
-      <!-- Password Section -->
       <div class="password-section text-start">
         <h6 class="fw-bold">PASSWORD CHANGE</h6>
         <p style="font-size: 13px; color: black">Leave password empty when you don’t want to change it.</p>
@@ -239,19 +109,53 @@
   </div>
 
   <!-- Profile Image Modal -->
-  <div class="modal fade" id="profileImageModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Change Profile Picture</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal fade" id="profileImageModal" tabindex="-1" aria-labelledby="profileImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #44B87D; border-radius: 15px;">
+        <div class="modal-header bg-white">
+          <h5 class="modal-title fw-bold mx-auto" id="profileImageModalLabel">Choose Profile Picture</h5>
         </div>
-        <div class="modal-body">
-          <input type="file" class="form-control" accept="image/*">
+        <div class="modal-body text-center text-white">
+          <p class="fw-bold fs-5 mb-3">Pick an existing icon or upload your own</p>
+          <div class="row row-cols-3 g-3 icon-container mb-3">
+
+            <!-- Upload Icon -->
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto"
+                style="width: 80px; height: 80px; cursor: pointer;"
+                onclick="selectUploadIcon(event); document.getElementById('fileInput').click();">
+                <img src="../../assets/img/savings/uploadIcon.png" alt="Upload"
+                  style="width: 50%; object-fit: contain; margin-top: 20px;">
+              </div>
+            </div>
+
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
+                onclick="selectProfile(event, '../../assets/img/shared/profile_Pic.png')">
+                <img src="../../assets/img/shared/profile_Pic.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
+                onclick="selectProfile(event, '../../assets/img/challenge/sample badge.png')">
+                <img src="../../assets/img/challenge/sample badge.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+            
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
+                onclick="selectProfile(event, '../../assets/img/challenge/sample badge2.png')">
+                <img src="../../assets/img/challenge/sample badge2.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+
+          </div>
+          <input type="file" id="fileInput" class="d-none" accept="image/*" onchange="previewUpload(event)">
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success">Save</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <div class="modal-footer bg-white justify-content-center">
+          <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success px-4 rounded-pill" data-bs-dismiss="modal" onclick="applySelectedProfile()">Apply</button>
         </div>
       </div>
     </div>
@@ -259,24 +163,118 @@
 
   <!-- Badge Modal -->
   <div class="modal fade" id="badgeModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Change Achievement Badge</h5>
+          <h5 class="modal-title">Choose Achievement Badges (max 3)</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <input type="file" class="form-control" accept="image/*">
+        <div class="modal-body text-center">
+          <div class="row row-cols-3 g-3 icon-container">
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
+                <img src="../../assets/img/challenge/sample badge.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
+                <img src="../../assets/img/challenge/sample badge2.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
+                <img src="../../assets/img/challenge/sample badge3.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
+                <img src="../../assets/img/challenge/sample badge4.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success">Save</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="saveBadges" class="btn btn-success" data-bs-dismiss="modal">Save</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  <script>
+    let selectedProfile = null;
+    let uploadedImage = null;
 
+    function selectProfile(event, src) {
+      selectedProfile = src;
+      uploadedImage = null;
+      document.querySelectorAll('#profileImageModal .icon-option').forEach(el => el.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+    }
+
+    function selectUploadIcon(event) {
+      document.querySelectorAll('#profileImageModal .icon-option').forEach(el => el.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+    }
+
+    function previewUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImage = e.target.result;
+          selectedProfile = null;
+          const uploadIcon = document.querySelector('#profileImageModal .icon-option[onclick*="fileInput"]');
+          document.querySelectorAll('#profileImageModal .icon-option').forEach(el => el.classList.remove('selected'));
+          if (uploadIcon) uploadIcon.classList.add('selected');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function applySelectedProfile() {
+      const profilePreview = document.getElementById('profilePreview');
+      if (uploadedImage) {
+        profilePreview.src = uploadedImage;
+      } else if (selectedProfile) {
+        profilePreview.src = selectedProfile;
+      } else {
+        profilePreview.src = "../../assets/img/shared/profile_Pic.png";
+      }
+    }
+
+    const badgeOptions = document.querySelectorAll('#badgeModal .icon-option');
+    const badgePreviewContainer = document.getElementById('badgePreviewContainer');
+    let selectedBadges = [];
+
+    badgeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const imgSrc = option.querySelector('img').src;
+
+        if (selectedBadges.includes(imgSrc)) {
+          selectedBadges = selectedBadges.filter(src => src !== imgSrc);
+          option.classList.remove('selected');
+        } else if (selectedBadges.length < 3) {
+          selectedBadges.push(imgSrc);
+          option.classList.add('selected');
+        } else {
+          alert("You can select up to 3 badges only.");
+        }
+      });
+    });
+
+    document.getElementById('saveBadges').addEventListener('click', () => {
+      badgePreviewContainer.innerHTML = '';
+      selectedBadges.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.width = 40;
+        img.height = 40;
+        img.style.marginRight = '5px';
+        badgePreviewContainer.appendChild(img);
+      });
+    });
+  </script>
+</body>
 </html>
