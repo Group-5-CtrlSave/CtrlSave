@@ -8,10 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/notification.css">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
 </head>
 
-<body style="background-color: #77D09A;">
+<body style="background-color: #44B87D;">
 
     <?php include ("../../assets/shared/navigationBar.php") ?>
     <?php include ("../../assets/shared/sideBar.php")?>
