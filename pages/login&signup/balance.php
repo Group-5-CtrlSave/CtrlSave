@@ -19,7 +19,6 @@
         h2 {
             font-family: "Poppins", sans-serif;
             font-weight: bold;
-            font-size: clamp(2rem, 1vw, 1rem);
             color: #ffff;
             text-align: center;
         }
@@ -57,13 +56,6 @@
 
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
-        }
-
-        .skipLink {
-            color: black;
-            font-weight: bold;
-            font-family: "Poppins", sans-serif;
-            padding-bottom: 5px;
         }
 
     </style>
@@ -106,11 +98,6 @@
             <!-- Button -->
             <div class="col-12 btNext mt-5 d-flex justify-content-center align-items-center">
                 <a href="pickExpense.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
-            </div>
-
-            <!-- Skip Button -->
-            <div class="col-12 mb-3 noAccount d-flex justify-content-center align-items-center">
-                <a href="pickExpense.php" class="skipLink" style="color: #141313;">Skip</a>
             </div>
 
         </div>

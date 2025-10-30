@@ -1,0 +1,168 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Title */
+h1 {
+    font-weight: 650;
+    color: #FFC727;
+    text-align: center;
+    align-items: center;
+}
+
+/* Add New Button */
+.addNewChallenge {
+    justify-content: start;
+    align-items: start;
+}
+
+.addbtn {
+    background-color: #F6D25B;
+    color: black;
+    text-align: center;
+    width: 200px;
+    height: 45px;
+    font-size: clamp(1rem, 1vw, 0.5rem);
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 2;
+    text-decoration: none;
+    border: none;
+    box-shadow: 0 9px 5px #999;
+}
+
+.addbtn:hover {
+    background-color: #F6D25B;
+}
+
+.addbtn:active {
+    background-color: #f1c225;
+    box-shadow: 0 5px 5px #323232;
+    transform: translateY(4px);
+}
+
+/* Filter */
+.filter {
+    justify-content: end;
+    align-items: end;
+    text-align: end;
+}
+
+.filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0 25px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-top: 10px;
+}
+
+.filter-dropdown {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-menu {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 160px;
+    padding: 8px 0;
+}
+
+.filter-menu .dropdown-header {
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 5px 10px 8px;
+    color: #333;
+}
+
+.filter-menu .dropdown-item:hover {
+    background-color: #FFC727 !important;
+}
+
+/* Challenge Section */
+.challenges {
+    background-color: #44B87D !important;
+    border-radius: 16px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 60px;
+}
+
+h3 {
+    color: white;
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    text-align: start;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* 3 Dots Button */
+.dropdown.three-dots-dropdown {
+    justify-content: end;
+    align-items: end;
+    text-align: end;
+}
+
+.three-dots-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1 !important;
+    color: #000 !important;
+}
+
+.dropdown-menu-end {
+    border-radius: 10px;
+    min-width: 120px;
+    z-index: 1;
+}
+
+.status-menu .delete-btn {
+    text-align: center;
+    color: #D32626;
+    font-weight: 500;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+.status-menu .delete-btn:hover {
+    text-decoration: underline;
+}
+
+.status-menu .dropdown-header {
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 5px 10px 8px;
+    color: #333;
+}
+
+.status-menu .dropdown-item:hover {
+    background-color: #FFC727 !important;
+}
+
+.status-menu .hover.active {
+    background-color: #FFC727;
+}
+
+/* Challenge Section */
+.challengeSection {
+    overflow-y: auto;
+}
