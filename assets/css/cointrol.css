@@ -3,35 +3,43 @@
 
 body {
     font-family: "Roboto", sans-serif;
-    background-color:  #44B87D !important;
+    background-color: #44B87D !important;
 }
 
 .mainContainer {
-    background-color:  #44B87D;
+    background-color: #44B87D;
 
 }
 
-.title{
+.scrollableContainer {
+    height: 80dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+}
+
+.title {
     font-family: "Poppins", sans-serif;
     font-weight: 700;
     color: #f3f3f3;
 }
 
-.monthlySpendingContainer{
+.monthlySpendingContainer {
     border-radius: 20px;
     background-color: #f3f3f3;
 }
 
-.expensesChart{
+.expensesChart {
     border-radius: 20px;
     background-color: #f3f3f3;
 }
 
-.tableContainer{
+.tableContainer {
     border-radius: 20px;
     background-color: #f3f3f3;
 }
-.analysisRecommendations{
+
+.analysisRecommendations {
     border-radius: 20px;
     background-color: #f3f3f3;
 }
