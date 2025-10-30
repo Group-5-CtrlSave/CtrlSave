@@ -25,7 +25,6 @@
       padding: 20px 30px;
       color: #FFFFFF;
       font-family: "Poppins", sans-serif;
-
     }
 
     .mainHeader h2 {
