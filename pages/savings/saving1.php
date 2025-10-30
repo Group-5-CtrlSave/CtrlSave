@@ -7,10 +7,13 @@
   <title>My Savings</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
+   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <style>
     body {
-      overflow: hidden;
-      background-color: #44B87D;
+       background-color: #44B87D;
+        margin: 0; 
+        padding: 0;
+        height: 100%;
     }
 
     .bg-green-custom {
@@ -20,14 +23,22 @@
       width: 100%;
       height: calc(100vh - 70px);
       background-color: #44B87D;
-      padding: 1rem;
       display: flex;
       flex-direction: column;
     }
 
     .savings-header {
-      flex-shrink: 0;
+      position: sticky;
+      background-color: #44B87D;
+      padding: 20px 30px 10px 30px; 
+      color: #FFFFFF;
+      font-family: "Poppins", sans-serif;
     }
+
+    .savings-header h2 {
+      font-weight: 700;
+    }
+
 
     .savings-list {
       flex-grow: 1;
@@ -58,6 +69,7 @@
 
     .savings-list {
       margin-bottom: 70px; 
+      padding: 1rem;
     }
 
     .savings-list::-webkit-scrollbar {
@@ -79,14 +91,15 @@
 <body>
   <!-- Navigation Bar -->
   <?php include ("../../assets/shared/navigationBar.php") ?>
-
-  <!-- Sidebar -->
-  <?php include ("../../assets/shared/sideBar.php") ?>
-
+  <!-- Sidebar content-->
+  <?php include ("../../assets/shared/sideBar.php")?>
   <!-- Green Section -->
+   
   <div class="bg-green-custom">
     <!-- Fixed Header -->
-    <h2 class="savings-header fs-4 fw-bold text-white mb-3">My Savings</h2>
+    <!-- Fixed Header -->
+  <div class="savings-header"><h2>My Savings</h2></div>
+
 
     <!-- Scrollable Cards -->
     <div class="savings-list">
@@ -138,6 +151,7 @@
       <!-- Add more cards here; they’ll scroll -->
     </div>
   </div>
+
 
   <!-- Plus Button -->
   <a href="addSaving1.php">
