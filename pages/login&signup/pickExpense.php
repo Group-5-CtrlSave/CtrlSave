@@ -19,7 +19,6 @@
         h2 {
             font-family: "Poppins", sans-serif;
             font-weight: bold;
-            font-size: clamp(2rem, 1vw, 1rem);
             color: #ffff;
             text-align: center;
             padding-top: 10px;
