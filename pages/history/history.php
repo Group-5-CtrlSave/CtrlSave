@@ -8,11 +8,12 @@
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!-- Bootstrap Icons CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
     body {
       font-family: "Roboto", sans-serif;
       background-color: #44B87D !important;
@@ -23,15 +24,33 @@
       background-color: #44B87D;
       padding: 20px 30px;
       color: #FFFFFF;
+      font-family: "Poppins", sans-serif;
+
     }
 
     .mainHeader h2 {
-      font-size: 27px;
-      font-weight: 600;
+      font-weight: 700;
+    }
+
+    .filter-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 0px 0 15px 0;
+    }
+
+    .filter-buttons button {
+      background-color: #FFFFFF;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 16px;
+      color: #44B87D;
+      font-weight: 700;
     }
 
     .scrollable-container {
-      height: 75dvh;
+      height: 70dvh;
       overflow-y: auto;
       padding-bottom: 20px;
     }
@@ -49,7 +68,7 @@
 
     .entry .time {
       color: #666;
-      font-size: 15px;
+      font-size: 12px;
       align-self: flex-end;
       margin-bottom: 5px;
     }
@@ -66,22 +85,51 @@
     .entry .icon img {
       width: 60px;
       height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .entry .text {
-      font-size: 20px;
-      color: #333;
+      font-size: 16px;
+      color: #000000;
     }
 
     .entry .amount {
       color: #FFD858;
-      font-size: 20px;
+      font-size: 16px;
       margin-left: auto;
       position: relative;
       top: 10px;
+    }
+
+    /* Modal */
+    .modal.modal-bottom-sheet .modal-dialog {
+      position: fixed;
+      margin: 0;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(100%);
+      transition: transform 0.4s ease-in-out;
+    }
+
+    .modal.modal-bottom-sheet.show .modal-dialog {
+      transform: translateY(0);
+    }
+
+    .modal-bottom-sheet .modal-content {
+      border-radius: 20px 20px 0 0;
+      border: none;
+      padding: 15px 0;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-backdrop.show {
+      opacity: 0.3;
+    }
+
+    .modal.modal-bottom-sheet.show .modal-dialog {
+      transform: translateY(0);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
   </style>
 </head>
@@ -90,9 +138,17 @@
   <?php include("../../assets/shared/navigationBar.php") ?>
   <?php include("../../assets/shared/sideBar.php") ?>
 
-  <!-- Sticky Page Header -->
   <div class="mainHeader">
     <h2>History</h2>
+  </div>
+
+  <div class="filter-buttons">
+    <button type="button" data-bs-toggle="modal" data-bs-target="#selectRangeModal">
+      <i class="fa-solid fa-filter"></i> Last 30 Days
+    </button>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#selectTypesModal">
+      <i class="fa-solid fa-filter"></i> All Types
+    </button>
   </div>
 
   <!-- Scrollable Entries -->
@@ -107,7 +163,6 @@
         <span class="amount">-P150</span>
       </div>
     </div>
-
 
     <div class="entry">
       <span class="time">2 hours ago</span>
@@ -197,7 +252,48 @@
       </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Modal -->
+    <div class="modal fade modal-bottom-sheet" id="selectRangeModal" tabindex="-1"
+      aria-labelledby="selectRangeModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="selectRangeModalLabel">Select Range</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Last 7 Days</li>
+              <li class="list-group-item">Last 30 Days</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Types -->
+    <div class="modal fade modal-bottom-sheet" id="selectTypesModal" tabindex="-1"
+      aria-labelledby="selectTypesModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="selectTypesModalLabel">Select Types</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">All Types</li>
+              <li class="list-group-item">Savings</li>
+              <li class="list-group-item">Income</li>
+              <li class="list-group-item">Expenses</li>
+              <li class="list-group-item">Challenges</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
