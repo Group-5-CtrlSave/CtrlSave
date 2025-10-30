@@ -151,17 +151,44 @@
         </div>
       </div>
 
-      <!-- Budget Rule Modal No Function yet-->
-      <div id="budgetRuleModal"
-        class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none justify-content-center align-items-center"
-        style="z-index: 9999;" onclick="overlayClose(event, 'budgetRule')">
-        <div class="bg-green-custom p-4 rounded shadow" style="width: 320px; background-color: #44B87D;" onclick="event.stopPropagation()">
-          <h5 class="fw-bold text-white mb-3">Edit Budget Rule</h5>
-          <!-- Blank module for now -->
-          <div class="text-white"> content is place here</div>
-          <button class="btn btn-warning w-100 fw-semibold mt-3" onclick="closeModal('budgetRule')">Save</button>
-        </div>
+      <!-- Budget Rule Modal -->
+<div id="budgetRuleModal"
+  class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none justify-content-center align-items-center"
+  style="z-index: 9999;" onclick="overlayClose(event, 'budgetRule')">
+
+  <div class="bg-green-custom p-4 rounded shadow text-white" style="width: 340px; background-color: #44B87D;"
+    onclick="event.stopPropagation()">
+    <h5 class="fw-bold mb-3">Edit Budget Rule</h5>
+
+    <!-- Step 1: Choose Type -->
+    <div id="budgetChoice" class="mb-3">
+      <p class="small">Select how you want to manage your budget:</p>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="ruleType" id="suggestedRule" value="suggested" checked>
+        <label class="form-check-label" for="suggestedRule">Use Suggested Rule</label>
       </div>
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="radio" name="ruleType" id="customRule" value="custom">
+        <label class="form-check-label" for="customRule">Create My Own</label>
+      </div>
+    </div>
+
+    <!-- Step 2B: Custom Rule Form -->
+    <div id="customRules" class="d-none">
+      <h6 class="fw-semibold mb-2">Custom Budget Rule</h6>
+      <p class="small mb-1">Enter percentage for each category:</p>
+
+      <input type="number" class="form-control mb-2" id="dining" placeholder="Dining Out (%)">
+      <input type="number" class="form-control mb-2" id="electricity" placeholder="Electricity (%)">
+      <input type="number" class="form-control mb-2" id="groceries" placeholder="Groceries (%)">
+      <input type="number" class="form-control mb-2" id="transport" placeholder="Transportation (%)">
+      <input type="number" class="form-control mb-2" id="savings" placeholder="Savings (%)">
+      <p class="small text-warning">Make sure your total adds up to 100%.</p>
+    </div>
+
+    <!-- Edit Button -->
+    <button class="btn btn-warning w-100 fw-semibold mt-2" onclick="editBudgetRule()">Edit</button>
+
 
   </div>
   <!-- Bootstrap JS for Offcanvas & other components -->
@@ -226,6 +253,19 @@
       manageBtn.textContent = "Done Managing";
     }
   }
+  
+  function editBudgetRule() {
+  const ruleType = document.querySelector('input[name="ruleType"]:checked').value;
+
+  if (ruleType === 'suggested') {
+    // Redirect to the suggested budget rule page
+    window.location.href = 'suggested_budget_rule.php';
+  } 
+  else if (ruleType === 'custom') {
+    // Redirect to custom rule creation page
+    window.location.href = 'custom_budget_rule.php';
+  }
+}
   </script>
 </body>
 
