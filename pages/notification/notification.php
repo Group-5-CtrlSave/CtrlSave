@@ -12,6 +12,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
 
         body {
             font-family: "Roboto", sans-serif;
@@ -32,13 +33,13 @@
             font-weight: 700;
         }
 
-        .scrollable-container {
+        .scrollableContainer {
             height: 77dvh;
             overflow-y: auto;
             padding: 0 20px;
         }
 
-        .notification-card {
+        .notificationCard {
             background-color: #FFFFFF;
             border-radius: 20px;
             padding: 20px;
@@ -49,30 +50,30 @@
             gap: 10px;
         }
 
-        .notification-card:hover {
+        .notificationCard:hover {
             background-color: #F0F1F6;
         }
 
-        .notification-card img.icon {
+        .notificationCard img.icon {
             width: 45px;
             height: 45px;
             object-fit: contain;
         }
 
-        .notification-content p {
+        .notificationContent p {
             margin: 0;
         }
 
-        .notification-content .title {
+        .notificationContent .title {
             font-weight: 700;
             font-size: 16px;
         }
 
-        .notification-content .subtitle {
+        .notificationContent .subtitle {
             font-size: 16px;
         }
 
-        .notification-time {
+        .notificationTime {
             position: absolute;
             bottom: 6px;
             right: 16px;
@@ -81,16 +82,15 @@
         }
 
         /* Different types of notifications */
-        /* MORE TO BE ADDED */
-        .notif-expense .title {
+        .notifExpense .title {
             color: #44B87D;
         }
 
-        .notif-alert .title {
+        .notifAlert .title {
             color: #E63946;
         }
 
-        .notif-savings .title {
+        .notifSavings .title {
             color: #44B87D;
         }
     </style>
@@ -104,130 +104,105 @@
         <h2>Notifications</h2>
     </div>
 
-    <div class="scrollable-container">
-        <div class="notification-card notif-expense">
-            <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notification-content">
-                <p class="title">Electricity</p>
-                <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
-            </div>
-            <div class="notification-time">08:00 AM</div>
-        </div>
+    <div class="scrollableContainer">
 
-        <div class="notification-card notif-alert">
+        <a href="viewNotification.php" style="text-decoration: none; color: inherit;">
+            <div class="notificationCard notifExpense">
+                <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
+                <div class="notificationContent">
+                    <p class="title">Electricity</p>
+                    <p class="subtitle">
+                        <span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025
+                    </p>
+                </div>
+                <div class="notificationTime">08:00 AM</div>
+            </div>
+        </a>
+
+        <div class="notificationCard notifAlert">
             <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Transportation Limit Exceeded</p>
                 <p class="subtitle">
                     <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
                     <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
                 </p>
             </div>
-            <div class="notification-time">May 20, 2025 | 10:30 AM</div>
+            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
         </div>
 
-        <div class="notification-card notif-savings">
+        <div class="notificationCard notifSavings">
             <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
                 style="border-radius: 50%;">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Saving Goals</p>
                 <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
             </div>
-            <div class="notification-time">May 14, 2025 | 11:16 AM</div>
+            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
         </div>
 
-        <div class="notification-card notif-expense">
+        <div class="notificationCard notifExpense">
             <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Electricity</p>
                 <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
             </div>
-            <div class="notification-time">08:00 AM</div>
+            <div class="notificationTime">08:00 AM</div>
         </div>
 
-        <div class="notification-card notif-alert">
+        <div class="notificationCard notifAlert">
             <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Transportation Limit Exceeded</p>
                 <p class="subtitle">
                     <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
                     <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
                 </p>
             </div>
-            <div class="notification-time">May 20, 2025 | 10:30 AM</div>
+            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
         </div>
 
-        <div class="notification-card notif-savings">
+        <div class="notificationCard notifSavings">
             <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
                 style="border-radius: 50%;">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Saving Goals</p>
                 <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
             </div>
-            <div class="notification-time">May 14, 2025 | 11:16 AM</div>
+            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
         </div>
 
-        <div class="notification-card notif-expense">
+        <div class="notificationCard notifExpense">
             <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Electricity</p>
                 <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
             </div>
-            <div class="notification-time">08:00 AM</div>
+            <div class="notificationTime">08:00 AM</div>
         </div>
 
-        <div class="notification-card notif-alert">
+        <div class="notificationCard notifAlert">
             <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Transportation Limit Exceeded</p>
                 <p class="subtitle">
                     <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
                     <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
                 </p>
             </div>
-            <div class="notification-time">May 20, 2025 | 10:30 AM</div>
+            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
         </div>
 
-        <div class="notification-card notif-savings">
+        <div class="notificationCard notifSavings">
             <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
                 style="border-radius: 50%;">
-            <div class="notification-content">
+            <div class="notificationContent">
                 <p class="title">Saving Goals</p>
                 <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
             </div>
-            <div class="notification-time">May 14, 2025 | 11:16 AM</div>
+            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
         </div>
 
-        <div class="notification-card notif-expense">
-            <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notification-content">
-                <p class="title">Electricity</p>
-                <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
-            </div>
-            <div class="notification-time">08:00 AM</div>
-        </div>
-
-        <div class="notification-card notif-alert">
-            <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notification-content">
-                <p class="title">Transportation Limit Exceeded</p>
-                <p class="subtitle">
-                    <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
-                    <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
-                </p>
-            </div>
-            <div class="notification-time">May 20, 2025 | 10:30 AM</div>
-        </div>
-
-        <div class="notification-card notif-savings">
-            <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
-                style="border-radius: 50%;">
-            <div class="notification-content">
-                <p class="title">Saving Goals</p>
-                <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
-            </div>
-            <div class="notification-time">May 14, 2025 | 11:16 AM</div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
