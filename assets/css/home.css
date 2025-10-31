@@ -84,11 +84,12 @@
       max-width: 600px;
       height: 100px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
     .vertical-divider {
-      width: 2px;
-      height: 50px;
+      width: 1px;
+      height: 40px;
       background-color: #44B87D;
       border-radius: 1px;
     }
@@ -152,3 +153,29 @@
       align-items: center;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
+  
+    h2 {
+      font-size: 1.75rem; 
+      font-weight: 600;
+      color: #000; 
+      margin-bottom: 10px;
+    }
+
+    body, p, .fw-semibold, .fw-medium, .tab-label, .today-text {
+      font-size: 16px;
+    }
+
+    .small-text, 
+    div[style*="font-size: 0.85rem"],
+    button.btn.bg-white.border.w-100.text-start.fw-semibold,
+    .text-muted {
+      font-size: 12px !important;
+    }
+
+    img {
+      object-fit: contain;
+      max-width: 100%;
+      height: auto;
+    }
+
+    
