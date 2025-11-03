@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="../../assets/css/home.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
+  <link rel="stylesheet" href="../../assets/css/income&expenses.css">
+
 </head>
 
 <body>
@@ -27,117 +29,127 @@
     <div class="container" style="margin-top: 120px; padding-bottom: 80px;">
 
 
-      <!-- Expense, Income, Balance Summary Card -->
-      <div class="summary-card d-flex justify-content-around align-items-center mx-auto py-2 position-fixed top-0 start-50 translate-middle-x shadow"
+      <!-- Summary Card -->
+<div style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 160px; /* adjust height kung gusto mo mas mataas */
+  background-color: #44B87D; /* same color as top background */
+  z-index: 998;">
+</div>
+
+<!-- Expense, Income, Balance Summary Card -->
+<div class="summary-card d-flex justify-content-around align-items-center mx-auto py-2 position-fixed top-0 start-50 translate-middle-x shadow"
      style="width: 90%; background-color: #F0F1F6; border-radius: 20px; margin-top: 80px; z-index: 1000;">
-
-        <!-- Expenses -->
-        <div class="summary-item text-center">
-          <div class="fw-semibold text-black d-flex flex-column align-items-center">
-          <div class="d-flex align-items-center justify-content-center mb-1">
-            <span style="color: #d60000; font-size: 1rem;" class="me-1">↓</span>
-            <i class="bi bi-arrow-down-circle-fill text-danger me-1"></i>
-            Expenses
-        </div>
-        <div class="fw-bold" style="color: #F6D25B;">₱2,700</div>
-        </div>
+     
+  <!-- Expenses -->
+  <div class="summary-item text-center">
+    <div class="fw-semibold text-black d-flex flex-column align-items-center">
+      <div class="d-flex align-items-center justify-content-center mb-1">
+        <span style="color: #d60000; font-size: 1rem;" class="me-1">↓</span>
+        <i class="bi bi-arrow-down-circle-fill text-danger me-1"></i>
+        Expenses
       </div>
-
-        <!-- Divider -->
-        <div class="vertical-divider"></div>
-
-        <!-- Income -->
-        <div class="summary-item text-center">
-          <div class="fw-semibold text-black d-flex flex-column align-items-center">
-          <div class="d-flex align-items-center justify-content-center mb-1">
-            <span style="color: #44B87D; font-size: 1rem;" class="me-1">↑</span>
-            <i class="bi bi-arrow-up-circle-fill text-success me-1"></i>
-            Income
-         </div>
-      <div class="fw-bold" style="color: #F6D25B;">₱10,200</div>
-     </div>
+      <div class="fw-bold" style="color: #F6D25B;">₱2,700</div>
     </div>
+  </div>
 
-        <!-- Divider -->
-        <div class="vertical-divider"></div>
+  <!-- Divider -->
+  <div class="vertical-divider"></div>
 
-        <!-- Balance -->
-        <div class="summary-item text-center">
-          <div class="fw-semibold text-black mb-1">Balance</div>
-          <div class="fw-bold" style="color: #F6D25B;">₱7,500</div>
-        </div>
+  <!-- Income -->
+  <div class="summary-item text-center">
+    <div class="fw-semibold text-black d-flex flex-column align-items-center">
+      <div class="d-flex align-items-center justify-content-center mb-1">
+        <span style="color: #44B87D; font-size: 1rem;" class="me-1">↑</span>
+        <i class="bi bi-arrow-up-circle-fill text-success me-1"></i>
+        Income
       </div>
+      <div class="fw-bold" style="color: #F6D25B;">₱10,200</div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="vertical-divider"></div>
+
+  <!-- Balance -->
+  <div class="summary-item text-center">
+    <div class="fw-semibold text-black mb-1">Balance</div>
+    <div class="fw-bold" style="color: #F6D25B;">₱7,500</div>
+  </div>
+</div>
 
       <!-- Date -->
       <div class="today-text">Today May 07 Wed</div>
 
-<!-- Expense and Income Cards -->
-<div class="d-flex flex-column align-items-center gap-3 mt-4">
+<!-- Income and Expense Row (styled like Income & Expenses page) -->
+<div class="scrollable-container mt-4">
+  <div class="row justify-content-center">
 
-  <!-- Allowance Card -->
-  <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 shadow-sm"
-       style="width: 100%; max-width: 335px; height: 84px; background-color: #F0F1F6; border-radius: 20px;">
-    <div class="d-flex align-items-center">
-      <img src="../../assets/img/home/allowance_IconB.png" alt="Allowance" style="width: 40px; height: 40px;" class="me-3">
-      <div>
-        <div class="fw-semibold text-dark">Allowance</div>
-        <div style="font-size: 0.85rem; color: #CCCC;">Note: Thanks mama</div>
+    <!-- Allowance (Mama) -->
+    <div class="col-12 col-md-8">
+      <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
+        <div class="container categoryImgContainer p-1">
+          <img class="img-fluid" src="../../assets/img/shared/categories/income/Allowance.png">
+        </div>
+        <div class="container categoryTextContainer p-1">
+          <p class="category m-0"><b>Allowance</b></p>
+          <p class="notes m-0">Notes: Bigay ni Mama</p>
+        </div>
+        <div class="container iePriceContainer p-1">
+          <h5 class="price m-0">+ ₱4,000</h5>
+          <p class="time m-0"><b>12:51 PM</b></p>
+        </div>
       </div>
     </div>
-    <div class="text-end">
-      <div style="color: #F6D25B; font-weight: 600; font-size: 1.1rem;">+ ₱200</div>
-      <div style="font-size: 0.85rem; color: #44B87D;">7:40 AM</div>
-    </div>
-  </div>
 
-  <!-- Dining Out Card -->
-  <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 shadow-sm"
-       style="width: 100%; max-width: 335px; height: 84px; background-color: #F0F1F6; border-radius: 20px;">
-    <div class="d-flex align-items-center">
-      <img src="../../assets/img/home/dining_Icon.png" alt="Dining Out" style="width: 40px; height: 40px;" class="me-3">
-      <div>
-        <div class="fw-semibold text-dark">Dining Out</div>
-        <div style="font-size: 0.85rem; color: #CCCC;">Note: Eat in Jollibee</div>
+    <!-- Dining Out -->
+    <div class="col-12 col-md-8">
+      <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
+        <div class="container categoryImgContainer p-1">
+          <img class="img-fluid" src="../../assets/img/shared/categories/expense/Dining Out.png">
+        </div>
+        <div class="container categoryTextContainer p-1">
+          <p class="category m-0"><b>Dining Out</b></p>
+          <p class="notes m-0">Notes: Jollibee</p>
+        </div>
+        <div class="container iePriceContainer p-1">
+          <h5 class="price m-0">- ₱300</h5>
+          <p class="time m-0"><b>6:40 PM</b></p>
+        </div>
       </div>
     </div>
-    <div class="text-end">
-      <div style="color: #F6D25B; font-weight: 600; font-size: 1.1rem;">- ₱500</div>
-      <div style="font-size: 0.85rem; color: #44B87D;">7:40 PM</div>
-    </div>
-  </div>
 
-  <!-- Transportation Card -->
-  <div class="mini-card d-flex justify-content-between align-items-center px-3 py-2 shadow-sm"
-       style="width: 100%; max-width: 335px; height: 84px; background-color: #F0F1F6; border-radius: 20px;">
-    <div class="d-flex align-items-center">
-      <img src="../../assets/img/home/transpoIcon.png" alt="Transportation" style="width: 40px; height: 40px;" class="me-3">
-      <div>
-        <div class="fw-semibold text-dark">Transportation</div>
-        <div style="font-size: 0.85rem; color: #CCCC;">Note: Pamasahe otw Manila</div>
+    <!-- Transportation -->
+    <div class="col-12 col-md-8">
+      <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
+        <div class="container categoryImgContainer p-1">
+          <img class="img-fluid" src="../../assets/img/shared/categories/expense/Transportation.png">
+        </div>
+        <div class="container categoryTextContainer p-1">
+          <p class="category m-0"><b>Transportation</b></p>
+          <p class="notes m-0">Notes: Pamasahe otw Manila</p>
+        </div>
+        <div class="container iePriceContainer p-1">
+          <h5 class="price m-0">- ₱2,000</h5>
+          <p class="time m-0"><b>9:50 PM</b></p>
+        </div>
       </div>
     </div>
-    <div class="text-end">
-      <div style="color: #F6D25B; font-weight: 600; font-size: 1.1rem;">- ₱2,000</div>
-      <div style="font-size: 0.85rem; color: #44B87D;">9:50 PM</div>
+
+    <!-- ✅ Move See More inside -->
+    <div class="text-end" style="margin-top: -5px;">
+      <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0"
+        style="font-size: 0.9rem;">See more</a>
     </div>
+
   </div>
 </div>
 
-      <!-- More Cards -->
-      <div id="more-cards" class="d-flex flex-column align-items-center gap-3 mt-3 d-none">
-        <div class="mini-card"></div>
-        <div class="mini-card"></div>
-        <div class="mini-card"></div>
-      </div>
-
-      <!-- See More Button -->
-      <div class="text-end" style="margin-top: 8px;">
-        <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0" 
-          style="font-size: 0.9rem;">See more</a>
-      </div>
-
-      <!-- Recommendation Card -->
-<div class="d-flex justify-content-center mt-4">
+<!-- Recommendation Card -->
+<div class="d-flex justify-content-center position-relative" style="margin-top: -80px !important;">
   <div class="recommendation-card p-2 px-3 position-relative"
     style="background-color: #F0F1F6; border-radius: 20px; width: 335px;">
     
@@ -147,10 +159,11 @@
     <!-- Image (centered) -->
     <div class="d-flex justify-content-center">
       <img src="../../assets/img/home/InsiteBg.png" alt="Recommendation Image"
-        style="width: 300px; height: 85px; border-radius: 20; object-fit: cover;">
+        style="width: 300px; height: 85px; border-radius: 20px; object-fit: cover;">
     </div>
   </div>
 </div>
+
 
   <!-- Watch. Read. Apply. Save Smart Section -->
 <div class="d-flex justify-content-center mt-4">

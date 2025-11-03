@@ -6,24 +6,26 @@
   <title>Calculator</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
-  <link rel="stylesheet" href="../../assets/css/calculator.css">
+  <link rel="stylesheet" href="../../assets/css/calculator.css?v=3">
 </head>
 <body>
 
   <!-- Top Navbar -->
-  <nav>
-    <a href="../home/home.php" class="text-decoration-none">
-      <img src="../../assets/img/shared/backArrow.png" alt="Back">
-    </a>
-  </nav>
+  <nav class="d-flex align-items-center justify-content-between px-3">
+  <a href="../home/home.php" class="text-decoration-none d-flex align-items-center">
+    <img src="../../assets/img/shared/backArrow.png" alt="Back">
+  </a>
+  <h1 class="calculator-title mb-0 text-center flex-grow-1">CALCULATOR</h1>
+  <div style="width: 25px;"></div> 
+</nav>
 
   <!-- Calculator Card -->
   <div class="calculator-container">
     <div class="display" id="display">0</div>
 
     <div class="buttons">
-      <button class="btn-calc" onclick="clearDisplay()">C</button>
-      <button class="btn-calc" onclick="deleteChar()">⌫</button>
+      <button class="btn-calc btn-clear" onclick="clearDisplay()">C</button>
+      <button class="btn-calc btn-delete" onclick="deleteChar()">⌫</button>
       <button class="btn-calc btn-operator" onclick="appendOperator('/')">÷</button>
       <button class="btn-calc btn-operator" onclick="appendOperator('*')">×</button>
 
