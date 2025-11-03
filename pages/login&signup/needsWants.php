@@ -26,7 +26,7 @@
 
         .desc {
             font-family: "Roboto", sans-serif;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 16px;
             color: #ffff;
             text-align: center;
         }
@@ -39,6 +39,8 @@
         .titleCateg{
             font-family: "Poppins", sans-serif;
             font-weight: bold;
+            color: black;
+            font-size: 20px;
         }
 
         .expenseName {
@@ -47,16 +49,20 @@
             font-weight: 500;
         }
 
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
-            font-family: "Roboto", sans-serif;
-            border-radius: 30px;
-            margin-top: 40px;
+            font-family: "Poppins", sans-serif;
+            border-radius: 27px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            margin-top: 30px;
         }
 
         .btn:hover {
@@ -107,13 +113,13 @@
         <!-- Need and Wants -->
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
-                <div class="p-3 rounded" style="min-width: 300px; height: 250px; background-color: #F0F1F6; border: 2px solid #F6D25B;">
+                <div class="p-3 rounded" style="min-width: 300px; height: 250px; background-color: white; border: 2px solid #F6D25B; border-radius: 20px;">
 
                     <!-- Table Header -->
-                    <div class="d-flex justify-content-between mb-3" style="color: #44B87D;">
-                        <div class="titleCateg" style="width: 100px;"><strong>Expense</strong></div>
-                        <div class="titleCateg"><strong>Needs</strong></div>
-                        <div class="titleCateg"><strong>Wants</strong></div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="titleCateg" style="width: 100px;">Expense</div>
+                        <div class="titleCateg">Needs</div>
+                        <div class="titleCateg">Wants</div>
                     </div>
 
                     <!-- Checkboxes -->
@@ -150,6 +156,7 @@
                             <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
                             <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
                         </div> 
+                        
                     </div>
 
                 </div>

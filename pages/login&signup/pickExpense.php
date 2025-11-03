@@ -39,14 +39,14 @@
 
         .expense-option {
             background-color: white;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 12px 15px;
             margin: 8px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border: 2px solid #F6D25B;
-            background-color: #F0F1F6;
+            background-color: white;
         }
 
         .expense-option input[type="checkbox"] {
@@ -61,7 +61,8 @@
         .expense-label {
             display: flex;
             align-items: center;
-            font-weight: bold;
+            font-size: 16px;
+            font-family: "Roboto", sans-serif;
         }
 
         .expense-icon {
@@ -69,19 +70,20 @@
             height: 40x;
         }
 
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
-            border-radius: 30px;
+            border-radius: 27px;
             cursor: pointer;
-            z-index: 2;
             text-decoration: none;
             border: none;
+            margin-top: 10px;
         }
 
         .btn:hover {
@@ -195,7 +197,7 @@
 
         <!-- Add more Expenses -->
         <div class="col-12 mt-1 d-flex justify-content-center align-items-center">
-            <p style="color: #ffff;">Can't find preffered expenses?</p>&nbsp;<a href="addExpensesSign.php"
+            <p style="color: #ffff; font-family: Poppins, sans-serif;">Can't find preffered expenses?</p>&nbsp;<a href="addExpensesSign.php"
                 class="addmoreLink" style="color: black;">Add more...</a>
         </div>
 

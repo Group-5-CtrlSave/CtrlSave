@@ -74,16 +74,19 @@
         }
 
         .form-control {
+            border: 2px solid #F6D25B;
             height: 50px;
             font-family: "Roboto", sans-serif;
             background-color: #F0F1F6;
+            border-radius: 20px;
         }
 
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 170px;
+            width: 125px;
             font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
@@ -91,7 +94,7 @@
             cursor: pointer;
             text-decoration: none;
             border: none;
-            margin-top: 25px;
+            margin-top: 10px;
         }
 
         .btn:hover {

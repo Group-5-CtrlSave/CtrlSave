@@ -16,19 +16,118 @@
         rel="stylesheet">
 </head>
 
+<Style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* Page Title */
+    .title {
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-weight: 650;
+        color: #FFC727;
+        text-align: center;
+        align-items: center;
+    }
+
+    /* Filters */
+
+    .filters {
+        margin-top: 40px;
+        justify-content: start;
+        align-items: start;
+    }
+
+    .addbtn {
+        background-color: #F6D25B;
+        color: black;
+        text-align: center;
+        width: 190px;
+        height: 45px;
+        font-size: 15px;
+        font-weight: bold;
+        font-family: "Poppins", sans-serif;
+        border-radius: 27px;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+        box-shadow: 0 9px 5px #999;
+    }
+
+    .addbtn:hover {
+        background-color: #F6D25B;
+    }
+
+    .addbtn:active {
+        background-color: #f1c225;
+        box-shadow: 0 5px 5px #323232;
+        transform: translateY(4px);
+    }
+
+    /* Filter */
+    .filter {
+        justify-content: end;
+        align-items: end;
+        text-align: end;
+    }
+
+    .filter-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 15px 0 25px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .filter-dropdown {
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .filter-menu {
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 130px;
+        padding: 8px 0;
+    }
+
+    .filter-menu .dropdown-header {
+        font-weight: 600;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 5px 10px 8px;
+        color: #333;
+    }
+
+    .filter-menu .dropdown-item:hover {
+        background-color: #FFC727 !important;
+    }
+</Style>
+
 <body>
     <!-- Navigation Bar -->
     <?php include("../../assets/shared/navigationBar.php") ?>
 
-    <!-- Content -->
-    <div class="container-fluid mainContainer">
+    <!-- Filter Container -->
+    <div class="container-fluid">
 
-        <!-- Page Title -->
-        <h1 class="Title mt-3">Challenges</h1>
+        <div class="row title">
+            <div class="col-12">
+                <h1>Challenges</h1>
+            </div>
+        </div>
 
-        <!-- Buttons Section -->
-        <div class="row mt-4">
-
+        <div class="row filters">
             <!-- Add Button -->
             <div class="col-8 addNewChallenge">
                 <button class="addbtn" href="addChallenge.html">Add New Challenge</button>
@@ -52,287 +151,42 @@
                     </ul>
                 </div>
             </div>
-
         </div>
-
-        <!-- Challenge Section -->
-        <div class="container-fluid challengeSection mt-5">
-
-            <!-- Challenge Row -->
-            <div class="row challenges ">
-                <!-- Challenge Button -->
-                <div class="col-9 ">
-                    <h3>Login to CtrlSave</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Save ₱5 to saving challenge</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>No-coffee spend day</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Save ₱40 to saving challenge</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>1-day no fast-food spend </h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Read financial tip for today</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Read financial tip for today</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Read financial tip for today</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Challenge Row -->
-            <div class="row challenges mt-2">
-
-                <!-- Challenge Button -->
-                <div class="col-9">
-                    <h3>Read financial tip for today</h3>
-                </div>
-                <!-- 3 dots Button -->
-                <div class="col-3">
-                    <div class="dropdown three-dots-dropdown">
-                        <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
-                        <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
-                            <li class="dropdown-header">Status</li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item">Show<span class="hover active"></span></a>
-                            </li>
-                            <li><a class="dropdown-item">Hide</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <div class="delete-btn" id="deleteFilter">Delete</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-
-
     </div>
 
+    <!-- Content -->
+    <div class="container-fluid challengeSection mt-2 p-4">
 
+        <!-- Challenge Row -->
+        <div class="row challenges ">
+            <!-- Challenge Button -->
+            <div class="col-9 ">
+                <h3>Login to CtrlSave</h3>
+            </div>
+            <!-- 3 dots Button -->
+            <div class="col-3">
+                <div class="dropdown three-dots-dropdown">
+                    <button class="three-dots-btn" data-bs-toggle="dropdown" aria-expanded="false">⋮</button>
+                    <ul class="dropdown-menu dropdown-menu-end status-menu" id="statusMenu">
+                        <li class="dropdown-header">Status</li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item">Show<span class="hover active"></span></a>
+                        </li>
+                        <li><a class="dropdown-item">Hide</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <div class="delete-btn" id="deleteFilter">Delete</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

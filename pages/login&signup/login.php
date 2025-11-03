@@ -70,9 +70,11 @@
         }
 
         .form-control {
+            border: 2px solid #F6D25B;
             height: 50px;
             font-family: "Roboto", sans-serif;
-            background-color: #F0F1F6;
+            background-color: white;
+            border-radius: 20px;
         }
 
         /* Button */
@@ -119,7 +121,7 @@
             .form-control {
                 height: 40px;
                 font-family: "Roboto", sans-serif;
-                background-color: #F0F1F6;
+                background-color: white;
             }
 
             .btn {
@@ -150,7 +152,7 @@
             .form-control {
                 height: 37px;
                 font-family: "Roboto", sans-serif;
-                background-color: #F0F1F6;
+                background-color: white;
             }
 
             .btn {
@@ -166,7 +168,7 @@
             .form-control {
                 height: 50px;
                 font-family: "Roboto", sans-serif;
-                background-color: #F0F1F6;
+                background-color: white;
             }
 
             .btn {
@@ -182,7 +184,7 @@
             .form-control {
                 height: 60px;
                 font-family: "Roboto", sans-serif;
-                background-color: #F0F1F6;
+                background-color: white;
             }
 
             .btn {
@@ -199,7 +201,7 @@
             .form-control {
                 height: 60px;
                 font-family: "Roboto", sans-serif;
-                background-color: #F0F1F6;
+                background-color: white;
             }
 
             .btn {

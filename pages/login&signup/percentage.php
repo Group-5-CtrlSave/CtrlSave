@@ -2,111 +2,194 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CtrlSave</title>
-    <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        body,
-        html {
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nanum+Myeongjo&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
             background-color: #44B87D;
+            overflow: hidden;
+        }
+
+        /* Title & Description */
+
+        .titleContainer {
+            margin-top: 10px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .descContainer {
+            margin-top: 10px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         h2 {
+            color: white;
             font-family: "Poppins", sans-serif;
             font-weight: bold;
-            color: #ffff;
-            text-align: center;
-            padding-top: 10px;
         }
 
-        .desc {
-            font-family: "Roboto", sans-serif;
-            font-size: clamp(1.3rem, 1vw, 1rem);
-            color: #ffff;
-            text-align: center;
-        }
-
-        nav {
-            background-color: white;
-            padding: 1rem;
-        }
-
-        .main-container {
-            height: calc(100vh - 120px);
-            /* full height minus nav + buttons */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .input-group {
-            background-color: #F0F1F6;
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            margin: 0.5rem auto;
-            width: 80%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 500;
-            border: 2px solid #F6D25B;
-        }
-
-        .input-group label {
-            margin: 0;
-            font-size: 1rem;
-            color: black;
-            flex: 1;
-        }
-
-        .input-group input {
-            border: none;
-            background: transparent;
-            border-radius: 5px;
-            text-align: center;
-            width: 50px;
-            font-weight: bold;
-            color: #44B87D;
-        }
-
-        .input-group input:focus {
-            outline: none;
-        }
-
-        .section-header {
+        p {
             color: white;
-            font-weight: 500;
-            font-size: 1rem;
-            text-align: center;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
+            font-family: "Roboto", sans-serif;
+            font-size: 16px;
         }
-        
+
+        /* White Table Content */
+        .tableContainer {
+            background-color: white;
+            border: 2px solid #F6D25B;
+            border-radius: 20px;
+        }
+
+        /* Categories Section */
+        .categories {
+            margin-top: 15px;
+        }
+
+        .expenses {
+            color: black;
+            justify-content: start;
+            align-items: start;
+            text-align: start;
+        }
+
+        .titleCateg {
+            color: black;
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .track {
+            color: black;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .limit {
+            color: black;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .scrollable-container {
+            overflow-y: auto;
+            height: 300px;
+            overflow-x: hidden;
+            margin-top: 1px;
+        }
+
+        /* Expense Css */
+
+        .expensesTab {
+            margin-top: 20px;
+            height: 40px;
+        }
+
+        .expenseName {
+            color: black;
+            font-size: 16px;
+            font-family: "Roboto", sans-serif;
+            font-weight: 500px;
+        }
+
+        .checkboxCol {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .labelLimit {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            accent-color: #F6D25B;
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 7px;
+        }
+
+        .amountForm {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 2px solid #F6D25B;
+            width: 80px;
+            font-family: "Roboto", sans-serif;
+        }
+
+        /* Savings Css */
+        .savingsContainer {
+            background-color: white;
+            border: 2px solid #F6D25B;
+            border-radius: 20px;
+            height: 50px;
+        }
+
+        .savingsTab {
+            margin-top: 8px;
+        }
+
+        .savingsCol {
+            margin-top: 3px;
+        }
+
+        .savings {
+            color: black;
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
+            text-align: start;
+        }
+
+        .savingsForm {
+            text-align: center;
+            border: 2px solid #F6D25B;
+            width: 135px;
+            font-family: "Roboto", sans-serif;
+        }
+
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
-            border-radius: 30px;
+            border-radius: 27px;
             cursor: pointer;
-            z-index: 2;
             text-decoration: none;
             border: none;
+            margin-top: 20px;
         }
 
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
-
     </style>
+
 </head>
 
 <body>
@@ -124,121 +207,292 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container-fluid d-flex flex-column justify-content-between main-container">
+    <div class="container-fluid mainContainer">
 
-    
-        <div class="row">
-            <!-- Title -->
-            <div class="col-12 title mt-2">
-                <h2>Create your own <br>budgeting rule</h2>
+        <!-- Title Container -->
+        <div class="titleContainer">
+            <h2>
+                Create your own<br>budget rule
+            </h2>
+        </div>
+
+        <!-- Description Container -->
+        <div class="descContainer">
+            <p>
+                How much do you want to spend per month?
+            <p>
+        </div>
+
+        <!-- Expenses Container -->
+        <div class="container tableContainer">
+
+            <!-- Row for Categories -->
+            <div class="row categories">
+                <div class="col-4 expenses">
+                    <h5 class="titleCateg">
+                        Expenses
+                    </h5>
+                </div>
+
+                <div class="col-3 track">
+                    <h5 class="titleCateg">
+                        Track
+                    </h5>
+                </div>
+
+                <div class="col-5 limit">
+                    <h5 class="titleCateg">
+                        Limit
+                    </h5>
+                </div>
             </div>
 
-            <!-- Description -->
-            <div class="col-12 desc mt-2">
-                <p>Set up your own budgeting rule</p>
+            <!-- Row for Expenses -->
+            <div class="scrollable-container">
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Groceries
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="grocery" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="grocery" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Rent
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Water
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="water" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="water" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            School Supplies
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="schoolSup" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="schoolSup" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Electricity
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="electricity" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="electricity" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Car
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="car" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="car" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Subscription
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="sub" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="sub" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
+                <div class="row expensesTab">
+                    <div class="col-4 expensesCol">
+                        <p class="expenseName">
+                            Internet Connection
+                        </p>
+                    </div>
+
+                    <div class="col-3 checkboxCol">
+                        <input type="checkbox" name="internet" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-1 checkboxCol">
+                        <input type="checkbox" name="internet" onchange="selectOnlyOne(this)">
+                    </div>
+
+                    <div class="col-4 labelLimit">
+                        <input class="form-control form-control-sm amountForm" type="text" placeholder="Php/%">
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
-        <!-- Set Percentage -->
-        <!-- Budget Inputs -->
-        <div class="row" style="overflow:scroll; height: 300px;">
-            <div class="col-12">
-                <div class="input-group">
-                    <label for="dining">Dining Out</label>
-                    <input type="text" id="dining" value="0" />
-                </div>
-                <div class="input-group">
-                    <label for="electricity">Electricity</label>
-                    <input type="text" id="electricity" value="0" />
-                </div>
-                <div class="input-group">
-                    <label for="groceries">Groceries</label>
-                    <input type="text" id="groceries" value="0" />
-                </div>
-                <div class="input-group">
-                    <label for="transportation">Transportation</label>
-                    <input type="text" id="transportation" value="0" />
+        <!-- Savings Description Container -->
+        <div class="descContainer">
+            <p>
+                How much do you want to save per month?
+            <p>
+        </div>
+
+        <!-- Savings Container -->
+        <div class="container savingsContainer">
+
+            <div class="row savingsTab">
+                <div class="col-6 savingsCol">
+                    <h5 class="savings">
+                        Savings
+                    </h5>
                 </div>
 
-                <p class="section-header">How much do you want to save?</p>
-
-                <div class="input-group">
-                    <label for="savings">Savings</label>
-                    <input type="text" id="savings" value="0" />
+                <div class="col-6 savingsLimit">
+                    <input class="form-control form-control-sm savingsForm" type="text" placeholder="Php/%">
                 </div>
             </div>
+
         </div>
 
-        <div class="col-12 d-flex justify-content-center">
-            <p id="warning-msg" style="color: #fff; font-weight: bold; size: 1.4rem;"></p>
+        <!-- Button Container -->
+        <div class="container buttonContainer">
+
+            <div class="col-12 btnNext d-flex justify-content-center align-items-center">
+                <a href="done.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+            </div>
+
         </div>
 
-
-        <!-- Buttons -->
-        <div class="col-12 d-flex justify-content-center">
-           <button onclick="location.href='done.php'" type="submit" class="btn btn-warning mb-3">Next</button>
-        </div>
 
     </div>
 
-
     <script>
-    const inputs = document.querySelectorAll('.input-group input');
-    const warning = document.getElementById('warning-msg');
-    const nextBtn = document.querySelector('.btn');
+        // Disable all limit inputs by default
+        document.querySelectorAll('.labelLimit input').forEach(input => {
+            input.disabled = true;
+            input.style.opacity = '0.5'; // make it look grayed out
+        });
 
-    function validateInputs() {
-        let valid = true;
-        inputs.forEach(input => {
-            let val = input.value.trim().replace(/,/g, ''); // remove commas for check
-            if (val === "" || isNaN(val)) {
-                valid = false;
+        // Add event listeners for each expense row
+        document.querySelectorAll('.expensesTab').forEach(row => {
+            const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+            const trackCheckbox = checkboxes[0]; // first checkbox = Track
+            const limitCheckbox = checkboxes[1]; // second checkbox = Limit
+            const limitInput = row.querySelector('.labelLimit input');
+
+            if (trackCheckbox && limitCheckbox && limitInput) {
+                // When Track checkbox is clicked
+                trackCheckbox.addEventListener('change', () => {
+                    if (trackCheckbox.checked) {
+                        // Disable input when tracking is chosen
+                        limitInput.disabled = true;
+                        limitInput.style.opacity = '0.5';
+                        limitInput.value = ''; // clear value
+                        limitCheckbox.checked = false; // uncheck limit if it was checked
+                    }
+                });
+
+                // When Limit checkbox is clicked
+                limitCheckbox.addEventListener('change', () => {
+                    if (limitCheckbox.checked) {
+                        // Enable input when limit is chosen
+                        limitInput.disabled = false;
+                        limitInput.style.opacity = '1';
+                        trackCheckbox.checked = false; // uncheck track if it was checked
+                    } else {
+                        // Disable and gray out input if limit unchecked
+                        limitInput.disabled = true;
+                        limitInput.style.opacity = '0.5';
+                        limitInput.value = '';
+                    }
+                });
             }
         });
+    </script>
 
-        if (!valid) {
-            warning.textContent = `Please enter valid numbers only.`;
-            nextBtn.disabled = true;
-            nextBtn.style.opacity = 0.5;
-        } else {
-            warning.textContent = '';
-            nextBtn.disabled = false;
-            nextBtn.style.opacity = 1;
-        }
-    }
-
-    function formatNumber(val) {
-        // Remove non-digits and commas, then reformat
-        val = val.replace(/[^0-9]/g, '');
-        return val ? parseInt(val, 10).toLocaleString() : "";
-    }
-
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
-            let cursorPos = input.selectionStart;
-            let beforeLength = input.value.length;
-
-            input.value = formatNumber(input.value);
-
-            // Keep cursor position after formatting
-            let afterLength = input.value.length;
-            input.selectionEnd = cursorPos + (afterLength - beforeLength);
-
-            validateInputs();
-        });
-
-        input.addEventListener('blur', () => {
-            if (input.value.trim() === "") {
-                input.value = "0";
-            }
-            validateInputs();
-        });
-    });
-
-    // Initial check
-    validateInputs();
-</script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
