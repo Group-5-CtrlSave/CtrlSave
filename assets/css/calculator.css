@@ -22,9 +22,19 @@ nav {
 }
 
 nav img {
-  width: 40px;
-  height: 40px;
+  width: 25px !important;
+  height: 25px !important;
   cursor: pointer;
+}
+
+.calculator-title {
+  color: #000;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-family: 'Roboto', sans-serif;
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
 }
 
 .calculator-container {
@@ -68,6 +78,24 @@ nav img {
 
 .btn-calc:hover {
   background-color: #ffd84f;
+}
+
+.btn-clear {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.btn-clear:hover {
+  background-color: #e04343;
+}
+
+.btn-delete {
+  background-color: #FF8C42;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #e67a35;
 }
 
 .btn-operator {
