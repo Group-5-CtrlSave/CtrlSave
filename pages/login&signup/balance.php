@@ -25,7 +25,7 @@
 
         .desc {
             font-family: "Roboto", sans-serif;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 16px;
             color: #ffff;
             text-align: center;
         }
@@ -33,25 +33,28 @@
         .form-control {
             border: 2px solid #F6D25B;
             height: 60px;
-            width: 230px;
+            width: 200px;
             text-align: center;
-            font-size: clamp(1.5rem, 1vw, 1rem);
-            background-color: #F0F1F6;
+            font-size: 20px;
+            background-color: white;
+            border-radius: 20px;
+            font-family: "Roboto", sans-serif;
         }
 
+         /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
-            border-radius: 30px;
+            border-radius: 27px;
             cursor: pointer;
-            z-index: 2;
             text-decoration: none;
             border: none;
+            margin-top: 10px;
         }
 
         .btn:hover {

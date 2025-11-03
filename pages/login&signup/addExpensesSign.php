@@ -14,6 +14,9 @@
 
         body {
             background-color: #44B87D;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         h2 {
@@ -23,30 +26,10 @@
             text-align: center;
         }
 
-       .btn {
-            background-color: #F6D25B;
-            color: black;
-            text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
-            font-weight: bold;
-            font-family: "Poppins", sans-serif;
-            border-radius: 30px;
-            cursor: pointer;
-            z-index: 2;
-            text-decoration: none;
-            border: none;
-            margin-top: 180px;
-        }
-
-        .btn:hover {
-            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
-        }
-
         .label {
             font-family: "Poppins", sans-serif;
             font-weight: 500;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 20px;
             color: #ffff;
             display: flex;
         }
@@ -57,6 +40,15 @@
             display: flex;
             font-family: "Roboto", sans-serif;
             background-color: #F0F1F6;
+            border-radius: 20px;
+        }
+
+        .expenseName {
+            margin-top: 20px;
+        }
+
+        .expenseIcon {
+            margin-top: 20px;
         }
 
         .custom-dropdown {
@@ -73,7 +65,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-radius: 5px;
+            border-radius: 20px;
         }
 
         .dropdown-options {
@@ -114,13 +106,177 @@
         .selected-option.open::after {
             transform: rotate(180deg);
         }
+
+        .needWants {
+            margin-top: 20px;
+        }
+
+        .limitTrack {
+            margin-top: 20px;
+        }
+
+        p {
+            color: white;
+            font-family: bolder !important;
+            font-family: "Poppins", sans-serif !important;
+            font-size: 20px;
+        }
+
+        .form-check-label {
+            color: black;
+            font-weight: 5px;
+            font-size: 20px;
+            font-family: "Roboto", sans-serif;
+        }
+
+        .btn {
+            background-color: #F6D25B;
+            color: black;
+            text-align: center;
+            width: 125px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            border-radius: 27px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        /* Media Queries of Every Mobile Screen */
+        @media screen and (min-width:344px) {}
+
+        @media screen and (min-width:360px) {}
+
+        @media screen and (min-width:375px) {
+            .label {
+                font-size: 18px;
+            }
+
+            .expenseName {
+                margin-top: 10px;
+            }
+
+            .expenseIcon {
+                margin-top: 10px;
+            }
+
+            .form-control {
+                height: 50px;
+            }
+
+            .needWants {
+                margin-top: 10px;
+            }
+
+            .limitTrack {
+                margin-top: 10px;
+            }
+        }
+
+        @media screen and (min-width:390px) {
+            .label {
+                font-size: 20px;
+            }
+
+            .expenseName {
+                margin-top: 30px;
+            }
+
+            .expenseIcon {
+                margin-top: 30px;
+            }
+
+            .form-control {
+                height: 50px;
+            }
+
+            .needWants {
+                margin-top: 30px;
+            }
+
+            .limitTrack {
+                margin-top: 30px;
+            }
+
+            .btn {
+            margin-top: 50px;
+            }
+        }
+
+        @media screen and (min-width:414px) {
+            .label {
+                font-size: 20px;
+            }
+
+            .expenseName {
+                margin-top: 20px;
+            }
+
+            .expenseIcon {
+                margin-top: 20px;
+            }
+
+            .form-control {
+                height: 50px;
+            }
+
+            .needWants {
+                margin-top: 20px;
+            }
+
+            .limitTrack {
+                margin-top: 20px;
+            }
+
+            .btn {
+            margin-top: 40px;
+            }
+        }
+
+         @media screen and (min-width:430px) {
+            .label {
+                font-size: 20px;
+            }
+
+            .expenseName {
+                margin-top: 30px;
+            }
+
+            .expenseIcon {
+                margin-top: 40px;
+            }
+
+            .form-control {
+                height: 50px;
+            }
+
+            .needWants {
+                margin-top: 40px;
+            }
+
+            .limitTrack {
+                margin-top: 40px;
+            }
+
+            .btn {
+            margin-top: 60px;
+            }
+        }
+
+
     </style>
 
 </head>
 
 <body>
 
-<!-- No Logo Navigation Bar -->
+    <!-- No Logo Navigation Bar -->
     <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative shadow"
         style="height: 72px;">
         <a href="pickExpense.php" class="text-decoration-none">
@@ -134,7 +290,7 @@
 
 
     <!-- Add New Expenses -->
-    <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5">
+    <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-4">
         <div class="row main-row">
 
             <!-- Title -->
@@ -143,108 +299,144 @@
             </div>
 
             <!-- New Expenses Name -->
-            <div class="col-12 firstname mt-3">
+            <div class="col-12 expenseName">
                 <label class="label">Enter category name:</label>
                 <input type="text" class="form-control" placeholder="e.g. Netflix" required>
             </div>
 
             <!-- New Expenses Icons -->
-                <div class="col-12 firstname mt-4">
-                    <label class="label">Choose category icon:</label>
-                    <div class="custom-dropdown" id="iconDropdown">
-                        <div class="selected-option" id="selectedOption">
-                            <span>Select icon</span>
-                        </div>
-                        <div class="dropdown-options" id="dropdownOptions">
-                            <div class="dropdown-option" data-value="car">
-                                <img src="../../assets/img/shared/categories/expense/Car.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="clothes">
-                                <img src="../../assets/img/shared/categories/expense/Clothes.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="coffee">
-                                <img src="../../assets/img/shared/categories/expense/Coffee.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="dinning">
-                                <img src="../../assets/img/shared/categories/expense/Dining Out.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="electricity">
-                                <img src="../../assets/img/shared/categories/expense/Electricity.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="entertainment">
-                                <img src="../../assets/img/shared/categories/expense/Entertainment.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="gift">
-                                <img src="../../assets/img/shared/categories/expense/Gift.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="groceries">
-                                <img src="../../assets/img/shared/categories/expense/Groceries.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="health">
-                                <img src="../../assets/img/shared/categories/expense/Health.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="house">
-                                <img src="../../assets/img/shared/categories/expense/House.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="wifi">
-                                <img src="../../assets/img/shared/categories/expense/Internet Connection.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="laundry">
-                                <img src="../../assets/img/shared/categories/expense/Laundry.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="party">
-                                <img src="../../assets/img/shared/categories/expense/Party.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="rent">
-                                <img src="../../assets/img/shared/categories/expense/Rent.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="schoolNeeds">
-                                <img src="../../assets/img/shared/categories/expense/School Needs.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="selfCare">
-                                <img src="../../assets/img/shared/categories/expense/Selfcare.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="shopping">
-                                <img src="../../assets/img/shared/categories/expense/Shopping.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="subscriptions">
-                                <img src="../../assets/img/shared/categories/expense/Subscriptions.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="transportation">
-                                <img src="../../assets/img/shared/categories/expense/Transportation.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="tuition">
-                                <img src="../../assets/img/shared/categories/expense/Tuition.png" width="40">
-                            </div>
-
-                            <div class="dropdown-option" data-value="water">
-                                <img src="../../assets/img/shared/categories/expense/Water.png" width="40">
-                            </div>
-                            
-                        </div>
+            <div class="col-12 expenseIcon">
+                <label class="label">Choose category icon:</label>
+                <div class="custom-dropdown" id="iconDropdown">
+                    <div class="selected-option" id="selectedOption">
+                        <span>Select icon</span>
                     </div>
+                    <div class="dropdown-options" id="dropdownOptions">
+                        <div class="dropdown-option" data-value="car">
+                            <img src="../../assets/img/shared/categories/expense/Car.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="clothes">
+                            <img src="../../assets/img/shared/categories/expense/Clothes.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="coffee">
+                            <img src="../../assets/img/shared/categories/expense/Coffee.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="dinning">
+                            <img src="../../assets/img/shared/categories/expense/Dining Out.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="electricity">
+                            <img src="../../assets/img/shared/categories/expense/Electricity.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="entertainment">
+                            <img src="../../assets/img/shared/categories/expense/Entertainment.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="gift">
+                            <img src="../../assets/img/shared/categories/expense/Gift.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="groceries">
+                            <img src="../../assets/img/shared/categories/expense/Groceries.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="health">
+                            <img src="../../assets/img/shared/categories/expense/Health.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="house">
+                            <img src="../../assets/img/shared/categories/expense/House.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="wifi">
+                            <img src="../../assets/img/shared/categories/expense/Internet Connection.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="laundry">
+                            <img src="../../assets/img/shared/categories/expense/Laundry.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="party">
+                            <img src="../../assets/img/shared/categories/expense/Party.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="rent">
+                            <img src="../../assets/img/shared/categories/expense/Rent.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="schoolNeeds">
+                            <img src="../../assets/img/shared/categories/expense/School Needs.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="selfCare">
+                            <img src="../../assets/img/shared/categories/expense/Selfcare.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="shopping">
+                            <img src="../../assets/img/shared/categories/expense/Shopping.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="subscriptions">
+                            <img src="../../assets/img/shared/categories/expense/Subscriptions.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="transportation">
+                            <img src="../../assets/img/shared/categories/expense/Transportation.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="tuition">
+                            <img src="../../assets/img/shared/categories/expense/Tuition.png" width="40">
+                        </div>
+
+                        <div class="dropdown-option" data-value="water">
+                            <img src="../../assets/img/shared/categories/expense/Water.png" width="40">
+                        </div>
+
+                    </div>
+                </div>
 
                 <input type="hidden" id="selectedIcon" name="selectedIcon">
 
+            </div>
+
+            <!-- Needs or Wants -->
+            <div class="col-12 needWants">
+                <label class="label">Is this expense a Need or a Want?</label>
+                <div class="form-check fs-4">
+                    <input class="form-check-input me-2 forms" type="radio" name="category" id="needs" value="needs">
+                    <label class="form-check-label" for="needs">
+                        Needs
+                    </label>
+                </div>
+
+                <div class="form-check fs-4">
+                    <input class="form-check-input me-2 forms" type="radio" name="category" id="wants" value="wants">
+                    <label class="form-check-label" for="wants">
+                        Wants
+                    </label>
+                </div>
+            </div>
+
+            <!-- Limit or Track -->
+            <div class="col-12 limitTrack">
+                <label class="label">Do you want to Limit or Track this expense?</label>
+                <div class="form-check fs-4">
+                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="limit" value="limit">
+                    <label class="form-check-label" for="imit">
+                        Limit
+                    </label>
+                </div>
+
+                <div class="form-check fs-4">
+                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="track" value="track">
+                    <label class="form-check-label" for="track">
+                        Track
+                    </label>
+                </div>
             </div>
 
             <!-- Button -->
@@ -253,6 +445,9 @@
             </div>
 
         </div>
+
+
+
     </div>
 
 

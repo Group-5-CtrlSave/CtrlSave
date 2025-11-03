@@ -52,12 +52,12 @@
             color: #ffffff;
             margin-top: -40px;
             font-family: "Poppins", sans-serif;
-            font-size: clamp(2rem, 1vw, 1rem);
+            font-size: 20px;
         }
 
         .description {
             font-family: "Roboto", sans-serif;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 16px;
             color: #ffffff;
             margin-bottom: 5px;
             max-width: 80%;
@@ -65,19 +65,20 @@
             margin-top: -30px;
         }
 
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
-            border-radius: 30px;
+            border-radius: 27px;
             cursor: pointer;
-            z-index: 2;
             text-decoration: none;
             border: none;
+            margin-top: 10px;
         }
 
         .btn:hover {

@@ -22,7 +22,7 @@
 
         .desc {
             font-family: "Roboto", sans-serif;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 16px;
             color: #ffff;
             text-align: center;
         }
@@ -35,11 +35,11 @@
 
         .form-group label {
             display: block;
-            font-size: clamp(1.3rem, 1vw, 1rem);
+            font-size: 20px;
             margin-bottom: 5px;
             text-align: left;
             font-family: "Poppins", sans-serif;
-            font-weight: 500;
+            font-weight: bold;
             color: #ffff;
         }
 
@@ -47,9 +47,9 @@
             width: 100%;
             padding: 10px;
             border: 2px solid #F6D25B;
-            border-radius: 10px;
-            background-color: #F0F1F6;
-            font-size: 1rem;
+            border-radius: 20px;
+            background-color: white;
+            font-size: 16px;
             color: #000000;
             appearance: none;
             background-repeat: no-repeat;
@@ -61,19 +61,20 @@
             --bs-form-select-bg-img: url("data:image/svg+xml;utf8,<svg fill='green' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1.5 5l6 6 6-6'/></svg>");
         }
 
+         /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
             text-align: center;
-            width: 150px;
-            font-size: clamp(1.3rem, 2vw, 1rem);
+            width: 125px;
+            font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
-            border-radius: 30px;
+            border-radius: 27px;
             cursor: pointer;
-            z-index: 2;
             text-decoration: none;
             border: none;
+            margin-top: 10px;
         }
 
         .btn:hover {
