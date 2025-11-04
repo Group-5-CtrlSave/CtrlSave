@@ -1,71 +1,71 @@
-<!DOCTYPE html>
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+
+if (!isset($_SESSION['user_id'])) {
+  $_SESSION['user_id'] = 1;
+}
+$userID = intval($_SESSION['user_id']);
+
+$createdAt = date('Y-m-d H:i:s');
+
+$goalName = isset($_SESSION['goalName']) ? $_SESSION['goalName'] : '';
+$goalIcon = isset($_SESSION['goalIcon']) ? $_SESSION['goalIcon'] : '';
+
+$iconFilename = basename($goalIcon);
+$displayIconRel = $iconFilename ? "../../assets/img/shared/categories/expense/" . $iconFilename : '';
+
+if (isset($_POST['btnAddGoalConfirmed'])) {
+  $goalName = mysqli_real_escape_string($conn, $_POST['goalName'] ?? $goalName);
+  $goalIcon = basename(mysqli_real_escape_string($conn, $_POST['goalIcon'] ?? $iconFilename));
+  $targetAmount = floatval($_POST['goalAmount']);
+  $currentAmount = floatval($_POST['currentBalance']);
+  $deadline = mysqli_real_escape_string($conn, $_POST['targetDate']);
+  $reminderEnabled = isset($_POST['reminderEnabled']) ? 1 : 0;
+  $reminderTime = $_POST['reminderTime'] ?? null;
+  $repeatFrequency = $_POST['repeatFrequency'] ?? null;
+  $status = "In Progress";
+
+  mysqli_begin_transaction($conn);
+
+  try {
+    $insertGoalQuery = "
+      INSERT INTO tbl_savinggoals 
+      (userID, goalName, icon, targetAmount, currentAmount, deadline, status, reminderEnabled, reminderTime, repeatFrequency, createdAt)
+      VALUES ('$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', '$deadline', '$status', '$reminderEnabled', " . 
+      ($reminderTime ? "'$reminderTime'" : "NULL") . ", " . 
+      ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", '$createdAt')
+    ";
+
+    if (!mysqli_query($conn, $insertGoalQuery)) {
+      throw new Exception("Error inserting saving goal: " . mysqli_error($conn));
+    }
+
+    mysqli_commit($conn);
+    unset($_SESSION['goalName'], $_SESSION['goalIcon']);
+    header("Location: savingGoal.php");
+    exit();
+
+  } catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo "Error: " . $e->getMessage();
+  }
+}
+?>
+
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Goal Details</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Saving — Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
-<style>
+ <style>
   body {
-    background-color: #44B87D;
-  }
-
-  .input-wrapper {
-    background-color: white;
-    border-radius: 12px;
-    padding: 10px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .input-wrapper input {
-    border: none;
-    background: transparent;
-    outline: none;
-    width: 100%;
-    font-weight: 600;
-  }
-
-  .save-btn {
-    background-color: #F6D25B;
-    border: none;
-    border-radius: 999px;
-    height: 50px;
-    font-size: 16px;
-    font-weight: 600;
-    width: 100%;
-    pointer-events: none;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-  }
-
-  .fixed-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: white;
-    z-index: 10;
-  }
-
-  .fixed-footer .progress-line {
-    height: 4px;
-    background-color: #F6D25B;
-    width: 0%;
-    animation: fillLine 1s ease-in-out forwards;
-  }
-
-  @keyframes fillLine {
-    from {
-      width: 50%;
-    }
-
-    to {
-      width: 100%;
-    }
+    background: #44B87D;
+    margin: 0;
+    padding: 0;
+    height: 100%;
   }
 
   label {
@@ -79,126 +79,136 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #F0f1f6;
-    padding: 10px 16px;
-    border-radius: 12px;
-    height: 56px;
-    margin-bottom: 1rem;
+    background: #F0f1f6;
+    padding: 14px 20px; 
+    border-radius: 14px; 
+    height: 64px; 
+    margin-bottom: 1.2rem; 
+    width: 100%;
+    max-width: 520px; 
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .input-wrapper input {
+  .input-wrapper input,
+  .input-wrapper select {
     background: transparent;
     border: none;
     outline: none;
     flex: 1;
+    font-weight: 600;
+    font-size: 15px;
   }
 
-  .input-wrapper input::placeholder {
-    color: #999;
+  .save-btn {
+    background: #F6D25B;
+    border: none;
+    border-radius: 999px;
+    height: 54px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    display: block;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity .2s;
   }
 
-  .input-wrapper span,
-  .input-wrapper img {
-    margin-left: 10px;
-  }
-
-  .form-check-input:checked {
-    background-color: #F6D25B;
-    border-color: #F6D25B;
-  }
-
-  .form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(246, 210, 91, 0.4);
-  }
-
-  html, body {
-    height: 100%;
-    overflow: hidden; /* prevent body scroll */
+  .fixed-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    z-index: 10;
+    padding: 1rem 0;
   }
 
   .content-list {
     overflow-y: auto;
+    height: calc(100vh - 72px - 88px - 72px);
+    padding: 1rem 1rem 80px;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
   }
 
-  .content-list::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
+  .icon-option {
+    width: 100px; 
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #F0f1f6;
+    margin: 0 auto;
   }
 
-  .content-list {
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
+  @media (max-width: 576px) {
+    .input-wrapper, .save-btn {
+      max-width: 100%;
+    }
   }
-
-  .content-list::-webkit-scrollbar-thumb {
-    background: transparent;
-  }
-
 </style>
 
 </head>
-
 <body>
-  <!-- Navbar (Fixed) -->
-  <nav class="px-4 d-flex align-items-center justify-content-between position-fixed top-0 w-100"
-    style="height: 72px; background-color: #F0f1f6; z-index: 20;">
-    <a href="addsaving1.php" class="text-decoration-none">
-      <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 32px;">
-    </a>
-    <h5 class="position-absolute start-50 translate-middle-x m-0 fw-bold text-dark">
-      Add Goal
-    </h5>
-  </nav>
 
-  <!-- Fixed Header Text -->
-  <div class="px-4 pt-3 position-fixed w-100" 
-       style="top: 72px; background-color: #44B87D; z-index: 15;">
-    <p class="fw-bold text-white fs-5 mb-3">
-      What are the details of your saving goal?
-    </p>
+<form method="POST">
+ <nav class="bg-white px-4 py-4 d-flex align-items-center shadow sticky-top" style="height: 72px;">
+  <a href="addsaving1.php">
+    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;">
+  </a>
+  <h5 class="m-0 fw-bold text-dark flex-grow-1 text-center" style="transform: translateX(-15px);">Add Goal</h5>
+</nav>
+
+  <div class="px-4 pt-3 position-fixed w-100" style="top:72px; background:#44B87D; z-index:15;">
+    <p class="fw-bold text-white fs-5 mb-3">What are the details of your saving goal?</p>
   </div>
 
-  <!-- Scrollable Content -->
-  <div class="px-4 content-list" style="height: calc(100vh - 200px); margin-top: 160px; padding-bottom: 60px;">
+  <div class="px-4 content-list" style="margin-top:160px;">
+    <p class="fw-bold text-white fs-5 mb-2">Saving goal: <?= htmlspecialchars($goalName) ?></p>
 
-    <!-- your form fields here -->
+    <?php if (!empty($iconFilename)): ?>
+      <div class="text-center mb-3">
+        <div class="icon-option mx-auto">
+          <img src="<?= htmlspecialchars($displayIconRel) ?>" alt="<?= htmlspecialchars($iconFilename) ?>" style="width:100%; height:100%; object-fit:contain;">
+        </div>
+      </div>
+    <?php endif; ?>
+
     <label>Goal Amount</label>
     <div class="input-wrapper">
-      <input type="text" id="goalAmount" placeholder="Enter amount" class="text-success">
+      <input type="number" name="goalAmount" placeholder="Enter amount" step="0.01" required>
       <span class="text-warning fw-bold">PHP</span>
     </div>
 
     <label>Current Balance</label>
     <div class="input-wrapper">
-      <input type="text" id="currentBalance" placeholder="Enter balance" class="text-success">
+      <input type="number" name="currentBalance" placeholder="Enter balance" step="0.01" required>
       <span class="text-warning fw-bold">PHP</span>
     </div>
 
     <label>Target Date</label>
     <div class="input-wrapper">
-      <input type="date" id="targetDate" class="text-success">
+      <input type="date" name="targetDate" required>
     </div>
 
     <p class="fw-bold text-white fs-5 mt-4 mb-3">Need a reminder for your savings?</p>
-
-    <div class="d-flex justify-content-between align-items-center px-3 py-2 mb-3"
-      style="height: 56px; background-color: #F0f1f6; border-radius: 12px;">
-      <span class="fw-semibold text-dark">Enable Reminders</span>
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 mb-3" style="height:56px; background:#F0f1f6; border-radius:12px;">
+      <span class="fw-semibold text-dark">Enable Reminder</span>
       <div class="form-check form-switch m-0">
-        <input class="form-check-input toggle-switch" type="checkbox" role="switch" checked>
+        <input class="form-check-input" type="checkbox" name="reminderEnabled" role="switch" checked>
       </div>
     </div>
 
-    <label>Time</label>
+    <label>Reminder Time</label>
     <div class="input-wrapper">
-      <input type="time" id="reminderTime" value="22:00" class="text-success">
+      <input type="time" name="reminderTime" value="22:00">
     </div>
 
     <label>Repeat Frequency</label>
     <div class="input-wrapper">
-      <select id="repeatFrequency" class="text-success border-0 bg-transparent fw-semibold w-100">
+      <select name="repeatFrequency" class="border-0 bg-transparent fw-semibold w-100">
         <option value="daily">Every Day</option>
         <option value="weekly" selected>Every Week</option>
         <option value="biweekly">Every 2 Weeks</option>
@@ -208,48 +218,25 @@
     </div>
   </div>
 
-  <!-- Fixed Save Button -->
   <div class="fixed-footer">
-    <div class="progress-line"></div>
     <div class="p-3">
-      <a href="saving1.php" class="d-block text-decoration-none">
-        <button id="saveBtn" class="save-btn d-flex justify-content-center align-items-center w-100">
-          Save
-        </button>
-      </a>
+      <button type="submit" name="btnAddGoalConfirmed" class="save-btn d-flex justify-content-center align-items-center w-100">Save</button>
     </div>
   </div>
+</form>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const saveBtn = document.querySelector(".save-btn");
+  const inputs = document.querySelectorAll('input[name="goalAmount"], input[name="currentBalance"], input[name="targetDate"]');
 
-  <script>
-    const saveBtn = document.getElementById("saveBtn");
-    const requiredFields = [
-      document.getElementById("goalAmount"),
-      document.getElementById("currentBalance"),
-      document.getElementById("targetDate")
-    ];
+  function checkFields(){
+    const allFilled = Array.from(inputs).every(i => i.value.trim() !== "");
+    saveBtn.style.pointerEvents = allFilled ? "auto" : "none";
+    saveBtn.style.opacity = allFilled ? "1" : "0.6";
+  }
 
-    function checkFields() {
-      let allFilled = requiredFields.every(function (input) {
-        return input.value.trim() !== "";
-      });
-
-      if (allFilled) {
-        saveBtn.style.pointerEvents = "auto";
-        saveBtn.style.opacity = "1";
-      } else {
-        saveBtn.style.pointerEvents = "none";
-        saveBtn.style.opacity = "0.6";
-      }
-    }
-
-    requiredFields.forEach(function (input) {
-      input.addEventListener("input", checkFields);
-    });
-
-    checkFields(); 
-  </script>
+  inputs.forEach(i => i.addEventListener("input", checkFields));
+  checkFields();
+</script>
 </body>
-
 </html>
