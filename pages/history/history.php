@@ -1,3 +1,101 @@
+<?php
+include("../../assets/shared/connect.php");
+date_default_timezone_set('Asia/Manila');
+
+// filters (intval = dbl check if legit number )
+$daysFilter = isset($_GET['days']) ? intval($_GET['days']) : 30;
+$typeFilter = isset($_GET['type']) ? $_GET['type'] : 'all';
+
+// query for income, expenses, savings
+$query = "
+  SELECT 
+    'expenses' AS type,
+    uc.categoryName AS name,
+    e.amount AS amount,
+    e.dateSpent AS date,
+    uc.type AS categoryType,
+    uc.icon AS icon
+  FROM tbl_expense e
+  JOIN tbl_usercategories uc ON e.userCategoryID = uc.userCategoryID
+
+  UNION ALL
+
+  SELECT 
+    'income' AS type,
+    uc.categoryName AS name,
+    i.amount AS amount,
+    i.dateReceived AS date,
+    uc.type AS categoryType,
+    uc.icon AS icon
+  FROM tbl_income i
+  JOIN tbl_usercategories uc ON i.userCategoryID = uc.userCategoryID
+
+  UNION ALL
+
+  SELECT 
+    'savings' AS type,
+    sg.goalName AS name,
+    gt.amount AS amount,
+    gt.date AS date,
+    'savings' AS categoryType,
+    sg.icon AS icon
+  FROM tbl_goaltransactions gt
+  JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
+";
+
+$query = "SELECT * FROM ($query) AS all_data";
+
+// filters
+$filterParts = [];
+
+// Days 
+if (isset($_GET['days']) && intval($_GET['days']) > 0) {
+  $daysFilter = intval($_GET['days']);
+  $filterParts[] = "all_data.date >= DATE_SUB(NOW(), INTERVAL $daysFilter DAY)";
+}
+
+// Type 
+if (isset($_GET['type']) && $_GET['type'] !== 'all') {
+  $typeFilter = strtolower($_GET['type']);
+  $filterParts[] = "all_data.type = '$typeFilter'";
+}
+
+if (!empty($filterParts)) {
+  $query .= " WHERE " . implode(" AND ", $filterParts);
+}
+
+// Desc order
+$query = $query . " ORDER BY all_data.date DESC";
+$result = executeQuery($query);
+
+function formatTimeAgo($datetime)
+{
+  $givenTime = strtotime($datetime);
+  $currentTime = time();
+  $timeDifference = $currentTime - $givenTime;
+  // If less than 60 secs
+  if ($timeDifference < 60) {
+    return 'Just now';
+  }
+  // If less than 1 hour ago
+  elseif ($timeDifference < 3600) {
+    $minutes = floor($timeDifference / 60);
+    $label = $minutes > 1 ? 'mins' : 'min';
+    return $minutes . " $label ago";
+  }
+  // If less than 24 hours ago 
+  elseif ($timeDifference < 86400) {
+    $hours = floor($timeDifference / 3600);
+    $label = $hours > 1 ? 'hours' : 'hour';
+    return $hours . " $label ago";
+  }
+  // If more than 1 day ago
+  else {
+    return date('F d, Y | H:i', $givenTime);
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,132 +104,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>History</title>
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
+  <link rel="stylesheet" href="../../assets/css/history.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
-
-    body {
-      font-family: "Roboto", sans-serif;
-      background-color: #44B87D !important;
-    }
-
-    .mainHeader {
-      position: sticky;
-      background-color: #44B87D;
-      padding: 20px 30px;
-      color: #FFFFFF;
-      font-family: "Poppins", sans-serif;
-    }
-
-    .mainHeader h2 {
-      font-weight: 700;
-    }
-
-    .filter-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin: 0px 0 15px 0;
-    }
-
-    .filter-buttons button {
-      background-color: #FFFFFF;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 20px;
-      font-size: 16px;
-      color: #44B87D;
-      font-weight: 700;
-    }
-
-    .scrollable-container {
-      height: 70dvh;
-      overflow-y: auto;
-      padding-bottom: 20px;
-    }
-
-    .entry {
-      background-color: #FFFFFF;
-      border-radius: 20px;
-      width: 85%;
-      padding: 10px;
-      margin: 10px auto;
-      display: flex;
-      flex-direction: column;
-      border: 2px solid #FFC107;
-    }
-
-    .entry .time {
-      color: #666;
-      font-size: 12px;
-      align-self: flex-end;
-      margin-bottom: 5px;
-    }
-
-    .entry .content {
-      display: flex;
-      justify-content: start;
-      align-items: center;
-      gap: 10px;
-      margin-top: -25px;
-      min-height: 50px;
-    }
-
-    .entry .icon img {
-      width: 60px;
-      height: 60px;
-    }
-
-    .entry .text {
-      font-size: 16px;
-      color: #000000;
-    }
-
-    .entry .amount {
-      color: #FFD858;
-      font-size: 16px;
-      margin-left: auto;
-      position: relative;
-      top: 10px;
-    }
-
-    /* Modal */
-    .modal.modal-bottom-sheet .modal-dialog {
-      position: fixed;
-      margin: 0;
-      width: 100%;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      transform: translateY(100%);
-      transition: transform 0.4s ease-in-out;
-    }
-
-    .modal.modal-bottom-sheet.show .modal-dialog {
-      transform: translateY(0);
-    }
-
-    .modal-bottom-sheet .modal-content {
-      border-radius: 20px 20px 0 0;
-      border: none;
-      padding: 15px 0;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-backdrop.show {
-      opacity: 0.3;
-    }
-
-    .modal.modal-bottom-sheet.show .modal-dialog {
-      transform: translateY(0);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-  </style>
 </head>
 
 <body>
@@ -143,158 +121,128 @@
   </div>
 
   <div class="filter-buttons">
-    <button type="button" data-bs-toggle="modal" data-bs-target="#selectRangeModal">
-      <i class="fa-solid fa-filter"></i> Last 30 Days
+    <button type="button" data-bs-toggle="modal" data-bs-target="#selectRangeModal" id="rangeBtn">
+      <i class="fa-solid fa-filter"></i>
+      <?php echo $daysFilter == 7 ? 'Last 7 Days' : 'Last 30 Days'; ?>
     </button>
-    <button type="button" data-bs-toggle="modal" data-bs-target="#selectTypesModal">
-      <i class="fa-solid fa-filter"></i> All Types
+    <button type="button" data-bs-toggle="modal" data-bs-target="#selectTypesModal" id="typeBtn">
+      <i class="fa-solid fa-filter"></i>
+      <?php echo ($typeFilter == 'all') ? 'All Types' : ucfirst($typeFilter); ?>
     </button>
   </div>
 
-  <!-- Scrollable Entries -->
   <div class="scrollable-container">
-    <div class="entry">
-      <span class="time">1 hour ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Coffee</span>
-        <span class="amount">-P150</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">2 hours ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Dining</span>
-        <span class="amount">+P500</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">Yesterday</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Shopping</span>
-        <span class="amount">-P1200</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">Yesterday</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Groceries</span>
-        <span class="amount">-P2500</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">3 days ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Fuel</span>
-        <span class="amount">-P800</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">5 days ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Utilities</span>
-        <span class="amount">-P1800</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">1 week ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Salary</span>
-        <span class="amount">+P15000</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">10 days ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Entertainment</span>
-        <span class="amount">-P600</span>
-      </div>
-    </div>
-
-    <div class="entry">
-      <span class="time">15 days ago</span>
-      <div class="content">
-        <span class="icon">
-          <img src="../../assets/img/shared/categories/expense/Coffee.png" alt="Coffee" class="img-fluid">
-        </span>
-        <span class="text">Phone Bill</span>
-        <span class="amount">-P1000</span>
-      </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade modal-bottom-sheet" id="selectRangeModal" tabindex="-1"
-      aria-labelledby="selectRangeModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="selectRangeModalLabel">Select Range</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <?php if (mysqli_num_rows(result: $result) > 0): ?>
+      <?php while ($row = mysqli_fetch_assoc($result)): ?>
+        <?php
+        $basePath = "../../assets/img/shared/categories/";
+        if ($row['categoryType'] == 'income') {
+          $iconPath = $basePath . "income/" . $row['icon'];
+        } elseif ($row['categoryType'] == 'expense') {
+          $iconPath = $basePath . "expense/" . $row['icon'];
+        } else { // savings
+          $iconPath = $basePath . "savings/" . $row['icon'];
+        }
+        ?>
+        <div class="entry">
+          <span class="time"><?php echo formatTimeAgo($row['date']); ?></span>
+          <div class="content">
+            <span class="icon">
+              <img src="<?php echo $iconPath; ?>" alt="<?php echo $row['categoryType']; ?>" class="img-fluid">
+            </span>
+            <span class="text"><?php echo ($row['name']); ?></span>
+            <span class="amount" style="color: <?= $row['type'] == 'expenses' ? '#FF5C5C' : '#44B87D' ?>">
+              <?php echo ($row['type'] == 'expenses' ? '-' : '+') . '₱' . number_format($row['amount'], 2); ?>
+            </span>
           </div>
-          <div class="modal-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">Last 7 Days</li>
-              <li class="list-group-item">Last 30 Days</li>
-            </ul>
-          </div>
+        </div>
+      <?php endwhile; ?>
+    <?php else: ?>
+      <div class="text-center text-white mt-5">
+        <h5 style="font-size:16px;">You haven’t made any transactions here yet.</h5>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade modal-bottom-sheet" id="selectRangeModal" tabindex="-1" aria-labelledby="selectRangeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="selectRangeModalLabel">Select Range</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Last 7 Days</li>
+            <li class="list-group-item">Last 30 Days</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Modal for Types -->
-    <div class="modal fade modal-bottom-sheet" id="selectTypesModal" tabindex="-1"
-      aria-labelledby="selectTypesModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="selectTypesModalLabel">Select Types</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">All Types</li>
-              <li class="list-group-item">Savings</li>
-              <li class="list-group-item">Income</li>
-              <li class="list-group-item">Expenses</li>
-              <li class="list-group-item">Challenges</li>
-            </ul>
-          </div>
+  <!-- Modal for Types -->
+  <div class="modal fade modal-bottom-sheet" id="selectTypesModal" tabindex="-1" aria-labelledby="selectTypesModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="selectTypesModalLabel">Select Types</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">All Types</li>
+            <li class="list-group-item">Income</li>
+            <li class="list-group-item">Expenses</li>
+            <li class="list-group-item">Savings</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    // filter modal function js
+    function applyFilter(name, value) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set(name, value);
+      window.location.href = currentUrl.toString();
+    }
+
+    // date filter
+    const dateItems = document.querySelectorAll('#selectRangeModal .list-group-item');
+    dateItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const selectedText = item.textContent.trim();
+        let days = 30; // def
+        if (selectedText.includes('7')) {
+          days = 7;
+        }
+        applyFilter('days', days);
+      });
+    });
+
+    // type filter
+    const typeItems = document.querySelectorAll('#selectTypesModal .list-group-item');
+    typeItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const selectedText = item.textContent.trim().toLowerCase();
+        let type = 'all'; // def
+
+        if (selectedText.includes('income')) type = 'income';
+        else if (selectedText.includes('expense')) type = 'expenses';
+        else if (selectedText.includes('saving')) type = 'savings';
+
+        applyFilter('type', type);
+      });
+    });
+  </script>
 </body>
 
 </html>
