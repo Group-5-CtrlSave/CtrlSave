@@ -348,7 +348,7 @@
         <div class="row buttonRow">
             <!-- Button -->
             <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
-                <a href="currencyLanguage.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+                <a href="currency.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
             </div>
 
             <!-- Sign Up -->

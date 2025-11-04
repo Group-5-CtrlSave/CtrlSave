@@ -15,6 +15,7 @@
         body,
         html {
             background-color: #44B87D;
+            overflow: hidden;
         }
 
         h2 {
@@ -82,7 +83,7 @@
             margin: auto;
         }
 
-         /* Button */
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
@@ -95,7 +96,6 @@
             cursor: pointer;
             text-decoration: none;
             border: none;
-            margin-top: 10px;
         }
 
         .btn:hover {
@@ -106,22 +106,27 @@
             color: black;
             font-family: "Poppins", sans-serif;
             font-weight: bold;
-            padding-top: 15px;
+            margin-top: 15px;
         }
+
     </style>
 </head>
 
 <body>
-    <!-- No Logo Navigation Bar -->
-    <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative shadow"
-        style="height: 72px;">
-        <a href="needsWants.php" class="text-decoration-none">
-            <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 32px;">
-        </a>
-        <h5 class="position-absolute start-50 translate-middle-x m-0 fw-bold text-dark"
-            style="font-family: Poppins, sans-serif;">
-            Budget Rule
-        </h5>
+    <!-- Navigation Bar -->
+    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+        <div class="container-fluid position-relative">
+            <div class="d-flex align-items-start justify-content-start">
+                <a href="needsWants.php">
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
+                        style="height: 24px;" />
+                </a>
+            </div>
+
+            <div class="position-absolute top-50 start-50 translate-middle">
+                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Budget Rule</h2>
+            </div>
+        </div>
     </nav>
 
     <!-- Title -->
@@ -203,11 +208,11 @@
         </div>
 
         <!-- Button -->
-        <div class="col-12 btNext mt-4 d-flex justify-content-center align-items-center">
+        <div class="col-12 btNext d-flex justify-content-center align-items-center">
             <a href="done.php"><button type="submit" class="btn btn-warning mt-4">Next</button></a>
         </div>
 
-        <div class="col-12 mb-3 mt-2 noAccount d-flex justify-content-center align-items-center">
+        <div class="col-12 noAccount d-flex justify-content-center align-items-center">
             <a href="percentage.php" class="preferMineLink" style="color: black;">I prefer mine</a>
         </div>
     </div>

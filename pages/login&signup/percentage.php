@@ -188,22 +188,64 @@
         .btn:hover {
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
+
+
+        /* Media Queries of Every Mobile Screen */
+        @media screen and (min-width:375px) {
+            .scrollable-container {
+                overflow-y: auto;
+                height: 200px;
+                overflow-x: hidden;
+                margin-top: 1px;
+            }
+        }
+
+        @media screen and (min-width:414px) {
+            .scrollable-container {
+                overflow-y: auto;
+                height: 370px;
+                overflow-x: hidden;
+                margin-top: 1px;
+            }
+        }
+
+        @media screen and (min-width:390px) {
+            .scrollable-container {
+                overflow-y: auto;
+                height: 300px;
+                overflow-x: hidden;
+                margin-top: 1px;
+            }
+        }
+
+        @media screen and (min-width:430px) {
+            .scrollable-container {
+                overflow-y: auto;
+                height: 330px;
+                overflow-x: hidden;
+                margin-top: 1px;
+            }
+        }
     </style>
 
 </head>
 
 <body>
 
-    <!-- No Logo Navigation Bar -->
-    <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative shadow"
-        style="height: 72px;">
-        <a href="budgetingRule.php" class="text-decoration-none">
-            <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 32px;">
-        </a>
-        <h5 class="position-absolute start-50 translate-middle-x m-0 fw-bold text-dark"
-            style="font-family: Poppins, sans-serif;">
-            Own Budget Rule
-        </h5>
+    <!-- Navigation Bar -->
+    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+        <div class="container-fluid position-relative">
+            <div class="d-flex align-items-start justify-content-start">
+                <a href="budgetingRule.php">
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
+                        style="height: 24px;" />
+                </a>
+            </div>
+
+            <div class="position-absolute top-50 start-50 translate-middle">
+                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Own Budget Rule</h2>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->

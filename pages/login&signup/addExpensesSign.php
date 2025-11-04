@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nanum+Myeongjo&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
@@ -39,7 +41,7 @@
             height: 50px;
             display: flex;
             font-family: "Roboto", sans-serif;
-            background-color: #F0F1F6;
+            background-color: white;
             border-radius: 20px;
         }
 
@@ -58,7 +60,7 @@
         }
 
         .selected-option {
-            background-color: #F0F1F6;
+            background-color: white;
             border: 2px solid #F6D25B;
             padding: 10px;
             height: 50px;
@@ -71,7 +73,7 @@
         .dropdown-options {
             display: none;
             position: absolute;
-            background-color: #F0F1F6;
+            background-color: white;
             border: 1px solid #F6D25B;
             width: 100%;
             max-height: 150px;
@@ -92,7 +94,7 @@
         }
 
         .dropdown-option:hover {
-            background-color: #F0F1F6;
+            background-color: white;
         }
 
         .selected-option::after {
@@ -117,13 +119,13 @@
 
         p {
             color: white;
-            font-family: bolder !important;
+            font-family: bolder;
             font-family: "Poppins", sans-serif !important;
             font-size: 20px;
         }
 
         .form-check-label {
-            color: black;
+            color: white;
             font-weight: 5px;
             font-size: 20px;
             font-family: "Roboto", sans-serif;
@@ -205,7 +207,7 @@
             }
 
             .btn {
-            margin-top: 50px;
+                margin-top: 50px;
             }
         }
 
@@ -235,11 +237,11 @@
             }
 
             .btn {
-            margin-top: 40px;
+                margin-top: 40px;
             }
         }
 
-         @media screen and (min-width:430px) {
+        @media screen and (min-width:430px) {
             .label {
                 font-size: 20px;
             }
@@ -265,27 +267,29 @@
             }
 
             .btn {
-            margin-top: 60px;
+                margin-top: 60px;
             }
         }
-
-
     </style>
 
 </head>
 
 <body>
 
-    <!-- No Logo Navigation Bar -->
-    <nav class="bg-white px-4 d-flex align-items-center justify-content-between position-relative shadow"
-        style="height: 72px;">
-        <a href="pickExpense.php" class="text-decoration-none">
-            <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 32px;">
-        </a>
-        <h5 class="position-absolute start-50 translate-middle-x m-0 fw-bold text-dark"
-            style="font-family: Poppins, sans-serif;">
-            Add Expenses
-        </h5>
+    <!-- Navigation Bar -->
+    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+        <div class="container-fluid position-relative">
+            <div class="d-flex align-items-start justify-content-start">
+                <a href="pickExpense.php">
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
+                        style="height: 24px;" />
+                </a>
+            </div>
+
+            <div class="position-absolute top-50 start-50 translate-middle">
+                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Add Expenses</h2>
+            </div>
+        </div>
     </nav>
 
 
@@ -311,7 +315,14 @@
                     <div class="selected-option" id="selectedOption">
                         <span>Select icon</span>
                     </div>
+
                     <div class="dropdown-options" id="dropdownOptions">
+
+                        <div class="dropdown-option" id="uploadIconOption">
+                            <i class="bi bi-cloud-upload" style="font-size: 1.8rem; color: #3a644e; margin-left: 8px;"></i>
+                            <input type="file" id="customIconInput" accept="image/*" style="display: none;">
+                        </div>
+
                         <div class="dropdown-option" data-value="car">
                             <img src="../../assets/img/shared/categories/expense/Car.png" width="40">
                         </div>
@@ -481,6 +492,36 @@
             }
         });
     </script>
+
+    <script>
+        const uploadIconOption = document.getElementById('uploadIconOption');
+        const customIconInput = document.getElementById('customIconInput');
+
+        // When user clicks upload option
+        uploadIconOption.addEventListener('click', () => {
+            customIconInput.click();
+        });
+
+        // Handle image upload
+        customIconInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.width = 40;
+
+                    selectedOption.innerHTML = '';
+                    selectedOption.appendChild(img);
+                    selectedIconInput.value = 'custom-' + file.name; // mark as custom upload
+                    dropdownOptions.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

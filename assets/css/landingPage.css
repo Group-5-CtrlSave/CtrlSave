@@ -5,7 +5,6 @@ body {
     background: #ffffff;
     position: relative;
     overflow: hidden;
-    font-family: Roboto, sans-serif;
 }
 
 .wave.top {
@@ -75,8 +74,9 @@ body {
 }
 
 .step-text {
-    font-family: 'Poppins', sans-serif; /*Poppins*/
-    font-size: 60px;
+    font-family: 'Poppins', sans-serif;
+    /*Poppins*/
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #ffffff;
@@ -84,8 +84,9 @@ body {
 }
 
 .description {
-    font-family: 'Roboto', sans-serif; /*Roboto*/
-    font-size: 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    /*Roboto*/
+    font-size: 16px;
     color: #ffffff;
     margin-bottom: 0px;
     max-width: 80%;
@@ -94,22 +95,22 @@ body {
 
 .next-btn {
     background-color: #F6D25B;
+    color: black;
+    text-align: center;
+    width: 125px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    border-radius: 27px;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    margin-top: 10px;
     position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    color: black;
-    text-align: center;
-    width: 150px;
-    font-size: clamp(1.5rem, 2vw, 1rem);
-    font-weight: bold;
-    font-family: "Poppins", sans-serif;
-    border-radius: 30px;
-    cursor: pointer;
-    margin-top: 40px;
     z-index: 2;
-    text-decoration: none;
-    border: none;
 }
 
 .next-btn:hover {
@@ -128,13 +129,13 @@ body {
     }
 
     .step-text {
-        font-size: 1.6rem;
+        font-size: 20px;
         margin-top: -45px;
         margin-bottom: 15px;
     }
 
     .description {
-        font-size: 0.9rem;
+        font-size: 16px;
         margin-top: -7px;
         margin-bottom: 12px;
     }
