@@ -49,7 +49,7 @@
       </li>
 
       <li>
-        <a href="../../pages/savings/saving1.php"
+        <a href="../../pages/savings/savingDetail.php"
            class="d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded"
            style="display:block; transition: background-color 0.25s, color 0.25s;"
            onmouseover="this.style.backgroundColor='#44B87D'; this.style.color='white';"
