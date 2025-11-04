@@ -31,14 +31,6 @@
     </nav>
 
 
-
-    </nav>
-
-
-
-
-
-
     <!-- Content -->
 
     <div class="container-fluid mainContainer d-flex flex-column">
@@ -69,111 +61,7 @@
                     <p class="categoryName py-2"><b>Transportation</b></p>
                 </button>
             </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
+          
             <div class="col-4 d-flex justify-content-center align-items-center">
                 <a style="text-decoration: none;" href="addExpensesCategory.php">
                     <div class="container p-0 mt-1 text-center">

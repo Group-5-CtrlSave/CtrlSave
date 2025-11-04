@@ -1,21 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 body {
+    background-color: #F3F3F3;
     font-family: "Roboto", sans-serif;
     color: #44B87D;
+    font-size: 18px;
 
 }
+
 
 
 .navigationBarTitle {
     font-family: "Poppins", sans-serif;
     font-weight: 700;
+    color: black;
+
 }
 
-.mainContainer {
-    background-color: #F3F3F3;
-    height: 90dvh;
+.choiceLabel{
+    color: black;
 }
+
 
 .btnSave{
     background-color: #F6D25B !important;
@@ -25,4 +30,15 @@ body {
 
 .forms{
     border-color: #F6D25B;
+    border-radius: 20px;
+}
+
+.selectForm .dropdown-toggle{
+    border-radius: 20px !important;
+    border-color: #F6D25B !important;
+    color: #000 !important;
+}
+
+.selectForm .dropdown-menu{
+    border-color: #F6D25B !important;
 }
