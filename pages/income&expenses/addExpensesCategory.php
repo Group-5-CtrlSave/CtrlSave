@@ -5,14 +5,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CtrlSave | Add Expense Category</title>
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap-Select -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+
+
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="stylesheet" href="../../assets/css/addIncomeExpenseCategory.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
+
+   
 </head>
 
 <body>
-     <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
@@ -22,66 +32,109 @@
                 </a>
             </div>
 
-
             <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center">Add Expense Category</h2>
+                <h2 class="m-0 text-center navigationBarTitle">Add Expense Category</h2>
             </div>
-
         </div>
     </nav>
 
     <!-- Content -->
-
     <div class="container-fluid mainContainer">
         <div class="container text-center py-3">
             <h4 class="title"><b>Add more expenses category</b></h4>
         </div>
-        <div class="container my-3 ">
+
+        <!-- Category Name -->
+        <div class="container my-2">
             <label class="form-check-label" for="categoryName"><b>Enter Category Name:</b></label>
-            <input type="text" class="form-control form-control-lg forms" id="categoryName" placeholder="e.g Entertainment">
-        </div>
-        <div class="container my-3 ">
-            <label class="form-check-label" for="percentage"><b>Target Limit:</b></label>
-            <input type="text" class="form-control form-control-lg forms" id="targetlimit" placeholder="e.g 25% / 2,000 PHP">
-        </div>
-        <div class="container my-3">
-            <div class="form-check fs-4">
-                <input class="form-check-input me-2 forms" type="radio" name="category" id="needs" value="needs">
-                <label class="form-check-label" for="needs">
-                    Needs
-                </label>
-            </div>
-            <div class="form-check fs-4">
-                <input class="form-check-input me-2 forms" type="radio" name="category" id="wants" value="wants">
-                <label class="form-check-label" for="wants">
-                    Wants
-                </label>
-            </div>
+            <input type="text" class="form-control form-control-lg forms" id="categoryName"
+                placeholder="e.g Entertainment">
         </div>
 
+        <!-- Category Icon -->
         <div class="container my-3">
-            <label class="form-check-label" for="icon">Choose Icon</label>
-            <select class="form-select form-select-lg forms">
-                <option selected>Entertainment.icon.png</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <label class="form-check-label" for="iconSelect"><b>Choose Category Icon:</b></label>
+            <select id="iconSelect" class="selectpicker btn-lg selectForm" data-live-search="true" title="Select an icon">
+                <option
+                    data-content="<img src='../../assets/img/shared/categories/expense/Car.png' width='30' height='30'>">
+                    Car
+                </option>
+             
             </select>
         </div>
 
-        <div class="container text-center py-5">
-              <button class="btn btn-lg btnSave"><b>Save</b></button>
+        <!-- Need or Want -->
+        <div class="container my-2">
+            <p class="question p-0 m-0"><b>Is this expense a Need or a Want?</b></p>
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="category" id="needs" value="needs">
+                <label class="form-check-label choiceLabel" for="needs">Needs</label>
+            </div>
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="category" id="wants" value="wants">
+                <label class="form-check-label choiceLabel" for="wants">Wants</label>
+            </div>
+        </div>
+
+        <!-- Limit or Track -->
+        <div class="container my-2">
+            <p class="question p-0 m-0"><b>Do you want to Limit or Track this expense?</b></p>
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="limitTrack" id="limit" value="limit">
+                <label class="form-check-label choiceLabel"for="limit">Limit</label>
+            </div>
+            <div class="form-check fs-4">
+                <input class="form-check-input me-2 forms" type="radio" name="limitTrack" id="track" value="track">
+                <label class="form-check-label choiceLabel" for="track">Track</label>
+            </div>
+        </div>
+
+        <!-- Target Limit -->
+        <div class="container my-2">
+            <label class="form-check-label" for="percentage"><b>Target Limit:</b></label>
+            <input type="text" class="form-control form-control-lg forms" id="targetlimit"
+                placeholder="e.g 25% / 2,000 PHP">
+        </div>
+
+        <!-- Save Button -->
+        <div class="container text-center py-2">
+            <button class="btn btn-lg btnSave"><b>Save</b></button>
         </div>
     </div>
 
 
-
-
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    
+    <!-- jQuery-->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap-Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+
+    <script>
+        $(function () {
+            $('.selectpicker').selectpicker();
+        });
+    </script>
+
+    <script>
+
+        const limit = document.getElementById("limit");
+        const track = document.getElementById("track")
+        const targetlimit =document.getElementById("targetlimit")
+        limit.addEventListener('change', ()=> {
+            if(limit.checked){
+                targetlimit.removeAttribute("disabled")
+            }
+        })
+
+        track.addEventListener('change', ()=>{
+            if(track.checked){
+                targetlimit.setAttribute("disabled", true)
+            }
+        })
+
+    </script>
 
 </body>
 

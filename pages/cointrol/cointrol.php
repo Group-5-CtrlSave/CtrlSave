@@ -28,22 +28,47 @@
         </div>
 
         <div class="scrollableContainer">
+            <!-- Spending Bar Chart -->
             <div class="container my-1 monthlySpendingContainer">
+                <div class="container py-1 text-center">
+                    <h5 class="visualTitle m-0 p-0" id="spendingReport"></h5>
+                </div>
                 <div>
                     <canvas id="monthlySpendingChart"></canvas>
                 </div>
 
             </div>
+            <!-- PrevNext Button Container -->
+            <div class="container my-3 d-flex justify-content-around">
+                <button class="btn btnCustom" onclick="changeMonth(-1)" type="button"><img class="img-fluid previousBtn"
+                        src="../../assets/img/shared/previous.png"></button>
+                <p class="title py-2 m-0" style="font-size: 18px" id="monthYear"></p>
+                <button class="btn btnCustom" onclick="changeMonth(1)" type="button" id="nextBtn"><img
+                        class="img-fluid nextBtn" src="../../assets/img/shared/next.png"></button>
+            </div>
+            <!-- Reset Button -->
+            <div class="container" id="resetButton" style="text-align: center; display: none">
+                <button class="btn btn-lg resetBtn" type="button"><b>RESET</b></button>
+            </div>
 
+
+            <!-- Expenses Pie Chart -->
             <div class="container my-3 py-3 expensesChart">
+                <div class="container py-1 text-center">
+                    <h5 class="visualTitle m-0 p-0">Expenses Chart</h5>
+                </div>
                 <div>
                     <canvas id="expensesChart" height="200" width="200"></canvas>
                 </div>
 
             </div>
 
+            <!-- Month Expenses -->
             <div class="container my-3 py-3 tableContainer">
-                <h5 class="mb-4 text-success fw-bold">Last Month Expenses</h5>
+                <div class="container py-1 text-center">
+                    <h5 class="visualTitle m-0 p-0" id="expensesTable"></h5>
+               
+                </div>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
                         <thead class="table-light">
@@ -86,10 +111,12 @@
 
 
             </div>
-
+            <!-- Analysis and Recommendations -->
             <div class="container analysisRecommendations my-3 py-3">
-                <h5 class="my-1 text-success fw-bold">Analysis and Recommendations</h5>
+                <div class="container p-0 text-center">
+                    <h5 class="visualTitle m-0 p-0" id="analysisForecast">Analysis and Recommendations</h5>
 
+                </div>
                 <p>Based on the current financial report, you have spent a total of 10,000 pesos for the month of May.
                 </p>
 
@@ -105,7 +132,9 @@
                 <p>To stay within your budget, try reducing your Dining Out expenses and use the extra money to buy more
                     groceries or increase your savings.</p>
 
-                <h5 class="my-1 text-success fw-bold">Additional Tips:</h5>
+                <div class="container p-0 text-center">
+                    <h5 class="visualTitle m-0 p-0">Additional Tips</h5>
+                </div>
 
                 <p>Try this additional tips based on your category:</p>
 
@@ -128,6 +157,121 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Global Variables
+        let count = 0;
+        let nextBtn = document.getElementById("nextBtn");
+        let resetBtn = document.getElementById("resetButton");
+        let monthYear = document.getElementById("monthYear");
+        let spendingReport = document.getElementById("spendingReport")
+        let expensesTable = document.getElementById("expensesTable")
+        let analysisForecast = document.getElementById("analysisForecast")
+     
+        function changeMonth(num) {
+            // Get the presentDate
+            let presentDate = new Date()
+            // Pass the present Date in a newDate
+            let newDate = new Date(presentDate)
+
+            // Set the counter
+            count += num;
+
+            // Prevent from going above 6 months
+            if (count >= 3) {
+                nextBtn.setAttribute("disabled", true)
+
+            } else {
+                nextBtn.removeAttribute("disabled")
+            }
+
+
+
+            // Set the new Month to the newDate
+            newDate.setMonth(newDate.getMonth() + count);
+
+            // Get the Present Month and Year
+            let presentMonth = presentDate.getMonth() + 1;
+            let presentYear = presentDate.getFullYear();
+            // Get the New Month and New Year
+            let newMonth = newDate.getMonth() + 1;
+            let newYear = newDate.getFullYear();
+
+            // Check if not in the Present Date
+
+
+            if (newMonth != presentMonth || newYear != presentYear) {
+
+                resetBtn.style.display = "block";
+
+            }
+            if (newMonth == presentMonth && newYear == presentYear) {
+                resetBtn.style.display = "none"
+            }
+
+            // Show the Months in Texts
+            let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            if (count == 1){
+                monthYear.innerHTML = "1 Month Forecast"
+                spendingReport.innerHTML = "1 Month Financial Forecast"
+                expensesTable.innerHTML = "1 Month Forecast Expenses"
+                analysisForecast.innerHTML = "Financial Forecast"
+            }else if (count == 2){
+                monthYear.innerHTML = "3 Months Forecast"
+                spendingReport.innerHTML = "3 Months Financial Forecast"
+                expensesTable.innerHTML = "3 Months Forecast Expenses"
+                analysisForecast.innerHTML = "Financial Forecast"
+            }else if (count == 3) {
+                monthYear.innerHTML = "6 Months Forecast"
+                spendingReport.innerHTML = "6 Months Financial Forecast"
+                expensesTable.innerHTML = "6 Months Forecast Expenses"
+                analysisForecast.innerHTML = "Financial Forecast"
+            } else{
+               monthYear.innerHTML = months[newMonth - 1] + " " + newYear;
+               spendingReport.innerHTML = "Monthly Spending Report"
+               expensesTable.innerHTML = months[newMonth - 1] + " " + newYear+" "+"Expenses"
+               analysisForecast.innerHTML = "Analysis and Recommendations"
+               
+              
+            }
+                
+            
+  
+
+
+
+
+
+
+
+
+
+            
+
+        }
+    </script>
+
+    <script>
+        function getMonth() {
+            let presentDate = new Date()
+            presentMonth = presentDate.getMonth() + 1;
+            presentYear = presentDate.getFullYear();
+
+            let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            let monthYear = document.getElementById('monthYear')
+            monthYear.innerHTML = months[presentMonth - 1] + " " + presentYear;
+
+            spendingReport.innerHTML = "Monthly Spending Report"
+            expensesTable.innerHTML = months[presentMonth - 1] + " " + presentYear +" "+"Expenses"
+
+        }
+
+        getMonth();
+    </script>
+
+    <!-- Bar Chart -->
+
+    <script>
         const ctx = document.getElementById('monthlySpendingChart');
 
         new Chart(ctx, {
@@ -144,22 +288,7 @@
                 }]
             },
             options: {
-                plugins: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Monthly Spending Report',
-                        color: '#2E7D32',
-                        font: {
-                            size: 24,
-                            weight: 'bold'
-                        },
-                        padding: {
-                            top: 10,
-                            bottom: 30
-                        }
-                    }
-                },
+
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -181,6 +310,8 @@
             }
         });
     </script>
+
+    <!-- Pie Chart -->
 
     <script>
         const expensesCtx = document.getElementById('expensesChart');
@@ -207,18 +338,7 @@
                             }
                         }
                     },
-                    title: {
-                        display: true,
-                        text: 'Expenses Structure',
-                        font: {
-                            size: 20,
-                            weight: 'bold'
-                        },
-                        color: '#2E7D32',
-                        padding: {
-                            bottom: 20
-                        }
-                    }
+
                 },
                 cutout: '60%',
                 responsive: true,

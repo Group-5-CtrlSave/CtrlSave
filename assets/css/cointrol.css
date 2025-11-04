@@ -29,11 +29,27 @@ body {
     background-color: #f3f3f3;
 }
 
+.previousBtn, .nextBtn{
+    max-height: 30px !important;
+}
+
+.resetBtn {
+    background-color: #F6D25B !important;
+    border-radius: 20px;
+    color: white !important;
+    
+}
+
+
 .expensesChart {
     border-radius: 20px;
     background-color: #f3f3f3;
 }
-
+.visualTitle{
+    color:#44B87D;
+    font-weight: 700;
+  
+}
 .tableContainer {
     border-radius: 20px;
     background-color: #f3f3f3;
