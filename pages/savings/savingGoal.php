@@ -2,15 +2,15 @@
 session_start();
 include '../../assets/shared/connect.php';
 
-if (!isset($_SESSION['userID'])) {
-    $_SESSION['userID'] = ""; 
+if (!isset($_SESSION['userID']) || empty($_SESSION['userID'])) {
+    $_SESSION['userID'] = 2;
 }
 
-// Use session userID if available, else default to 1
-$userID = !empty($_SESSION['userID']) ? $_SESSION['userID'] : 1;
+$userID = intval($_SESSION['userID']);
 $query = "SELECT * FROM tbl_savinggoals WHERE userID = $userID";
 $result = mysqli_query($conn, $query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
