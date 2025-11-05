@@ -1,3 +1,26 @@
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['userID'])) {
+    header(header: "Location: ../../login.php");
+    exit;
+}
+
+$userID = $_SESSION['userID'];
+
+// query for notif
+$query = "
+    SELECT notificationTitle, message, icon, createdAt, isRead
+    FROM tbl_notifications
+    WHERE userID = '$userID'
+    ORDER BY createdAt DESC
+";
+
+$result = executeQuery($query);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,10 +77,10 @@
             background-color: #F0F1F6;
         }
 
-        .notificationCard img.icon {
-            width: 45px;
-            height: 45px;
-            object-fit: contain;
+        .notificationCard img {
+            width: 50px;
+            height: 50px;
+            \ 
         }
 
         .notificationContent p {
@@ -75,23 +98,10 @@
 
         .notificationTime {
             position: absolute;
-            bottom: 6px;
+            bottom: 3px;
             right: 16px;
             font-size: 12px;
             color: #666;
-        }
-
-        /* Different types of notifications */
-        .notifExpense .title {
-            color: #44B87D;
-        }
-
-        .notifAlert .title {
-            color: #E63946;
-        }
-
-        .notifSavings .title {
-            color: #44B87D;
         }
     </style>
 </head>
@@ -106,106 +116,70 @@
 
     <div class="scrollableContainer">
 
-        <a href="viewNotification.php" style="text-decoration: none; color: inherit;">
-            <div class="notificationCard notifExpense">
-                <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-                <div class="notificationContent">
-                    <p class="title">Electricity</p>
-                    <p class="subtitle">
-                        <span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025
-                    </p>
-                </div>
-                <div class="notificationTime">08:00 AM</div>
-            </div>
-        </a>
 
-        <div class="notificationCard notifAlert">
-            <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notificationContent">
-                <p class="title">Transportation Limit Exceeded</p>
-                <p class="subtitle">
-                    <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
-                    <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
-                </p>
-            </div>
-            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
-        </div>
+        <?php
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
 
-        <div class="notificationCard notifSavings">
-            <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
-                style="border-radius: 50%;">
-            <div class="notificationContent">
-                <p class="title">Saving Goals</p>
-                <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
-            </div>
-            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
-        </div>
+                $formattedTime = date("M d, Y | h:i A", strtotime($row['createdAt']));
+                $readClass = $row['isRead'] ? "read" : "";
 
-        <div class="notificationCard notifExpense">
-            <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notificationContent">
-                <p class="title">Electricity</p>
-                <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
-            </div>
-            <div class="notificationTime">08:00 AM</div>
-        </div>
+                $iconFile = ($row['icon']);
+                $iconPath = "../../assets/img/";
 
-        <div class="notificationCard notifAlert">
-            <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notificationContent">
-                <p class="title">Transportation Limit Exceeded</p>
-                <p class="subtitle">
-                    <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
-                    <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
-                </p>
-            </div>
-            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
-        </div>
+                //all possible paths
+                $psblePaths = [
+                    "challenge/",
+                    "home/",
+                    "landing&ads/",
+                    "login&signup/",
+                    "notification/",
+                    "savings/",
+                    "settings/",
+                    "shared/",
+                    "shared/categories/expense/",
+                    "shared/categories/income/",
+                    "shared/categories/savings/",
+                    "shared/sidebar/"
+                ];
+                //if exists 
+                foreach ($psblePaths as $path) {
+                    if (file_exists($iconPath . $path . $iconFile)) {
+                        $iconPath = $iconPath . $path . $iconFile;
+                        break;
+                    }
+                }
+                //if not
+                if (!file_exists($iconPath)) {
+                    $iconPath = "../../assets/img/shared/logo_s.png";
+                }
 
-        <div class="notificationCard notifSavings">
-            <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
-                style="border-radius: 50%;">
-            <div class="notificationContent">
-                <p class="title">Saving Goals</p>
-                <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
-            </div>
-            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
-        </div>
+                //for identification color (ALERT)
+                //base is alert.png
+                $isAlert = (strtolower(pathinfo($iconFile, PATHINFO_FILENAME)) === "alert");
+                $titleColor = $isAlert ? "#E63946" : "#44B87D";
+                ?>
 
-        <div class="notificationCard notifExpense">
-            <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity" class="icon">
-            <div class="notificationContent">
-                <p class="title">Electricity</p>
-                <p class="subtitle"><span style="color: #F6D25B; font-weight: 500;">Due Date:</span> June 07, 2025</p>
-            </div>
-            <div class="notificationTime">08:00 AM</div>
-        </div>
+                <a href="viewNotification.php" style="text-decoration: none; color: inherit;">
+                    <div class="notificationCard <?= $readClass ?>">
+                        <img src="<?= $iconPath ?>" alt="icon">
+                        <div class="notificationContent">
+                            <div class="title" style="color: <?= $titleColor ?>;">
+                                <?= ($row['notificationTitle']) ?>
+                            </div>
+                            <div class="subtitle"><?= nl2br(($row['message'])) ?></div>
+                        </div>
+                        <div class="notificationTime"><?= $formattedTime ?></div>
+                    </div>
+                </a>
 
-        <div class="notificationCard notifAlert">
-            <img src="../../assets/img/notification/alert.png" alt="Alert" class="icon">
-            <div class="notificationContent">
-                <p class="title">Transportation Limit Exceeded</p>
-                <p class="subtitle">
-                    <span style="color: #F6D25B; font-weight: 500;">Limit:</span> 15% (₱1,500)<br>
-                    <span style="color: #44B87D; font-weight: 500;">Spent:</span> ₱2,000
-                </p>
-            </div>
-            <div class="notificationTime">May 20, 2025 | 10:30 AM</div>
-        </div>
-
-        <div class="notificationCard notifSavings">
-            <img src="../../assets/img/shared/categories/Savings.png" alt="Savings" class="icon"
-                style="border-radius: 50%;">
-            <div class="notificationContent">
-                <p class="title">Saving Goals</p>
-                <p class="subtitle">Set and monitor goals — vacation, gadgets, or emergency fund.</p>
-            </div>
-            <div class="notificationTime">May 14, 2025 | 11:16 AM</div>
-        </div>
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <?php
+            }
+        } else {
+            echo "<p style='font-size:16px; color:white; text-align:center; margin-top:40px;'>No notifications yet.</p>";
+        }
+        ?>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -1,6 +1,14 @@
 <?php
+session_start();
 include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['userID'])) {
+    header(header: "Location: ../../login.php");
+    exit;
+}
+
+$userID = $_SESSION['userID'];
 
 // filters (intval = dbl check if legit number )
 $daysFilter = isset($_GET['days']) ? intval($_GET['days']) : 30;
@@ -17,6 +25,7 @@ $query = "
     uc.icon AS icon
   FROM tbl_expense e
   JOIN tbl_usercategories uc ON e.userCategoryID = uc.userCategoryID
+  WHERE e.userID = '$userID'
 
   UNION ALL
 
@@ -29,6 +38,7 @@ $query = "
     uc.icon AS icon
   FROM tbl_income i
   JOIN tbl_usercategories uc ON i.userCategoryID = uc.userCategoryID
+  WHERE i.userID = '$userID'
 
   UNION ALL
 
@@ -41,7 +51,8 @@ $query = "
     sg.icon AS icon
   FROM tbl_goaltransactions gt
   JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
-";
+  WHERE sg.userID = '$userID'
+  ";
 
 $query = "SELECT * FROM ($query) AS all_data";
 
