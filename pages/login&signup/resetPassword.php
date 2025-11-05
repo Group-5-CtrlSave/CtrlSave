@@ -106,7 +106,7 @@
         }
 
         @media screen and (min-width:344px) {
-             .formRow {
+            .formRow {
                 margin-top: 470px;
             }
 
@@ -129,12 +129,12 @@
             }
 
             .back {
-            margin-top:20px;
+                margin-top: 20px;
             }
         }
 
-         @media screen and (min-width:360px) {
-             .formRow {
+        @media screen and (min-width:360px) {
+            .formRow {
                 margin-top: 420px;
             }
 
@@ -157,7 +157,7 @@
             }
 
             .back {
-            margin-top:20px;
+                margin-top: 20px;
             }
         }
 
@@ -183,7 +183,7 @@
             }
 
             .back {
-            margin-top: 5px;
+                margin-top: 5px;
             }
         }
 
@@ -209,7 +209,7 @@
             }
 
             .back {
-            margin-top:20px;
+                margin-top: 20px;
             }
         }
 
@@ -235,7 +235,7 @@
             }
 
             .back {
-            margin-top:20px;
+                margin-top: 20px;
             }
         }
     </style>
@@ -260,16 +260,18 @@
                 </p>
             </div>
 
+            <form method="POST">
             <!-- Email Field -->
             <div class="col-12">
-                <h5 class="label">Email</h5>
-                <input type="email" class="form-control" placeholder="Enter your email" required>
+                    <h5 class="label">Email</h5>
+                    <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
             </div>
 
             <!-- Send Code Button -->
             <div class="col-12 d-flex justify-content-center align-items-center">
-                <button type="button" class="btn">Send Code</button>
+                <button type="submit" class="btn" name="sendCode">Send Code</button>
             </div>
+            </form>
 
             <!-- Back to Login -->
             <div class="col-12 text-center back">
