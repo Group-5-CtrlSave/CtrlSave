@@ -2,54 +2,57 @@
 session_start();
 include("../../assets/shared/connect.php");
 
-if (!isset($_SESSION['user_id'])) {
-  $_SESSION['user_id'] = 1;
+if (!isset($_SESSION['userID'])) {
+    $_SESSION['userID'] = 2; 
 }
-$userID = intval($_SESSION['user_id']);
 
+$userID = intval($_SESSION['userID']);
 $createdAt = date('Y-m-d H:i:s');
-
-$goalName = isset($_SESSION['goalName']) ? $_SESSION['goalName'] : '';
-$goalIcon = isset($_SESSION['goalIcon']) ? $_SESSION['goalIcon'] : '';
+$goalName = $_SESSION['goalName'] ?? '';
+$goalIcon = $_SESSION['goalIcon'] ?? '';
 
 $iconFilename = basename($goalIcon);
 $displayIconRel = $iconFilename ? "../../assets/img/shared/categories/expense/" . $iconFilename : '';
 
 if (isset($_POST['btnAddGoalConfirmed'])) {
-  $goalName = mysqli_real_escape_string($conn, $_POST['goalName'] ?? $goalName);
-  $goalIcon = basename(mysqli_real_escape_string($conn, $_POST['goalIcon'] ?? $iconFilename));
-  $targetAmount = floatval($_POST['goalAmount']);
-  $currentAmount = floatval($_POST['currentBalance']);
-  $deadline = mysqli_real_escape_string($conn, $_POST['targetDate']);
-  $reminderEnabled = isset($_POST['reminderEnabled']) ? 1 : 0;
-  $reminderTime = $_POST['reminderTime'] ?? null;
-  $repeatFrequency = $_POST['repeatFrequency'] ?? null;
-  $status = "In Progress";
+    $goalName = mysqli_real_escape_string($conn, $_POST['goalName'] ?? $goalName);
+    $goalIcon = basename(mysqli_real_escape_string($conn, $_POST['goalIcon'] ?? $iconFilename));
+    $targetAmount = floatval($_POST['goalAmount']);
+    $currentAmount = floatval($_POST['currentBalance']);
+    $deadline = mysqli_real_escape_string($conn, $_POST['targetDate']);
+    $reminderEnabled = isset($_POST['reminderEnabled']) ? 1 : 0;
+    $reminderTime = $_POST['reminderTime'] ?? null;
+    $repeatFrequency = $_POST['repeatFrequency'] ?? null;
+    $status = "In Progress";
 
-  mysqli_begin_transaction($conn);
+    mysqli_begin_transaction($conn);
 
-  try {
-    $insertGoalQuery = "
-      INSERT INTO tbl_savinggoals 
-      (userID, goalName, icon, targetAmount, currentAmount, deadline, status, reminderEnabled, reminderTime, repeatFrequency, createdAt)
-      VALUES ('$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', '$deadline', '$status', '$reminderEnabled', " . 
-      ($reminderTime ? "'$reminderTime'" : "NULL") . ", " . 
-      ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", '$createdAt')
-    ";
+    try {
+        $insertGoalQuery = "
+          INSERT INTO tbl_savinggoals 
+          (userID, goalName, icon, targetAmount, currentAmount, deadline, status, reminderEnabled, reminderTime, repeatFrequency, createdAt)
+          VALUES (
+            '$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', 
+            '$deadline', '$status', '$reminderEnabled',
+            " . ($reminderTime ? "'$reminderTime'" : "NULL") . ", 
+            " . ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", 
+            '$createdAt'
+          )
+        ";
 
-    if (!mysqli_query($conn, $insertGoalQuery)) {
-      throw new Exception("Error inserting saving goal: " . mysqli_error($conn));
+        if (!mysqli_query($conn, $insertGoalQuery)) {
+            throw new Exception("Error inserting saving goal: " . mysqli_error($conn));
+        }
+
+        mysqli_commit($conn);
+        unset($_SESSION['goalName'], $_SESSION['goalIcon']);
+        header("Location: savingGoal.php");
+        exit();
+
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        echo "Error: " . $e->getMessage();
     }
-
-    mysqli_commit($conn);
-    unset($_SESSION['goalName'], $_SESSION['goalIcon']);
-    header("Location: savingGoal.php");
-    exit();
-
-  } catch (Exception $e) {
-    mysqli_rollback($conn);
-    echo "Error: " . $e->getMessage();
-  }
 }
 ?>
 
@@ -165,7 +168,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     <p class="fw-bold text-white fs-5 mb-3">What are the details of your saving goal?</p>
   </div>
 
-  <div class="px-4 content-list" style="margin-top:160px;">
+  <div class="px-4 content-list" style="margin-top:100px;">
     <p class="fw-bold text-white fs-5 mb-2">Saving goal: <?= htmlspecialchars($goalName) ?></p>
 
     <?php if (!empty($iconFilename)): ?>
