@@ -1,3 +1,11 @@
+<?php
+
+include("../../assets/shared/connect.php");
+include("../../pages/login&signup/process/currencyBE.php");
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,6 +19,45 @@
     <style>
         body {
             background-color: #44B87D;
+        }
+
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
         }
 
         h2 {
@@ -61,7 +108,7 @@
             --bs-form-select-bg-img: url("data:image/svg+xml;utf8,<svg fill='green' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1.5 5l6 6 6-6'/></svg>");
         }
 
-         /* Button */
+        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
@@ -84,53 +131,38 @@
 </head>
 
 <body>
-   <!-- Navigation Bar -->
+
+    <?php if (!empty($error)): ?>
+        <div id="errorToast"><?php echo $error; ?></div>
+    <?php endif; ?>
+
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
-            <div class="d-flex align-items-start justify-content-start">
-                <a href="signUp.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
-                        style="height: 24px;" />
-                </a>
-            </div>
-
-            <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Set Currency</h2>
-            </div>
+            <a href="signUp.php">
+                <img src="../../assets/img/shared/BackArrow.png" style="height:24px;">
+            </a>
+            <h2 class="position-absolute top-50 start-50 translate-middle" style="color:black;">Set Currency</h2>
         </div>
     </nav>
 
-    <!-- Forms Content -->
-    <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5">
-        <div class="row main-row">
+    <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5" >
+        <div class="row main-row text-center">
 
-        <!-- Title -->
-            <div class="col-12 title">
-                <h2>Choose Your Main Currency</h2>
-            </div>
+            <h2 style="color:white;">Choose Your Main Currency</h2>
+            <p style="color:white;">Don't worry this can be changed later</p>
 
-        <!-- Description -->
-            <div class="col-12 desc mt-4 mb-1">
-                <p>Don't worry this can be changed later</p>
-            </div>
-
-            <div class="col-12 amount mt-5 mb-5 d-flex justify-content-center align-items-center">
-               
-                <!-- Forms -->
-                <div class="form-group">
-                    <label>Common Currency</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Currency</option>
-                        <option value="1">Pesos</option>
-                        <option value="2">Dollar</option>
+            <form method="POST">
+                <div class="form-group mt-4 mb-5" style="max-width:300px; margin:auto;">
+                    <label class="text-white">Common Currency</label>
+                    <select class="form-select" name="currency" required>
+                        <option selected disabled>Currency</option>
+                        <option value="PH">Philippine Peso (PHP)</option>
+                        <option value="US">US Dollar (USD)</option>
                     </select>
                 </div>
-            </div>
 
-            <!-- Button -->
-            <div class="col-12 btNext mt-4 d-flex justify-content-center align-items-center">
-                <a href="balance.php"><button type="submit" class="btn btn-warning mt-4">Next</button></a>
-            </div>
+                <button type="submit" name="setCurrency" class="btn btn-warning mt-4">Next</button>
+            </form>
 
         </div>
     </div>

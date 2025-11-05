@@ -30,6 +30,11 @@ if (isset($_POST['signup'])) {
         $insert->bind_param("sssss", $username, $fname, $lname, $email, $hashedPassword);
 
         if ($insert->execute()) {
+
+            // ✅ Store the new user's ID to session
+            $_SESSION['userID'] = $insert->insert_id;
+
+            // ✅ Redirect to currency page after sign up
             header("Location: currency.php");
             exit();
         } else {
