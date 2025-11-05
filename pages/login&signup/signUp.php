@@ -1,3 +1,8 @@
+<?php
+include("../../assets/shared/connect.php");
+include("../../pages/login&signup/process/signupBE.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,6 +22,50 @@
             position: relative;
             overflow: hidden;
         }
+
+
+        /* Error Handling */
+
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        /* Fade Animation: stays visible → fades out smoothly */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
 
         /* Logo */
         .header {
@@ -118,10 +167,45 @@
             font-size: 16px;
         }
 
+
+        /* Password toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input.form-control {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #44B87D;
+            outline: none;
+        }
+
+        .toggle-password svg {
+            display: block;
+        }
+
+        .toggle-password:focus {
+            box-shadow: none;
+        }
+
+
         /* Media Queries of Every Mobile Screen */
 
         @media screen and (min-width:360px) {
-             .title {
+            .title {
                 margin-top: 280px;
             }
 
@@ -134,7 +218,7 @@
 
             .formRow {
                 overflow: scroll;
-                height:300px;
+                height: 260px;
                 margin-top: 10px;
             }
 
@@ -209,7 +293,7 @@
         }
 
         @media screen and (min-width:412px) {
-             .title {
+            .title {
                 margin-top: 320px;
             }
 
@@ -292,6 +376,11 @@
 </head>
 
 <body>
+    <!-- ✅ Toast Message -->
+    <?php if (!empty($error)) { ?>
+        <div id="errorToast"><?php echo $error; ?></div>
+    <?php } ?>
+
     <!-- Logo -->
     <div class="header p-5">
         <img class="img-fluid" src="../../assets/img/shared/logoName_S.png" alt="CtrlSave Logo" class="logo">
@@ -310,54 +399,101 @@
             </div>
         </div>
 
-        <!-- Row for Forms -->
-        <div class="row formRow">
-            <!-- Username -->
-            <div class="col-12 forms mt-3">
-                <h5>Username</h5>
-                <input type="text" class="form-control" placeholder="Username" required>
+        <form method="POST">
+            <!-- Row for Forms -->
+            <div class="row formRow">
+
+
+                <!-- Username -->
+                <div class="col-12 forms mt-3">
+                    <h5>Username</h5>
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
+
+                <!-- First name -->
+                <div class="col-12 forms mt-3">
+                    <h5>First Name</h5>
+                    <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-12 forms mt-3">
+                    <h5>Last Name</h5>
+                    <input type="text" class="form-control" name="lastname" placeholder="Last Name" required>
+                </div>
+
+                <!-- Email -->
+                <div class="col-12 forms mt-3">
+                    <h5>Email</h5>
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+
+                <!-- Password -->
+                <div class="col-12 forms mt-3">
+                    <h5>Password</h5>
+                    <div class="password-wrapper">
+                        <input id="password" type="password" class="form-control" name="password" placeholder="Password"
+                            required>
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password"
+                            title="Show password">
+                            <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+
+                            <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3-11-8 1.13-3.15 3.67-5.67 6.6-6.77">
+                                </path>
+                                <path d="M1 1l22 22"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+
             </div>
 
-            <!-- First name -->
-            <div class="col-12 forms mt-3">
-                <h5>First Name</h5>
-                <input type="text" class="form-control" placeholder="First Name" required>
-            </div>
+            <!-- Row for buttons -->
+            <div class="row buttonRow">
+                <!-- Button -->
+                <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
+                    <button type="submit" name="signup" class="btn btn-warning mb-3">Next</button></a>
+                </div>
 
-            <!-- Last Name -->
-            <div class="col-12 forms mt-3">
-                <h5>Last Name</h5>
-                <input type="text" class="form-control" placeholder="Last Name" required>
-            </div>
 
-            <!-- Email -->
-            <div class="col-12 forms mt-3">
-                <h5>Email</h5>
-                <input type="text" class="form-control" placeholder="Email" required>
+                <!-- Sign Up -->
+                <div class="col-12 noAccount mt-1 d-flex justify-content-center align-items-center">
+                    <a href="login.php" class="back" style="color: black;">back to login</a>
+                </div>
             </div>
-
-            <!-- Password -->
-            <div class="col-12 forms mt-3">
-                <h5>Password</h5>
-                <input type="text" class="form-control" placeholder="Password" required>
-            </div>
-
-        </div>
-
-        <!-- Row for buttons -->
-        <div class="row buttonRow">
-            <!-- Button -->
-            <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
-                <a href="currency.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
-            </div>
-
-            <!-- Sign Up -->
-            <div class="col-12 noAccount mt-1 d-flex justify-content-center align-items-center">
-                <a href="login.php" class="back" style="color: black;">back to login</a>
-            </div>
-        </div>
+        </form>
 
     </div>
+
+
+    <script>
+        const pwd = document.getElementById("password");
+        const toggle = document.getElementById("togglePassword");
+        const eyeOpen = document.getElementById("eyeOpen");
+        const eyeClosed = document.getElementById("eyeClosed");
+
+        toggle.addEventListener("click", () => {
+            if (pwd.type === "password") {
+                pwd.type = "text";
+                eyeOpen.style.display = "block";   // show open eye
+                eyeClosed.style.display = "none";  // hide closed eye
+            } else {
+                pwd.type = "password";
+                eyeOpen.style.display = "none";    // hide open eye
+                eyeClosed.style.display = "block"; // show closed eye
+            }
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
