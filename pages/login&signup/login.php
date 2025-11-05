@@ -1,3 +1,42 @@
+<?php
+include("../../assets/shared/connect.php");
+session_start();
+
+if (isset($_POST['btnLogin'])) {
+
+    $emailUsername = trim($_POST['emailUsername']);
+    $password = trim($_POST['password']);
+
+    $stmt = $conn->prepare("SELECT userID, userName, email, password 
+                            FROM tbl_users 
+                            WHERE BINARY email = ? OR BINARY userName = ? 
+                            LIMIT 1");
+    $stmt->bind_param("ss", $emailUsername, $emailUsername);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+
+        if (password_verify($password, $row['password'])) {
+
+            $_SESSION['userID'] = $row['userID'];
+            $_SESSION['userName'] = $row['userName'];
+            $_SESSION['email']   = $row['email'];
+
+            header("Location: ../home/home.php");
+            exit;
+        } else {
+            $error = "Incorrect Password";
+        }
+    } else {
+        $error = "User not found. Incorrect Email/Username.";
+    }
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,6 +55,48 @@
             background-color: white;
             position: relative;
             overflow: hidden;
+        }
+
+        /* Error Handling */
+
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        /* Fade Animation: stays visible → fades out smoothly */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
         }
 
         /* Logo */
@@ -101,7 +182,8 @@
             font-size: 16px;
             color: white;
             font-weight: bold;
-            font-family: "Poppins", sans-serif; ;
+            font-family: "Poppins", sans-serif;
+            ;
         }
 
         .signupLink {
@@ -110,6 +192,39 @@
             font-family: "Poppins", sans-serif;
             padding-bottom: 15px;
             font-size: 16px;
+        }
+
+        /* Password toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input.form-control {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #44B87D;
+            outline: none;
+        }
+
+        .toggle-password svg {
+            display: block;
+        }
+
+        .toggle-password:focus {
+            box-shadow: none;
         }
 
         /* Media Queries of Every Mobile Screen */
@@ -125,7 +240,7 @@
             }
 
             .btn {
-            margin-top: 35px;
+                margin-top: 35px;
             }
 
         }
@@ -140,13 +255,13 @@
             }
 
             .btn {
-            margin-top: 30px;
+                margin-top: 30px;
             }
         }
 
         @media screen and (min-width:375px) {
             .formRow {
-                margin-top: 360px;
+                margin-top: 365px;
             }
 
             .form-control {
@@ -156,7 +271,7 @@
             }
 
             .btn {
-            margin-top: 15px;
+                margin-top: 15px;
             }
         }
 
@@ -172,12 +287,12 @@
             }
 
             .btn {
-            margin-top: 40px;
+                margin-top: 40px;
             }
         }
 
         @media screen and (min-width:412px) {
-             .formRow {
+            .formRow {
                 margin-top: 430px;
             }
 
@@ -188,7 +303,7 @@
             }
 
             .btn {
-            margin-top: 40px;
+                margin-top: 40px;
             }
 
         }
@@ -212,6 +327,11 @@
 </head>
 
 <body>
+    <?php if (isset($error)) { ?>
+        <div id="errorToast">
+            <?php echo $error; ?>
+        </div>
+    <?php } ?>
     <!-- Logo -->
     <div class="header p-5">
         <img class="img-fluid" src="../../assets/img/shared/logoName_L.png" alt="CtrlSave Logo" class="logo">
@@ -223,40 +343,80 @@
     <!-- Content -->
     <div class="container-fluid formContainer">
 
-        <div class="row formRow">
-            <!-- Email -->
-            <div class="col-12 forms mt-3">
-                <h5>Email/Username</h5>
-                <input type="text" class="form-control" placeholder="Email/Username" required>
-            </div>
+        <form method="POST">
+            <div class="row formRow">
+                <!-- Email -->
+                <div class="col-12 forms mt-3">
+                    <h5>Email/Username</h5>
+                    <input type="text" class="form-control" name="emailUsername" placeholder="Email/Username" required>
+                </div>
 
-            <!-- Password -->
-            <div class="col-12 forms mt-3">
-                <h5>Password</h5>
-                <input type="text" class="form-control" placeholder="Password" required>
-            </div>
+                <div class="col-12 forms mt-2">
+                    <h5>Password</h5>
+                    <div class="password-wrapper">
+                        <input id="password" type="password" class="form-control" name="password" placeholder="Password"
+                            required>
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password"
+                            title="Show password">
+                            <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
 
-            <div class="col-12 text-end mt-2">
-                <a href="resetPassword.php" class="text-decoration-none"
-                    style="color: #ffff; font-family: Poppins, sans-serif;">
-                    Forgot Password?
-                </a>
-            </div>
+                            <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3-11-8 1.13-3.15 3.67-5.67 6.6-6.77">
+                                </path>
+                                <path d="M1 1l22 22"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-            <!-- Button -->
-            <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
-                <a href="../home/home.php"><button type="submit" class="btn btn-warning mb-3">Login</button></a>
-            </div>
+                <div class="col-12 text-end mt-1">
+                    <a href="resetPassword.php" class="text-decoration-none"
+                        style="color: #ffff; font-family: Poppins, sans-serif;">
+                        Forgot Password?
+                    </a>
+                </div>
 
-            <!-- Sign Up -->
-            <div class="col-12 noAccount mt-1 d-flex justify-content-center align-items-center">
-                <p style="color: #ffff;">Don't have an account?</p>&nbsp;<a href="../landing&ads/firstAd.html"
-                    class="signupLink" style="color: black;">Sign Up</a>
+                <!-- Button -->
+                <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
+                    <button type="submit" class="btn btn-warning mb-3" name="btnLogin">Login</button>
+                </div>
+
+                <!-- Sign Up -->
+                <div class="col-12 noAccount mt-1 d-flex justify-content-center align-items-center">
+                    <p style="color: #ffff;">Don't have an account?</p>&nbsp;<a href="../landing&ads/firstAd.html"
+                        class="signupLink" style="color: black;">Sign Up</a>
+                </div>
             </div>
-        </div>
+        </form>
 
     </div>
 
+    <script>
+        const pwd = document.getElementById("password");
+        const toggle = document.getElementById("togglePassword");
+        const eyeOpen = document.getElementById("eyeOpen");
+        const eyeClosed = document.getElementById("eyeClosed");
+
+        toggle.addEventListener("click", () => {
+            if (pwd.type === "password") {
+                pwd.type = "text";
+                eyeOpen.style.display = "block";   // show open eye
+                eyeClosed.style.display = "none";  // hide closed eye
+            } else {
+                pwd.type = "password";
+                eyeOpen.style.display = "none";    // hide open eye
+                eyeClosed.style.display = "block"; // show closed eye
+            }
+        });
+    </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
