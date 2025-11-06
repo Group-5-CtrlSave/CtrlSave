@@ -38,23 +38,21 @@
         <p class="profile-answer">cassymondragon@gmail.com</p>
       </div>
 
-      <div class="profile-section">
-        <p class="profile-label">Birthday:</p>
-        <p class="profile-answer">10/20/2003</p>
-      </div>
-
-      <div class="profile-section">
-        <p class="profile-label">Gender:</p>
-        <p class="profile-answer">Non-Binary</p>
-      </div>
     </div>
 
-    <!-- Buttons -->
-    <div class="button-wrapper w-100 d-flex flex-column align-items-center">
-      <button class="btn edit-btn mb-2" onclick="window.location.href='editProfile.php'">Edit profile</button>
-      <button class="btn logout-btn">Logout</button>
-    </div>
-  </div>
+<!-- Buttons -->                                                                      
+<div class="button-wrapper w-100 d-flex flex-column align-items-center" style="margin-top: 2px;">
+  <img src="../../assets/img/shared/achievements.png" 
+       alt="Achievements" 
+       onclick="window.location.href='achievements.php'" 
+       style="width: 100px; height: 100px; cursor: pointer; transition: transform 0.2s; margin-bottom: 2px;"
+       onmouseover="this.style.transform='scale(1.1)'" 
+       onmouseout="this.style.transform='scale(1)'">
+       
+  <button class="btn edit-btn mb-2" style="margin-top: 1px;" onclick="window.location.href='editProfile.php'">Edit Profile</button>
+  <button class="btn logout-btn" style="margin-top: 1px;">Logout</button>
+</div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
