@@ -20,7 +20,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     $targetAmount = floatval($_POST['goalAmount']);
     $currentAmount = floatval($_POST['currentBalance']);
     $deadline = mysqli_real_escape_string($conn, $_POST['targetDate']);
-    $reminderEnabled = isset($_POST['reminderEnabled']) ? 1 : 0;
+    $reminder = isset($_POST['reminder']) ? 1 : 0;
     $reminderTime = $_POST['reminderTime'] ?? null;
     $repeatFrequency = $_POST['repeatFrequency'] ?? null;
     $status = "In Progress";
@@ -28,17 +28,17 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     mysqli_begin_transaction($conn);
 
     try {
-        $insertGoalQuery = "
-          INSERT INTO tbl_savinggoals 
-          (userID, goalName, icon, targetAmount, currentAmount, deadline, status, reminderEnabled, reminderTime, repeatFrequency, createdAt)
-          VALUES (
-            '$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', 
-            '$deadline', '$status', '$reminderEnabled',
-            " . ($reminderTime ? "'$reminderTime'" : "NULL") . ", 
-            " . ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", 
-            '$createdAt'
-          )
-        ";
+       $insertGoalQuery = "
+        INSERT INTO tbl_savinggoals 
+        (userID, goalName, icon, targetAmount, currentAmount, deadline, status, remind, time, frequency, createdAt)
+        VALUES (
+          '$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', 
+          '$deadline', '$status', '$reminder',
+          " . ($reminderTime ? "'$reminderTime'" : "NULL") . ", 
+          " . ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", 
+          '$createdAt'
+        )
+      ";
 
         if (!mysqli_query($conn, $insertGoalQuery)) {
             throw new Exception("Error inserting saving goal: " . mysqli_error($conn));
@@ -200,7 +200,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     <div class="d-flex justify-content-between align-items-center px-3 py-2 mb-3" style="height:56px; background:#F0f1f6; border-radius:12px;">
       <span class="fw-semibold text-dark">Enable Reminder</span>
       <div class="form-check form-switch m-0">
-        <input class="form-check-input" type="checkbox" name="reminderEnabled" role="switch" checked>
+        <input class="form-check-input" type="checkbox" name="reminder" role="switch" checked>
       </div>
     </div>
 
