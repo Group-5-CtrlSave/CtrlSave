@@ -13,7 +13,7 @@ if (isset($_POST['setCurrency'])) {
     $currency = $_POST['currency'] ?? "";
     $userID = $_SESSION['userID'];
 
-    if ($currency !== "PH" && $currency !== "US") {
+    if ($currency !== "PHP" && $currency !== "USD") {
         $error = "Please choose a valid currency.";
     } else {
         $update = $conn->prepare("UPDATE tbl_users SET currencyCode = ? WHERE userID = ?");
