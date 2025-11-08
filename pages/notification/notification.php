@@ -12,7 +12,7 @@ $userID = $_SESSION['userID'];
 
 // query for notif
 $query = "
-    SELECT notificationTitle, message, icon, createdAt, isRead
+    SELECT notificationID, notificationTitle, message, icon, createdAt, isRead
     FROM tbl_notifications
     WHERE userID = '$userID'
     ORDER BY createdAt DESC
@@ -20,6 +20,7 @@ $query = "
 
 $result = executeQuery($query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,7 +31,6 @@ $result = executeQuery($query);
     <title>Notifications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link rel="stylesheet" href="../../assets/css/notification.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
 
     <style>
@@ -50,10 +50,6 @@ $result = executeQuery($query);
             padding: 20px 30px;
             color: #fff;
             font-family: "Poppins", sans-serif;
-        }
-
-        .mainHeader h2 {
-            font-weight: 700;
         }
 
         .scrollableContainer {
@@ -80,7 +76,6 @@ $result = executeQuery($query);
         .notificationCard img {
             width: 50px;
             height: 50px;
-            \ 
         }
 
         .notificationContent p {
@@ -94,6 +89,10 @@ $result = executeQuery($query);
 
         .notificationContent .subtitle {
             font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 240px;
         }
 
         .notificationTime {
@@ -158,16 +157,21 @@ $result = executeQuery($query);
                 //base is alert.png
                 $isAlert = (strtolower(pathinfo($iconFile, PATHINFO_FILENAME)) === "alert");
                 $titleColor = $isAlert ? "#E63946" : "#44B87D";
+
+                $message = $row['message'];
+                if (strlen($message) > 30) {
+                    $message = substr($message, 0, 30) . "...";
+                }
                 ?>
 
-                <a href="viewNotification.php" style="text-decoration: none; color: inherit;">
+                <a href="viewNotification.php?id=<?= $row['notificationID'] ?>" style="text-decoration: none; color: inherit;">
                     <div class="notificationCard <?= $readClass ?>">
                         <img src="<?= $iconPath ?>" alt="icon">
                         <div class="notificationContent">
                             <div class="title" style="color: <?= $titleColor ?>;">
                                 <?= ($row['notificationTitle']) ?>
                             </div>
-                            <div class="subtitle"><?= nl2br(($row['message'])) ?></div>
+                            <div class="subtitle"><?= nl2br($message) ?></div>
                         </div>
                         <div class="notificationTime"><?= $formattedTime ?></div>
                     </div>
