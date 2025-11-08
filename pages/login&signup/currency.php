@@ -156,8 +156,8 @@ include("../../pages/login&signup/process/currencyBE.php");
                     <label class="text-white">Common Currency</label>
                     <select class="form-select" name="currency" required>
                         <option selected disabled>Currency</option>
-                        <option value="PH">Philippine Peso (PHP)</option>
-                        <option value="US">US Dollar (USD)</option>
+                        <option value="PHP">Philippine Peso (PHP)</option>
+                        <option value="USD">US Dollar (USD)</option>
                     </select>
                 </div>
 

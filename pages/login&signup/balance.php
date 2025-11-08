@@ -1,3 +1,10 @@
+<?php
+
+include("../../assets/shared/connect.php");
+include("../../pages/login&signup/process/balanceBE.php");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nanum+Myeongjo&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&family=Nanum+Myeongjo&family=Roboto&display=swap');
 
         body {
             background-color: #44B87D;
@@ -41,76 +48,121 @@
             font-family: "Roboto", sans-serif;
         }
 
-         /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
-            text-align: center;
             width: 125px;
             font-size: 20px;
             font-weight: bold;
             font-family: "Poppins", sans-serif;
             border-radius: 27px;
-            cursor: pointer;
-            text-decoration: none;
             border: none;
             margin-top: 10px;
         }
 
         .btn:hover {
-            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+            box-shadow: 0 12px 16px rgba(0, 0, 0, .24), 0 17px 50px rgba(0, 0, 0, .19);
         }
 
+        /* Red login-style toast */
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -5px);
+            }
+
+            10%,
+            70% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -5px);
+            }
+        }
+
+        ::placeholder {
+            color: rgba(0, 0, 0, 0.35);
+        }
     </style>
 
 </head>
 
 <body>
 
+    <?php if (!empty($error)) { ?>
+        <div id="errorToast"><?php echo htmlspecialchars($error); ?></div>
+    <?php } ?>
+
     <!-- Navigation Bar -->
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
                 <a href="currency.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
-                        style="height: 24px;" />
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" style="height: 24px;" />
                 </a>
             </div>
-
             <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Set Balance</h2>
+                <h2 class="m-0 text-center" style="color:black;">Set Balance</h2>
             </div>
         </div>
     </nav>
 
-    <!-- Cash Balance -->
+    <!-- UI -->
     <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-5">
         <div class="row main-row">
 
-            <!-- Title -->
             <div class="col-12 title">
                 <h2>Set up your cash<br>balance</h2>
             </div>
 
-            <!-- Description -->
             <div class="col-12 desc mt-3 mb-4">
                 <p>How much cash do you have in<br>your wallet right now?</p>
             </div>
-            
-            <!-- Form -->
-            <div class="col-12 amount mt-5 mb-5 d-flex justify-content-center align-items-center">
-                <input type="number" placeholder="&#8369" class="form-control" style="color: #000000">
-            </div>
+
+            <form method="POST" id="balanceForm"
+                class="col-12 amount mt-5 mb-5 d-flex justify-content-center align-items-center">
+                <input type="text" name="balance" id="balanceInput" placeholder="₱0" class="form-control"
+                    style="color:#000000;">
+            </form>
 
             <!-- Button -->
             <div class="col-12 btNext mt-5 d-flex justify-content-center align-items-center">
-                <a href="pickExpense.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+                <button type="submit" form="balanceForm" class="btn btn-warning mb-3" name="submit">Next</button>
             </div>
 
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const input = document.getElementById("balanceInput");
+        input.addEventListener("input", function () {
+            let v = this.value.replace(/[^0-9.]/g, "");
+            if (v === "") { this.value = ""; return; }
+            this.value = "₱" + Number(v).toLocaleString("en-PH");
+        });
+    </script>
+
 </body>
 
 </html>
