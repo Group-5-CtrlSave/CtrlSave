@@ -1,10 +1,71 @@
+<?php
+include("../../assets/shared/connect.php");
+date_default_timezone_set('Asia/Manila');
+
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("<p style='color:white; text-align:center;'>Invalid notification.</p>");
+}
+
+$notificationID = intval($_GET['id']);
+
+//query for showing details in each notif
+$query = "
+    SELECT notificationTitle, message, icon, createdAt
+    FROM tbl_notifications
+    WHERE notificationID = $notificationID
+    LIMIT 1
+";
+
+$result = executeQuery($query);
+
+if ($result->num_rows == 0) {
+    die("<p style='color:white; text-align:center;'>Notification not found.</p>");
+}
+
+
+$row = $result->fetch_assoc();
+
+$formattedTime = date("h:i A | F d, Y", strtotime($row['createdAt']));
+
+$iconFile = $row['icon'];
+$iconPath = "../../assets/img/";
+$paths = [
+    "challenge/",
+    "home/",
+    "landing&ads/",
+    "login&signup/",
+    "notification/",
+    "savings/",
+    "settings/",
+    "shared/",
+    "shared/categories/expense/",
+    "shared/categories/income/",
+    "shared/categories/savings/",
+    "shared/sidebar/"
+];
+
+//if exixts
+foreach ($paths as $p) {
+    if (file_exists($iconPath . $p . $iconFile)) {
+        $iconPath = $iconPath . $p . $iconFile;
+        break;
+    }
+}
+
+//if not
+if (!file_exists($iconPath)) {
+    $iconPath = "../../assets/img/shared/logo_s.png";
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Bill Due</title>
+    <title>Notification Detail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
@@ -17,10 +78,6 @@
             background-color: #44B87D;
             font-family: "Roboto", sans-serif;
             color: #000;
-        }
-
-        .categoryImage {
-            height: 100px;
         }
 
         .mainHeader {
@@ -36,12 +93,19 @@
         }
 
         .scrollableContainer {
-            height: 70dvh;
-            padding: 25px;
             background-color: #fff;
-            border-radius: 20px;
             width: 90%;
-            margin: 5px auto;
+            margin: 15px auto;
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .notifIcon {
+            height: 110px;
+            display: block;
+            margin: 0 auto 15px auto;
         }
 
         .notifHeader {
@@ -54,18 +118,18 @@
             font-size: 20px;
             font-weight: 700;
             color: #44B87D;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
-        .notifSubtitle {
+        .notifMessage {
+            text-align: left;
             font-size: 16px;
             color: #000;
-        }
-
-        .notifDetails {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #000;
+            line-height: 1.5;
+            text-indent: 25px;
+            word-break: break-word;
+            margin-top: 5px;
+            margin-left: 8px;
         }
 
         .notifTime {
@@ -74,11 +138,14 @@
             font-size: 12px;
             margin-top: 25px;
         }
+
+        .navigationBarTitle {
+            font-family: "Poppins", sans-serif;
+        }
     </style>
 </head>
 
 <body>
-
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
@@ -87,36 +154,30 @@
                         style="height: 24px;" />
                 </a>
             </div>
+        </div>
+
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <h2 class="m-0 text-center navigationBarTitle">Detail</h2>
+        </div>
+
+        </div>
+
     </nav>
 
-    <div class="mainHeader">
-        <h2>Notification Detail</h2>
+    <!-- contents (full after ...) -->
+    <div class="scrollableContainer">
+        <img src="<?= $iconPath ?>" alt="Icon" class="notifIcon">
+
+        <p class="notifTitle"><?= $row['notificationTitle'] ?></p>
+
+        <p class="notifMessage">
+            <?= nl2br($row['message']) ?>
+        </p>
+
+        <div class="notifTime"><?= $formattedTime ?></div>
     </div>
 
-    <div class="scrollableContainer">
-        <div class="notifHeader">
-            <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity Icon">
-            <div>
-                <p class="notifTitle">Electricity Bill Due</p>
-                <p class="notifSubtitle">Your electricity bill payment is approaching the due date.</p>
-            </div>
-        </div>
-
-        <div class="notifDetails">
-            <p><strong>Due Date:</strong> June 07, 2025</p>
-            <p>
-                Make sure to pay your electricity bill before the due date to avoid penalties or service interruptions.
-                You can pay through your preferred payment channels or directly at your electric company’s office.
-            </p>
-            <p>
-                Stay on top of your bills to maintain good credit and avoid unexpected disconnections.
-            </p>
-        </div>
-
-        <div class="notifTime">08:00 AM | June 07, 2025</div>
-
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
