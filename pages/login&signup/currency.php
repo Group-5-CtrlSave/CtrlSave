@@ -136,12 +136,11 @@ include("../../pages/login&signup/process/currencyBE.php");
         <div id="errorToast"><?php echo $error; ?></div>
     <?php endif; ?>
 
-    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top" style="height: 75px;">
         <div class="container-fluid position-relative">
-            <a href="signUp.php">
-                <img src="../../assets/img/shared/BackArrow.png" style="height:24px;">
-            </a>
-            <h2 class="position-absolute top-50 start-50 translate-middle" style="color:black;">Set Currency</h2>
+            <div class="position-absolute top-70 start-50 translate-middle">
+                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Set Currency</h2>
+            </div>
         </div>
     </nav>
 

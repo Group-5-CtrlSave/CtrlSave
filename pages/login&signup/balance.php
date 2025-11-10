@@ -115,15 +115,10 @@ include("../../pages/login&signup/process/balanceBE.php");
     <?php } ?>
 
     <!-- Navigation Bar -->
-    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+   <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top" style="height: 75px;">
         <div class="container-fluid position-relative">
-            <div class="d-flex align-items-start justify-content-start">
-                <a href="currency.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" style="height: 24px;" />
-                </a>
-            </div>
-            <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center" style="color:black;">Set Balance</h2>
+            <div class="position-absolute top-70 start-50 translate-middle">
+                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Set Balance</h2>
             </div>
         </div>
     </nav>
