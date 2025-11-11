@@ -76,21 +76,6 @@
         <input type="email" class="form-control" value="cassymondragon@gmail.com">
       </div>
 
-      <div class="text-start">
-        <label class="form-label">Date of Birth</label>
-        <input type="date" class="form-control" value="2003-10-20">
-      </div>
-
-      <div class="text-start">
-        <label class="form-label">Gender</label>
-        <select class="form-select">
-          <option selected>Non-Binary</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Prefer not to say</option>
-        </select>
-      </div>
-
       <button type="submit" class="btn-save">Save Changes</button>
 
       <div class="password-section text-start">
