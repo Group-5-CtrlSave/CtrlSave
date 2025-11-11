@@ -4,6 +4,8 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
 }
 
 include_once '../../assets/shared/connect.php';
+
+// Redirect to login if userID is not set
 if (!isset($_SESSION['userID'])) {
     if (!headers_sent()) {
         header('Location: ../../pages/login&signup/login.php');
@@ -12,23 +14,36 @@ if (!isset($_SESSION['userID'])) {
 }
 
 $userID = $_SESSION['userID'] ?? 0;
-$userQuery = "SELECT userName, email FROM tbl_users WHERE userID = '$userID' LIMIT 1";
-$userResult = mysqli_query($conn, $userQuery);
-$user = mysqli_fetch_assoc($userResult) ?? ['userName' => 'User', 'email' => ''];
-$levelQuery = "SELECT exp, lvl FROM tbl_userLvl WHERE userID = '$userID' LIMIT 1";
-$levelResult = mysqli_query($conn, $levelQuery);
-$level = mysqli_fetch_assoc($levelResult) ?? ['exp' => 0, 'lvl' => 1];
+
+$stmtUser = $conn->prepare("SELECT userName, email FROM tbl_users WHERE userID = ? LIMIT 1");
+$stmtUser->bind_param("i", $userID);
+$stmtUser->execute();
+$userResult = $stmtUser->get_result();
+$user = $userResult->fetch_assoc() ?? ['userName' => 'User', 'email' => ''];
+$stmtUser->close();
+$stmtLevel = $conn->prepare("SELECT exp, lvl FROM tbl_userLvl WHERE userID = ? LIMIT 1");
+$stmtLevel->bind_param("i", $userID);
+$stmtLevel->execute();
+$levelResult = $stmtLevel->get_result();
+$level = $levelResult->fetch_assoc() ?? ['exp' => 0, 'lvl' => 1];
+$stmtLevel->close();
+
 $currentXP = $level['exp'];
 $currentLevel = $level['lvl'];
 $xpNeeded = 100;
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
-$achievementsQuery = "
+
+// --- Fetch user achievements safely ---
+$stmtAch = $conn->prepare("
   SELECT a.achievementName, a.icon
   FROM tbl_userAchievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
-  WHERE ua.userID = '$userID' AND ua.isClaimed = 1
-";
-$achievementsResult = mysqli_query($conn, $achievementsQuery);
+  WHERE ua.userID = ? AND ua.isClaimed = 1
+");
+$stmtAch->bind_param("i", $userID);
+$stmtAch->execute();
+$achievementsResult = $stmtAch->get_result();
+$stmtAch->close();
 ?>
 
 <!-- Sidebar UI -->
