@@ -12,7 +12,6 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'] ?? 0;
 
-// ✅ Fetch user info (first name, last name, etc.)
 $userQuery = "SELECT firstName, lastName, userName, email, profilePicture 
               FROM tbl_users 
               WHERE userID = '$userID' 
@@ -73,7 +72,6 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
     <div class="profile-card text-center">
       <h4 class="profile-name"><?= htmlspecialchars($fullName); ?></h4>
 
-
       <!-- Profile Picture -->
       <img src="<?= !empty($user['profilePicture']) 
                   ? '../../assets/img/uploads/' . htmlspecialchars($user['profilePicture']) 
@@ -129,9 +127,10 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
       
       <button class="btn edit-btn mb-2" style="margin-top: 1px;" onclick="window.location.href='editProfile.php'">Edit Profile</button>
       
-      <form method="post" action="../../pages/login&signup/login.php" style="width:100px;">
-        <button type="submit" class="btn logout-btn w-100" style="margin-top: 1px;">Logout</button>
+      <form method="post" action="../../pages/login&signup/login.php" class="d-flex justify-content-center">
+      <button type="submit" class="btn logout-btn">Logout</button>
       </form>
+
     </div>
   </div>
 
