@@ -96,7 +96,7 @@ $stmtAch->close();
         <?= $currentXP; ?> XP / <?= $xpNeeded; ?> XP
       </p>
 
-      <form method="post" action="../../pages/login&signup/logout.php">
+      <form method="post" action="../../pages/login&signup/login.php">
         <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
       </form>
     </div>
