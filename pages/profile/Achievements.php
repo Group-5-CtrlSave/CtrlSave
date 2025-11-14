@@ -1,3 +1,143 @@
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+date_default_timezone_set('Asia/Manila');
+
+//to check if user is not (null) login
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../login.php");
+    exit;
+}
+
+$userID = $_SESSION['userID'];
+
+// to check the right achievement for the current user
+if (isset($_POST['claimAchievementID'])) {
+    //intval means to prevent sql error as this is number
+    $achievementID = intval($_POST['claimAchievementID']);
+    executeQuery("
+        UPDATE tbl_userachievements
+        SET isClaimed = 1, date = NOW()
+        WHERE achievementID = $achievementID AND userID = $userID
+    ");
+    echo "success";
+    exit;
+}
+
+//get all achievements ID from tbl_achievements
+$allAchievements = executeQuery("SELECT achievementID FROM tbl_achievements");
+//loop for all of the achievements (array)
+while ($ach = mysqli_fetch_assoc($allAchievements)) {
+
+    //to check if the achievements in tbl_achievement has the user, if not yet it inserts with isClaimed '0' 
+    $check = executeQuery("
+        SELECT * FROM tbl_userachievements
+        WHERE achievementID = '{$ach['achievementID']}' AND userID = '$userID'
+    ");
+    if (mysqli_num_rows($check) == 0) {
+        executeQuery("
+            INSERT INTO tbl_userachievements(achievementID, userID, isClaimed, date)
+            VALUES('{$ach['achievementID']}', '$userID', 0, NULL)
+        ");
+    }
+}
+
+//get the userLVL 
+$getLvl = executeQuery("SELECT lvl FROM tbl_userlvl WHERE userID = '$userID'");
+$lvlRow = mysqli_fetch_assoc($getLvl);
+$userLevel = $lvlRow ? intval($lvlRow['lvl']) : 0;
+
+//BADGE QUERIES
+//get the total count of income transactions
+$incomeCountQuery = executeQuery("
+    SELECT COUNT(*) AS total
+    FROM tbl_income
+    WHERE userID = '$userID'
+");
+$incomeCount = mysqli_fetch_assoc($incomeCountQuery)['total'] ?? 0;
+
+//get the total count of completed saving goals
+$savingCountQuery = executeQuery("
+    SELECT COUNT(*) AS total
+    FROM tbl_savinggoals
+    WHERE userID = '$userID' AND status = 'completed'
+");
+$savingCompleted = mysqli_fetch_assoc($savingCountQuery)['total'] ?? 0;
+
+// $challengeCountQuery = executeQuery("
+//     SELECT COUNT(*) AS total
+//     FROM tbl_challengeprogress
+//     WHERE userID = '$userID' AND status = 'completed'
+// ");
+// $challengesDone = mysqli_fetch_assoc($challengeCountQuery)
+
+
+//GET ALL ACHIEVEMENTS & USER CLAIM STATUS
+$query = "
+    SELECT 
+        a.achievementID,
+        a.achievementName,
+        a.achievementDescription,
+        a.icon,
+        a.lvl,
+        a.type,
+        ua.isClaimed,
+        ua.date AS claimDate
+    FROM tbl_achievements a
+    LEFT JOIN tbl_userachievements ua
+        ON a.achievementID = ua.achievementID AND ua.userID = '$userID'
+    ORDER BY 
+        CASE 
+            WHEN a.type = 'title' THEN 1
+            WHEN a.type = 'badge' THEN 2
+        END ASC,
+        CASE 
+            WHEN a.type = 'title' THEN a.lvl
+            WHEN a.type = 'badge' THEN a.achievementID
+        END ASC
+";
+
+$result = executeQuery($query);
+$achievements = [];
+
+//loop for title and badges
+while ($row = mysqli_fetch_assoc($result)) {
+
+    if ($row['type'] == 'title') {
+        // title unlock rule (if greater or equal to title's level then, it's true)
+        $row['canClaim'] = ($userLevel >= intval($row['lvl']));
+    } else if ($row['type'] == 'badge') {
+        //specific rule per badge
+        switch ($row['achievementID']) {
+
+            case 5: // Newcomer (always true as already login)
+                $row['canClaim'] = true;
+                break;
+
+            case 6: // Income Badge (if equal or greater to 20 income transactions)
+                $row['canClaim'] = ($incomeCount >= 20);
+                break;
+
+            case 7: // Saving Badge (if completed 1 savinggoal)
+                $row['canClaim'] = ($savingCompleted >= 1);
+                break;
+
+            // case 8: // Challenge Pro
+            //     $row['canClaim'] = ($challengesDone >= 20);
+            //     break;
+
+            default:
+                $row['canClaim'] = false;
+                break;
+        }
+    }
+
+    $achievements[$row['type']][] = $row;
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,6 +147,7 @@
     <title>Achievements</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -114,6 +255,17 @@
             min-width: 80px;
         }
 
+        .achievement-item button.locked {
+            background: #F0F1F6;
+            color: #666;
+            border: 2px solid #aaa;
+            font-weight: bold;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: not-allowed;
+            min-width: 80px;
+        }
+
         .achievement-item button.claim-btn:active {
             transform: scale(0.95);
         }
@@ -121,6 +273,7 @@
         .achievement-item button.claimed {
             background-color: transparent;
             color: #FFC727;
+            border-radius: 20px;
             font-weight: 600;
             border: 2px solid #FFC727;
             cursor: default;
@@ -129,7 +282,7 @@
         }
 
         .emoji-icon {
-            font-size: 20px;
+            font-size: 16px;
             margin-right: 10px;
         }
 
@@ -142,9 +295,9 @@
 
         .level-badge {
             display: inline-block;
-            width: 60px;               
-            height: auto;               
-            object-fit: contain;        
+            width: 60px;
+            height: auto;
+            object-fit: contain;
             margin-top: 8px;
             margin-bottom: 10px;
         }
@@ -179,195 +332,151 @@
     </div>
 
     <!-- Titles Section -->
-    <section style="padding-bottom: 20px;">
-        <div class="achievement-card">
-            <h3>Titles</h3>
-            <div class="achievement-container">
-                <div class="achievement-item">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Newbie Saver</div>
-                        <!-- Must be Level 1-->
-                        <div class="achievement-description">
-                            Reach Level 1 <img class="level-badge" src="../../assets/img/challenge/newbieTitle.png" alt="Level 1 Badge">
-                        </div>
-                    </div>
-                    <button class="claimed">Claimed</button>
-                </div>
+    <?php if (isset($achievements['title'])): ?>
+        <section style="padding-bottom: 20px;">
+            <div class="achievement-card">
+                <h3>Titles</h3>
+                <div class="achievement-container">
+                    <?php foreach ($achievements['title'] as $ach): ?>
+                        <div class="achievement-item" data-achievement-id="<?= $ach['achievementID'] ?>">
+                            <div class="achievement-info">
+                                <div class="achievement-title"><?= ($ach['achievementName']) ?></div>
+                                <div class="achievement-description">
+                                    <?= ($ach['achievementDescription']) ?>
+                                    <?php if (!empty($ach['icon'])): ?>
+                                        <img class="level-badge" src="../../assets/img/challenge/<?= $ach['icon'] ?>">
+                                    <?php endif; ?>
+                                </div>
+                            </div>
 
-                <div class="achievement-item">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Passionate Saver</div>
-                        <!-- Must be Level 5-->
-                        <div class="achievement-description">
-                            Reach Level 5 <img class="level-badge" src="../../assets/img/challenge/passionateTitle.png" alt="Level 5 Badge">
-                        </div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
-                </div>
+                            <?php if ($ach['isClaimed'] == '1'): ?>
+                                <button class="claimed" disabled>Claimed</button>
+                            <?php elseif (!$ach['canClaim']): ?>
+                                <button class="locked" disabled>Locked</button>
+                            <?php else: ?>
+                                <button class="claim-btn">Claim</button>
+                            <?php endif; ?>
 
-                <div class="achievement-item">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Elite Saver</div>
-                        <!-- Must be Level 7-->
-                        <div class="achievement-description">
-                            Reach Level 7 <img class="level-badge" src="../../assets/img/challenge/eliteTitle.png" alt="Level 7 Badge">
                         </div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
-                </div>
-
-                <div class="achievement-item">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Veteran Saver</div>
-                        <!-- Must be Level 10-->
-                        <div class="achievement-description">
-                            Reach Level 10 <img class="level-badge" src="../../assets/img/challenge/veteranTitle.png" alt="Level 10 Badge">
-                        </div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
+
 
         <!-- Badges Section -->
-        <div class="achievement-card">
-            <h3>Badges</h3>
-            <div class="achievement-container">
-                <div class="achievement-item">
-                    <img src="../../assets/img/challenge/newcomerBadge.png" alt="Newcomer" class="achievement-icon">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Newcomer</div>
-                        <!-- Must be login, this is claimable agad-->
-                        <div class="achievement-description">Login to CtrlSave</div>
-                    </div>
-                    <button class="claimed">Claimed</button>
-                </div>
+        <?php if (isset($achievements['badge'])): ?>
+            <div class="achievement-card">
+                <h3>Badges</h3>
+                <div class="achievement-container">
+                    <?php foreach ($achievements['badge'] as $ach): ?>
 
-                <div class="achievement-item">
-                    <img src="../../assets/img/challenge/incomeproBadge.png" alt="Income" class="achievement-icon">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Income Badge</div>
-                        <!-- Must get the complete 20 income from Income and Expense page-->
-                        <div class="achievement-description">Add 20 Income Transaction</div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
-                </div>
+                        <div class="achievement-item" data-achievement-id="<?= $ach['achievementID'] ?>">
+                            <?php if (!empty($ach['icon'])): ?>
+                                <img src="../../assets/img/challenge/<?= $ach['icon'] ?>" class="achievement-icon">
+                            <?php endif; ?>
+                            <div class="achievement-info">
+                                <div class="achievement-title"><?= ($ach['achievementName']) ?></div>
+                                <div class="achievement-description"><?= htmlspecialchars($ach['achievementDescription']) ?>
+                                </div>
+                            </div>
 
-                <div class="achievement-item">
-                    <img src="../../assets/img/challenge/savinggoalsBadge.png" alt="Saving" class="achievement-icon">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Saving Badge</div>
-                        <!-- Must get the completed a Saving Goal from Saving Goal page -->
-                        <div class="achievement-description">Complete a Saving Goal</div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
-                </div>
+                            <?php if ($ach['isClaimed'] == '1'): ?>
+                                <button class="claimed" disabled>Claimed</button>
+                            <?php elseif (!$ach['canClaim']): ?>
+                                <button class="locked" disabled>Locked</button>
+                            <?php else: ?>
+                                <button class="claim-btn">Claim</button>
+                            <?php endif; ?>
 
-                <div class="achievement-item">
-                    <img src="../../assets/img/challenge/challengeproBadge.png" alt="Challenge" class="achievement-icon">
-                    <div class="achievement-info">
-                        <div class="achievement-title">Challenge Pro</div>
-                        <!-- Must get the completed 20 challenges from Challenge page -->
-                        <div class="achievement-description">Complete 0/20 Challenges</div>
-                    </div>
-                    <button class="claim-btn">Claim</button>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
     </section>
 
-<!-- Reward Modal -->
-<div class="modal fade" id="rewardModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4" style="background-color: #44B87D; border-radius: 20px;">
-      <h5 class="fw-bold" style="color: #fff; font-size: 30px;">Achievement Unlocked!</h5>
-      <div class="position-relative d-inline-block my-3">
-        <img id="achievementImage"
-             src="../../assets/img/challenge/newcomerBadge.png"
-             alt="Achievement Icon"
-             style="width: 150px; height: 150px; object-fit: contain; border-radius: 10px; transition: all 0.3s ease;">
-      </div>
-      <p style="color: white; font-size: 18px;" id="achievementName">New Achievement</p>
+
+    <!-- Reward Modal -->
+    <div class="modal fade" id="rewardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4" style="background-color: #44B87D; border-radius: 20px;">
+
+                <!-- Title -->
+                <h5 class="fw-bold mb-2" style="color: #fff; font-size: 25px; font-family: Poppins, sans-serif;">
+                    Achievement Unlocked!
+                </h5>
+
+                <!-- Image -->
+                <img id="achievementImage" class="mb-2 mx-auto d-block"
+                    style="width: 150px; height: 150px; object-fit: contain; border-radius: 10px;">
+
+
+                <!-- Text -->
+                <p id="achievementName" class="text-white mb-0"
+                    style="font-size: 16px; font-family: Roboto, sans-serif;">
+                </p>
+
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-const claimButtons = document.querySelectorAll('.claim-btn');
 
-claimButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const achievementItem = button.closest('.achievement-item');
-    const achievementTitle = achievementItem.querySelector('.achievement-title')?.textContent || "Achievement";
-    
-    // Check which image exists (badge or title)
-    const achievementImage = achievementItem.querySelector('.achievement-icon, .level-badge');
-    const achievementIconSrc = achievementImage?.getAttribute('src') || "../../assets/img/challenge/newcomerBadge.png";
-    const isLevelBadge = achievementImage?.classList.contains('level-badge');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-    // Update modal with correct name and image
-    const modalImage = document.getElementById('achievementImage');
-    const modalTitle = document.getElementById('achievementName');
-    
-    modalTitle.textContent = achievementTitle;
-    modalImage.src = achievementIconSrc;
+    <script>
+        function launchConfetti() {
+            const duration = 1500;
+            const end = Date.now() + duration;
 
-    // Adjust modal image style depending on badge type
-    if (isLevelBadge) {
-      modalImage.style.width = "180px";
-      modalImage.style.height = "auto";
-      modalImage.style.borderRadius = "8px";
-      modalImage.style.objectFit = "contain";
-    } else {
-      modalImage.style.width = "150px";
-      modalImage.style.height = "150px";
-      modalImage.style.borderRadius = "50%";
-      modalImage.style.objectFit = "cover";
-    }
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#FFC727', '#44B87D', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#FFC727', '#44B87D', '#ffffff']
+                });
 
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('rewardModal'));
-    modal.show();
+                if (Date.now() < end) requestAnimationFrame(frame);
+            })();
+        }
 
-    // Confetti celebration
-    launchConfetti();
+        document.querySelectorAll('.claim-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.achievement-item');
+                const achievementID = item.dataset.achievementId;
+                const name = item.querySelector('.achievement-title').textContent;
+                const icon = item.querySelector('img')?.src;
 
-    // Change button to claimed state
-    button.textContent = 'Claimed';
-    button.classList.remove('claim-btn');
-    button.classList.add('claimed');
-  });
-});
-</script>
+                document.getElementById('achievementName').textContent = name;
+                document.getElementById('achievementImage').src = icon;
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+                launchConfetti();
+                new bootstrap.Modal(document.getElementById('rewardModal')).show();
 
-<script>
-function launchConfetti() {
-  const duration = 1500;
-  const end = Date.now() + duration;
+                btn.textContent = 'Claimed';
+                btn.classList.remove('claim-btn');
+                btn.classList.add('claimed');
+                btn.disabled = true;
 
-  (function frame() {
-    confetti({
-      particleCount: 5,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 },
-      colors: ['#FFC727', '#44B87D', '#ffffff']
-    });
-    confetti({
-      particleCount: 5,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 },
-      colors: ['#FFC727', '#44B87D', '#ffffff']
-    });
+                fetch(window.location.href, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'claimAchievementID=' + achievementID
+                });
+            });
+        });
+    </script>
 
-    if (Date.now() < end) requestAnimationFrame(frame);
-  })();
-}
-</script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
