@@ -1,3 +1,116 @@
+<?php
+session_start();
+include_once '../../assets/shared/connect.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['userID'])) {
+  if (!headers_sent()) {
+    header('Location: ../../pages/login&signup/login.php');
+    exit();
+  }
+}
+
+$userID = $_SESSION['userID'] ?? 0;
+
+// Check if displayedBadges column exists, add if not
+$checkColumnQuery = "SHOW COLUMNS FROM tbl_users LIKE 'displayedBadges'";
+$checkResult = mysqli_query($conn, $checkColumnQuery);
+if (mysqli_num_rows($checkResult) == 0) {
+  $addColumnQuery = "ALTER TABLE tbl_users ADD COLUMN displayedBadges VARCHAR(255) DEFAULT ''";
+  mysqli_query($conn, $addColumnQuery);
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $firstName = mysqli_real_escape_string($conn, $_POST['firstName'] ?? '');
+  $lastName = mysqli_real_escape_string($conn, $_POST['lastName'] ?? '');
+  $userName = mysqli_real_escape_string($conn, $_POST['userName'] ?? '');
+  $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
+
+  // Profile picture handling
+  $profilePictureQuery = "SELECT profilePicture FROM tbl_users WHERE userID = '$userID'";
+  $currentResult = mysqli_query($conn, $profilePictureQuery);
+  $current = mysqli_fetch_assoc($currentResult);
+  $profilePicture = $current['profilePicture'];
+
+  if (isset($_POST['selectedProfile']) && !empty($_POST['selectedProfile'])) {
+    $profilePicture = basename($_POST['selectedProfile']);
+  }
+
+  if (isset($_FILES['profileUpload']) && $_FILES['profileUpload']['error'] == 0) {
+    $targetDir = "../../assets/img/profile/";
+    $fileName = time() . '_' . basename($_FILES["profileUpload"]["name"]); // Add timestamp to avoid duplicates
+    $targetFile = $targetDir . $fileName;
+    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+    // Basic validation: image file
+    $check = getimagesize($_FILES["profileUpload"]["tmp_name"]);
+    if ($check !== false && in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+      if (move_uploaded_file($_FILES["profileUpload"]["tmp_name"], $targetFile)) {
+        $profilePicture = $fileName;
+      }
+    }
+  }
+
+  // Badges
+  $displayedBadges = mysqli_real_escape_string($conn, $_POST['selectedBadges'] ?? '');
+
+  // Update user details
+  $updateQuery = "UPDATE tbl_users SET 
+                    firstName = '$firstName', 
+                    lastName = '$lastName', 
+                    userName = '$userName', 
+                    email = '$email', 
+                    profilePicture = '$profilePicture',
+                    displayedBadges = '$displayedBadges'
+                  WHERE userID = '$userID'";
+  mysqli_query($conn, $updateQuery);
+
+  // Password change
+  $newPassword = $_POST['newPassword'] ?? '';
+  $confirmPassword = $_POST['confirmPassword'] ?? '';
+  if (!empty($newPassword) && $newPassword === $confirmPassword) {
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT); // Assuming password column exists in tbl_users
+    $updatePassQuery = "UPDATE tbl_users SET password = '$hashedPassword' WHERE userID = '$userID'";
+    mysqli_query($conn, $updatePassQuery);
+  }
+
+  // Redirect to profile
+  header('Location: profile.php');
+  exit();
+}
+
+// Fetch user data
+$userQuery = "SELECT firstName, lastName, userName, email, profilePicture, displayedBadges 
+              FROM tbl_users 
+              WHERE userID = '$userID' 
+              LIMIT 1";
+$userResult = mysqli_query($conn, $userQuery);
+$user = mysqli_fetch_assoc($userResult) ?? [
+  'firstName' => '',
+  'lastName' => '',
+  'userName' => '',
+  'email' => '',
+  'profilePicture' => 'profile_Pic.png',
+  'displayedBadges' => ''
+];
+
+// Fetch claimed achievements
+$achievementsQuery = "
+  SELECT a.achievementID, a.achievementName, a.icon
+  FROM tbl_userAchievements ua
+  JOIN tbl_achievements a ON ua.achievementID = a.achievementID
+  WHERE ua.userID = '$userID' AND ua.isClaimed = 1
+";
+$achievementsResult = mysqli_query($conn, $achievementsQuery);
+$achievements = [];
+while ($row = mysqli_fetch_assoc($achievementsResult)) {
+  $achievements[] = $row;
+}
+
+// Current displayed badges
+$displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,12 +144,16 @@
 
   <!-- Edit Profile Form -->
   <div class="container-box">
-    <form>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="selectedProfile" id="selectedProfileInput">
+      <input type="hidden" name="selectedBadges" id="selectedBadgesInput">
+      <input type="file" name="profileUpload" id="fileInput" class="d-none" accept="image/*" onchange="previewUpload(event)">
+
       <div class="row g-3 align-items-center">
         <div class="col-6 text-center">
           <!-- Profile Image -->
           <div class="profile-wrapper">
-            <img id="profilePreview" src="../../assets/img/shared/profile_Pic.png" alt="Profile" class="profile-pic">
+            <img id="profilePreview" src="<?php echo !empty($user['profilePicture']) ? '../../assets/img/profile/' . htmlspecialchars($user['profilePicture']) : '../../assets/img/shared/profile_Pic.png'; ?>" alt="Profile" class="profile-pic">
             <div class="profile-overlay" data-bs-toggle="modal" data-bs-target="#profileImageModal">
               <i class="bi bi-pencil-fill"></i>
             </div>
@@ -48,9 +165,17 @@
               Achievements
             </button>
             <div id="badgePreviewContainer" class="badge-preview-container mt-2 d-flex justify-content-center">
-              <img src="../../assets/img/challenge/sample badge.png" alt="Badge" width="40" height="40">
-              <img src="../../assets/img/challenge/sample badge2.png" alt="Badge" width="40" height="40">
-              <img src="../../assets/img/challenge/sample badge3.png" alt="Badge" width="40" height="40">
+              <?php
+              if (!empty($displayedBadgesArray) && $displayedBadgesArray[0] !== '') {
+                foreach ($displayedBadgesArray as $icon) {
+                  if (!empty($icon)) {
+                    echo '<img src="../../assets/img/challenge/' . htmlspecialchars(trim($icon)) . '" alt="Badge" width="40" height="40">';
+                  }
+                }
+              } else {
+                echo '<p class="text-muted small">No achievements yet</p>';
+              }
+              ?>
             </div>
           </div>
         </div>
@@ -58,22 +183,22 @@
         <div class="col-6">
           <div class="text-start">
             <label class="form-label">First name</label>
-            <input type="text" class="form-control" value="Cassy">
+            <input type="text" class="form-control" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>">
           </div>
           <div class="text-start">
             <label class="form-label">Last name</label>
-            <input type="text" class="form-control" value="Mondragon">
+            <input type="text" class="form-control" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>">
           </div>
           <div class="text-start">
             <label class="form-label">Username</label>
-            <input type="text" class="form-control" value="Cassey">
+            <input type="text" class="form-control" name="userName" value="<?php echo htmlspecialchars($user['userName']); ?>">
           </div>
         </div>
       </div>
 
       <div class="text-start">
         <label class="form-label">Email</label>
-        <input type="email" class="form-control" value="cassymondragon@gmail.com">
+        <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($user['email']); ?>">
       </div>
 
       <button type="submit" class="btn-save">Save Changes</button>
@@ -83,12 +208,12 @@
         <p style="font-size: 13px; color: black">Leave password empty when you don’t want to change it.</p>
 
         <label class="form-label">New Password</label>
-        <input type="password" class="form-control">
+        <input type="password" class="form-control" name="newPassword">
 
         <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control">
+        <input type="password" class="form-control" name="confirmPassword">
 
-        <button type="button" class="btn-password">Change Password</button>
+        <button type="submit" class="btn-password">Change Password</button>
       </div>
     </form>
   </div>
@@ -116,27 +241,32 @@
 
             <div class="col text-center">
               <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
-                onclick="selectProfile(event, '../../assets/img/shared/profile_Pic.png')">
-                <img src="../../assets/img/shared/profile_Pic.png" style="width: 100%; height: 100%; object-fit: contain;">
+                onclick="selectProfile(event, '../../assets/img/profile/profile1.png')">
+                <img src="../../assets/img/profile/profile1.png" style="width: 100%; height: 100%; object-fit: contain;">
               </div>
             </div>
 
             <div class="col text-center">
               <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
-                onclick="selectProfile(event, '../../assets/img/challenge/sample badge.png')">
-                <img src="../../assets/img/challenge/sample badge.png" style="width: 100%; height: 100%; object-fit: contain;">
+                onclick="selectProfile(event, '../../assets/img/profile/profile2.png')">
+                <img src="../../assets/img/profile/profile2.png" style="width: 100%; height: 100%; object-fit: contain;">
               </div>
             </div>
             
             <div class="col text-center">
               <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
-                onclick="selectProfile(event, '../../assets/img/challenge/sample badge2.png')">
-                <img src="../../assets/img/challenge/sample badge2.png" style="width: 100%; height: 100%; object-fit: contain;">
+                onclick="selectProfile(event, '../../assets/img/profile/profile3.png')">
+                <img src="../../assets/img/profile/profile3.png" style="width: 100%; height: 100%; object-fit: contain;">
+              </div>
+            </div>
+            <div class="col text-center">
+              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;"
+                onclick="selectProfile(event, '../../assets/img/profile/profile4.png')">
+                <img src="../../assets/img/profile/profile4.png" style="width: 100%; height: 100%; object-fit: contain;">
               </div>
             </div>
 
           </div>
-          <input type="file" id="fileInput" class="d-none" accept="image/*" onchange="previewUpload(event)">
         </div>
         <div class="modal-footer bg-white justify-content-center">
           <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
@@ -154,28 +284,15 @@
           <h5 class="modal-title">Choose Achievement Badges (max 3)</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body text-center">
-          <div class="row row-cols-3 g-3 icon-container">
-            <div class="col text-center">
-              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
-                <img src="../../assets/img/challenge/sample badge.png" style="width: 100%; height: 100%; object-fit: contain;">
+        <div class="modal-body">
+          <div class="row row-cols-3 g-3 icon-container mb-3">
+            <?php foreach ($achievements as $achievement): ?>
+              <div class="col text-center">
+                <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px;" data-icon="<?php echo htmlspecialchars($achievement['icon']); ?>" onclick="selectBadge(event, '<?php echo htmlspecialchars($achievement['icon']); ?>')">
+                  <img src="../../assets/img/challenge/<?php echo htmlspecialchars($achievement['icon']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
               </div>
-            </div>
-            <div class="col text-center">
-              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
-                <img src="../../assets/img/challenge/sample badge2.png" style="width: 100%; height: 100%; object-fit: contain;">
-              </div>
-            </div>
-            <div class="col text-center">
-              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
-                <img src="../../assets/img/challenge/sample badge3.png" style="width: 100%; height: 100%; object-fit: contain;">
-              </div>
-            </div>
-            <div class="col text-center">
-              <div class="icon-option border rounded-circle p-2 bg-white mx-auto" style="width: 80px; height: 80px; cursor: pointer;">
-                <img src="../../assets/img/challenge/sample badge4.png" style="width: 100%; height: 100%; object-fit: contain;">
-              </div>
-            </div>
+            <?php endforeach; ?>
           </div>
         </div>
         <div class="modal-footer">
@@ -190,6 +307,7 @@
   <script>
     let selectedProfile = null;
     let uploadedImage = null;
+    let selectedBadges = [];
 
     function selectProfile(event, src) {
       selectedProfile = src;
@@ -220,45 +338,69 @@
 
     function applySelectedProfile() {
       const profilePreview = document.getElementById('profilePreview');
+      const selectedInput = document.getElementById('selectedProfileInput');
       if (uploadedImage) {
         profilePreview.src = uploadedImage;
+        selectedInput.value = '';
       } else if (selectedProfile) {
         profilePreview.src = selectedProfile;
-      } else {
-        profilePreview.src = "../../assets/img/shared/profile_Pic.png";
+        selectedInput.value = selectedProfile;
       }
     }
 
-    const badgeOptions = document.querySelectorAll('#badgeModal .icon-option');
-    const badgePreviewContainer = document.getElementById('badgePreviewContainer');
-    let selectedBadges = [];
-
-    badgeOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        const imgSrc = option.querySelector('img').src;
-
-        if (selectedBadges.includes(imgSrc)) {
-          selectedBadges = selectedBadges.filter(src => src !== imgSrc);
-          option.classList.remove('selected');
-        } else if (selectedBadges.length < 3) {
-          selectedBadges.push(imgSrc);
-          option.classList.add('selected');
-        } else {
-          alert("You can select up to 3 badges only.");
-        }
-      });
-    });
+    function selectBadge(event, icon) {
+      const option = event.currentTarget;
+      if (selectedBadges.includes(icon)) {
+        selectedBadges = selectedBadges.filter(i => i !== icon);
+        option.classList.remove('selected');
+      } else if (selectedBadges.length < 3) {
+        selectedBadges.push(icon);
+        option.classList.add('selected');
+      } else {
+        alert("You can select up to 3 badges only.");
+      }
+    }
 
     document.getElementById('saveBadges').addEventListener('click', () => {
+      const badgePreviewContainer = document.getElementById('badgePreviewContainer');
+      const selectedBadgesInput = document.getElementById('selectedBadgesInput');
       badgePreviewContainer.innerHTML = '';
-      selectedBadges.forEach(src => {
-        const img = document.createElement('img');
-        img.src = src;
-        img.width = 40;
-        img.height = 40;
-        img.style.marginRight = '5px';
-        badgePreviewContainer.appendChild(img);
+      if (selectedBadges.length > 0) {
+        selectedBadges.forEach(icon => {
+          const img = document.createElement('img');
+          img.src = `../../assets/img/challenge/${icon}`;
+          img.alt = 'Badge';
+          img.width = 40;
+          img.height = 40;
+          img.style.marginRight = '5px';
+          badgePreviewContainer.appendChild(img);
+        });
+      } else {
+        badgePreviewContainer.innerHTML = '<p class="text-muted small">No achievements yet</p>';
+      }
+      selectedBadgesInput.value = selectedBadges.join(',');
+    });
+
+    // Preselect badges and profile on load
+    window.addEventListener('load', () => {
+      const currentDisplayed = '<?php echo $user['displayedBadges']; ?>'.split(',').filter(d => d);
+      selectedBadges = currentDisplayed;
+      document.querySelectorAll('#badgeModal .icon-option').forEach(opt => {
+        const icon = opt.dataset.icon;
+        if (selectedBadges.includes(icon)) {
+          opt.classList.add('selected');
+        }
       });
+
+      const currentProfile = '<?php echo htmlspecialchars($user['profilePicture']); ?>';
+      if (currentProfile.startsWith('profile')) {
+        document.querySelectorAll('#profileImageModal .icon-option:not([onclick*="fileInput"])').forEach(el => {
+          const imgSrc = el.querySelector('img').src;
+          if (imgSrc.endsWith(currentProfile)) {
+            el.classList.add('selected');
+          }
+        });
+      }
     });
   </script>
 </body>
