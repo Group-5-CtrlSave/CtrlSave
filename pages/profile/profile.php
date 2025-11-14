@@ -60,7 +60,7 @@ if (!empty($profilePic)) {
 if (file_exists($imageServerPath)) {
   $src .= '?v=' . filemtime($imageServerPath);
 } else {
-  $src .= '?v=' . time(); // Fallback if file missing (e.g., during development)
+  $src .= '?v=' . time(); 
 }
 ?>
 
