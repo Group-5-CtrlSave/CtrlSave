@@ -86,6 +86,23 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       margin-bottom: 18px;
     }
 
+      .section h4 {
+      color: #F6D25B;
+      font-size: 20px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #44B87D;
+      display: inline-block;
+      font-family: 'Poppins', sans-serif;
+    }
+    .section {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
 
   </style>
 </head>
@@ -111,7 +128,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
         <!-- VIDEOS -->
         <div class="section">
-          <h2>Watch: Learn the Basics of Saving</h2>
+          <h4>Watch: Learn the Basics of Saving</h4>
 
           <?php if (mysqli_num_rows($videosResult) > 0): ?>
             <?php while ($video = mysqli_fetch_assoc($videosResult)): ?>
@@ -163,7 +180,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
         <!-- ARTICLES -->
         <div class="section">
-          <h2>Read: Resources to Save Smarter</h2>
+          <h4>Read: Resources to Save Smarter</h4>
           <div class="resources">
             <?php if (mysqli_num_rows($articlesResult) > 0): ?>
               <?php while ($article = mysqli_fetch_assoc($articlesResult)): ?>
@@ -199,7 +216,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
         <!-- BOOKS -->
         <div class="section">
-          <h2>Books: Learn Even More</h2>
+          <h4>Books: Learn Even More</h4>
           <div class="resources">
             <?php if (mysqli_num_rows($booksResult) > 0): ?>
               <?php while ($book = mysqli_fetch_assoc($booksResult)): ?>

@@ -22,7 +22,7 @@ $user = mysqli_fetch_assoc($userResult) ?? [
   'lastName' => '',
   'userName' => '',
   'email' => '',
-  'profilePicture' => 'default.png'
+  'profilePicture' => 'profile1.png'
 ];
 
 // ✅ Combine full name
@@ -46,6 +46,22 @@ $achievementsQuery = "
   WHERE ua.userID = '$userID' AND ua.isClaimed = 1
 ";
 $achievementsResult = mysqli_query($conn, $achievementsQuery);
+
+// ✅ Determine profile picture src with cache busting
+$profilePic = $user['profilePicture'];
+if (!empty($profilePic)) {
+  $imageServerPath = __DIR__ . '/../../assets/img/profile/' . $profilePic;
+  $src = '../../assets/img/profile/' . htmlspecialchars($profilePic);
+} else {
+  $imageServerPath = __DIR__ . '/../../assets/img/profile/profile1.png';
+  $src = '../../assets/img/profile/profile1.png';
+}
+
+if (file_exists($imageServerPath)) {
+  $src .= '?v=' . filemtime($imageServerPath);
+} else {
+  $src .= '?v=' . time(); // Fallback if file missing (e.g., during development)
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,6 +77,9 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
   <link rel="stylesheet" href="../../assets/css/profile.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
 </head>
 
 <body>
@@ -69,13 +88,19 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
 
   <!-- Profile Content -->
   <div class="profile-container d-flex justify-content-center align-items-center w-100 flex-column">
+    
+<button 
+  class="btn rounded-pill mb-3 align-self-end"
+  style="background-color:#F6D25B; border-color:#F6D25B; color:#000;"
+  onclick="window.location.href='achievements.php'">
+    <i class="bi bi-trophy"></i> Claim Achievements
+</button>
+    
     <div class="profile-card text-center">
       <h4 class="profile-name"><?= htmlspecialchars($fullName); ?></h4>
 
       <!-- Profile Picture -->
-      <img src="<?= !empty($user['profilePicture']) 
-                  ? '../../assets/img/uploads/' . htmlspecialchars($user['profilePicture']) 
-                  : '../../assets/img/shared/profile_Pic.png'; ?>" 
+      <img src="<?= $src; ?>" 
            alt="Avatar" 
            class="profile-img">
 
@@ -104,7 +129,7 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
       <!-- Level and XP -->
       <div class="profile-section">
         <p class="profile-label">Level: <?= $currentLevel; ?></p>
-        <div class="progress" style="height: 10px;">
+        <div class="progress" style="height: 15px;">
           <div class="progress-bar bg-warning" role="progressbar"
                style="width: <?= $progressPercent; ?>%;" 
                aria-valuenow="<?= $progressPercent; ?>" 
@@ -118,12 +143,6 @@ $achievementsResult = mysqli_query($conn, $achievementsQuery);
 
     <!-- Buttons -->
     <div class="button-wrapper w-100 d-flex flex-column align-items-center" style="margin-top: 2px;">
-      <img src="../../assets/img/shared/achievements.png" 
-           alt="Achievements" 
-           onclick="window.location.href='achievements.php'" 
-           style="width: 100px; height: 100px; cursor: pointer; transition: transform 0.2s; margin-bottom: 2px;"
-           onmouseover="this.style.transform='scale(1.1)'" 
-           onmouseout="this.style.transform='scale(1)'">
       
       <button class="btn edit-btn mb-2" style="margin-top: 1px;" onclick="window.location.href='editProfile.php'">Edit Profile</button>
       

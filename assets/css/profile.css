@@ -14,7 +14,7 @@ html, body {
 }
 
 .profile-container {
-  padding-top: 0; 
+  padding-top: 20px; 
   padding-bottom: 20px;
   min-height: auto;
 }
@@ -110,6 +110,7 @@ html, body {
   margin-bottom: 30px;
 }
 
+
 @media (max-width: 992px) {
   .profile-card {
     max-width: 90%;
@@ -143,7 +144,7 @@ html, body {
   }
 
   .profile-container {
-    padding-top: 90px;
+    padding-top: 30px;
   }
 }
 
