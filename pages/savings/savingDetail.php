@@ -12,7 +12,6 @@ $errorMessage = '';
 
 if (isset($_POST['add_amount'])) {
   $amount = (float)$_POST['amount'];
-  $date = mysqli_real_escape_string($conn, $_POST['date']);
   $goalCheck = mysqli_query($conn, "SELECT currentAmount, targetAmount FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID");
   $goalData = mysqli_fetch_assoc($goalCheck);
   $currentAmount = $goalData['currentAmount'];
@@ -28,8 +27,8 @@ if (isset($_POST['add_amount'])) {
 
   // Only insert if no error
   if (empty($errorMessage)) {
-    $insertQuery = "INSERT INTO tbl_goaltransactions (savingGoalID, amount, transaction, date)
-                    VALUES ($savingGoalID, $amount, 'add', '$date')";
+    $insertQuery = "INSERT INTO tbl_goaltransactions (savingGoalID, amount, transaction, `date`)
+                    VALUES ($savingGoalID, $amount, 'add', NOW())";
     mysqli_query($conn, $insertQuery);
 
     $updateQuery = "UPDATE tbl_savinggoals 
@@ -188,14 +187,14 @@ if ($result && mysqli_num_rows($result) > 0) {
       </div>
       <div class="transactions-list">
         <?php
-        $transactionQuery = "SELECT * FROM tbl_goaltransactions WHERE savingGoalID = $savingGoalID ORDER BY date DESC";
+        $transactionQuery = "SELECT * FROM tbl_goaltransactions WHERE savingGoalID = $savingGoalID ORDER BY `date` DESC";
         $transactionResult = mysqli_query($conn, $transactionQuery);
 
         if ($transactionResult && mysqli_num_rows($transactionResult) > 0) {
           while ($transaction = mysqli_fetch_assoc($transactionResult)) {
             $amount = number_format((float)$transaction['amount'], 2);
             $type = htmlspecialchars($transaction['transaction']); //add
-            $date = date("M d, Y", strtotime($transaction['date']));
+            $date = date("M d, Y g:i A", strtotime($transaction['date']));
             $color = ($type === 'add') ? 'text-success' : 'text-danger';
             $sign = ($type === 'add') ? '+ ' : '- ';
 
@@ -247,12 +246,6 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <?php echo htmlspecialchars($errorMessage); ?>
               </p>
             <?php endif; ?>
-
-            <label class="form-label fw-semibold text-white mt-3">Date</label>
-            <div class="input-group mb-4 rounded-3" style="background-color: #F0f1f6;">
-              <input type="date" name="date" required
-                class="form-control border-0 bg-transparent text-success fw-semibold">
-            </div>
           </div>
 
           <div class="modal-footer border-0 bg-white rounded-bottom justify-content-center">
@@ -322,7 +315,7 @@ if ($result && mysqli_num_rows($result) > 0) {
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
   
   <?php if (!empty($errorMessage)): ?>
   <script>
