@@ -1,3 +1,133 @@
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+
+$error = "";
+
+/* ---------------- SESSION CHECK ---------------- */
+if (!isset($_SESSION['userID'])) {
+    // Onboarding requires a logged-in (or session-set) user. If your signup sets the session immediately,
+    // this will let the onboarding continue. Adjust redirect if needed.
+    header("Location: ../login&signup/login.php");
+    exit;
+}
+$userID = (int) $_SESSION['userID'];
+
+/* ---------------- FETCH RULES + ALLOCATIONS ----------------
+   tbl_defaultbudgetrule:
+     - defaultBudgetruleID, ruleName, ruleDescription, createdAt
+   tbl_defaultallocation:
+     - defaultAllocationID, defaultBudgetruleID, defaultnecessityType, value
+------------------------------------------------------------*/
+$sql = "
+    SELECT r.defaultBudgetruleID, r.ruleName, r.ruleDescription,
+           a.defaultnecessityType AS category, a.value AS percentage
+    FROM tbl_defaultbudgetrule r
+    LEFT JOIN tbl_defaultallocation a
+        ON r.defaultBudgetruleID = a.defaultBudgetruleID
+    ORDER BY r.defaultBudgetruleID, a.defaultAllocationID
+";
+$res = $conn->query($sql);
+
+$rules = [];
+while ($row = $res->fetch_assoc()) {
+    $id = $row['defaultBudgetruleID'];
+    if (!isset($rules[$id])) {
+        $rules[$id] = [
+            'id' => $id,
+            'ruleName' => $row['ruleName'],
+            'ruleDescription' => $row['ruleDescription'],
+            'allocations' => []
+        ];
+    }
+    if ($row['category'] !== null) {
+        $rules[$id]['allocations'][] = [
+            'category' => $row['category'],
+            'percentage' => (int)$row['percentage']
+        ];
+    }
+}
+
+/* ---------------- HANDLE FORM SUBMIT ---------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // If user prefers own percentages
+    if (isset($_POST['preferMine'])) {
+        header("Location: percentage.php");
+        exit;
+    }
+
+    // Validate selected rule
+    if (empty($_POST['ruleOption'])) {
+        $error = "Please select a budget rule before proceeding.";
+    } else {
+        $selectedRule = (int) $_POST['ruleOption'];
+
+        // Confirm selected rule exists in fetched rules
+        if (!isset($rules[$selectedRule])) {
+            $error = "Invalid rule selected.";
+        } else {
+            // Begin transaction
+            $conn->begin_transaction();
+
+            try {
+                $ruleName = $rules[$selectedRule]['ruleName'];
+
+                // Upsert into tbl_userbudgetrule
+                // Check if user already has a budget rule
+                $check = $conn->prepare("SELECT userBudgetRuleID FROM tbl_userbudgetrule WHERE userID = ?");
+                $check->bind_param("i", $userID);
+                $check->execute();
+                $chkRes = $check->get_result();
+
+                if ($chkRes->num_rows > 0) {
+                    // update existing: set isSelected = 0 for all first (safety), then update this
+                    // (optional) set others to isSelected=0 if your app supports multiple userBudgetrule rows
+                    $existingRow = $chkRes->fetch_assoc();
+                    $userBudgetRuleID = (int) $existingRow['userBudgetRuleID'];
+
+                    // Update existing row to reflect chosen ruleName and isSelected=1
+                    $upd = $conn->prepare("UPDATE tbl_userbudgetrule SET ruleName = ?, isSelected = 1 WHERE userBudgetRuleID = ?");
+                    $upd->bind_param("si", $ruleName, $userBudgetRuleID);
+                    $upd->execute();
+                } else {
+                    // Insert a new userBudgetRule row
+                    $ins = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected) VALUES (?, ?, NOW(), 1)");
+                    $ins->bind_param("is", $userID, $ruleName);
+                    $ins->execute();
+                    $userBudgetRuleID = $conn->insert_id;
+                }
+
+                // Delete any existing allocations for this userBudgetRuleID (to avoid duplicates)
+                $del = $conn->prepare("DELETE FROM tbl_userallocation WHERE userBudgetruleID = ?");
+                $del->bind_param("i", $userBudgetRuleID);
+                $del->execute();
+
+                // Insert allocations from default into tbl_userallocation
+                $insertAlloc = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, ?, 0, ?)");
+                foreach ($rules[$selectedRule]['allocations'] as $alloc) {
+                    $necessity = $alloc['category'];   // e.g., 'need', 'want', 'saving' or similar
+                    $value = (int) $alloc['percentage'];
+                    $insertAlloc->bind_param("isi", $userBudgetRuleID, $necessity, $value); // but types must match: need string,int
+                    // bind_param types must be "isi": integer, string, integer
+                    // However PHP requires variable types matching — ensure $necessity is string
+                    $insertAlloc->execute();
+                }
+
+                $conn->commit();
+                header("Location: done.php");
+                exit;
+            } catch (Exception $ex) {
+                $conn->rollback();
+                $error = "Failed to save selected rule. Please try again.";
+                // For debugging uncomment the next line (don't show on production)
+                // $error .= " (".$ex->getMessage().")";
+            }
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -109,158 +239,187 @@
             margin-top: 15px;
         }
 
+        /* ERROR TOAST */
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 320px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Navigation Bar -->
-    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
-        <div class="container-fluid position-relative">
-            <div class="d-flex align-items-start justify-content-start">
-                <a href="needsWants.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
-                        style="height: 24px;" />
-                </a>
-            </div>
+    <!-- show server-side error toast -->
+    <?php if (!empty($error)) : ?>
+        <div id="errorToast"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-            <div class="position-absolute top-50 start-50 translate-middle">
-                <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Budget Rule</h2>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Title -->
-    <div class="container py-4">
-        <h2>Do you follow a budgeting rule?</h2>
-
-        <!-- Description -->
-        <p class="desc mb-4">Here are some budgeting rules to help<br />you get started on your saving journey.</p>
-
-        <!-- Accordion for Budgeting Rules -->
-        <div class="row" style="overflow:scroll; height: 290px;">
-            <div class="accordion" id="budgetingRulesAccordion">
-
-                <!-- 50/30/20 -->
-                <div class="accordion-item rule-card">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#rule1" aria-expanded="false">
-                            <input class="form-check-input me-2" type="checkbox" name="ruleOption" />
-                            50/30/20 Rule
-                        </button>
-                    </h2>
-                    <div id="rule1" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
-                        <div class="accordion-body text-center">
-                            <canvas id="chart1"></canvas>
-                            <p class="mt-3">
-                                The 50/30/20 rule allocates your income: 50% for needs, 30% for wants, and 20% for
-                                savings.
-                                It’s popular for beginners because of its simplicity and balance.
-                            </p>
-                        </div>
-                    </div>
+    <form method="POST">
+        <!-- Navigation Bar -->
+        <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
+            <div class="container-fluid position-relative">
+                <div class="d-flex align-items-start justify-content-start">
+                    <a href="needsWants.php">
+                        <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
+                            style="height: 24px;" />
+                    </a>
                 </div>
 
-                <!-- 60/20/20 -->
-                <div class="accordion-item rule-card">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#rule2" aria-expanded="false">
-                            <input class="form-check-input me-2" type="checkbox" name="ruleOption" />
-                            60/20/20 Rule
-                        </button>
-                    </h2>
-                    <div id="rule2" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
-                        <div class="accordion-body text-center">
-                            <canvas id="chart2"></canvas>
-                            <p class="mt-3">
-                                The 60/20/20 rule suggests using 60% of your income for essential expenses, and 20% each
-                                for
-                                savings and discretionary spending.
-                            </p>
-                        </div>
-                    </div>
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Budget Rule</h2>
                 </div>
+            </div>
+        </nav>
 
-                <!-- 80/20 -->
-                <div class="accordion-item rule-card">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#rule3" aria-expanded="false">
-                            <input class="form-check-input me-2" type="checkbox" name="ruleOption" />
-                            80/20 Rule
-                        </button>
-                    </h2>
-                    <div id="rule3" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
-                        <div class="accordion-body text-center">
-                            <canvas id="chart3"></canvas>
-                            <p class="mt-3">
-                                The 80/20 rule is simple: save 20% of your income and spend the remaining 80% on
-                                everything
-                                else.
-                                It's ideal for those who want a flexible plan.
-                            </p>
+        <!-- Title -->
+        <div class="container py-4">
+            <h2>Do you follow a budgeting rule?</h2>
+
+            <!-- Description -->
+            <p class="desc mb-4">Here are some budgeting rules to help<br />you get started on your saving journey.</p>
+
+            <!-- Accordion for Budgeting Rules -->
+            <div class="row" style="overflow:scroll; height: 290px;">
+                <div class="accordion" id="budgetingRulesAccordion">
+
+                    <?php foreach ($rules as $r): ?>
+                        <div class="accordion-item rule-card">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#rule<?= $r['id'] ?>" aria-expanded="false">
+                                    <input class="form-check-input me-2 ruleCheck" type="checkbox" name="ruleOption"
+                                        value="<?= $r['id'] ?>"/>
+                                    <?= htmlspecialchars($r['ruleName']) ?>
+                                </button>
+                            </h2>
+                            <div id="rule<?= $r['id'] ?>" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
+                                <div class="accordion-body text-center">
+                                    <canvas id="chart<?= $r['id'] ?>"></canvas>
+                                    <p class="mt-3">
+                                        <?= htmlspecialchars($r['ruleDescription']) ?>
+                                    </p>
+
+                                    <?php if (!empty($r['allocations'])): ?>
+                                        <div class="mt-2">
+                                            <?php foreach ($r['allocations'] as $alloc): ?>
+                                                <p style="margin: 0; font-family:'Roboto', sans-serif;">
+                                                    <?= htmlspecialchars($alloc['category']) ?>: <?= (int)$alloc['percentage'] ?>%
+                                                </p>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
 
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="col-12 btNext d-flex justify-content-center align-items-center">
+                <button id="nextBtn" type="submit" class="btn btn-warning mt-4" disabled>Next</button>
+            </div>
+
+            <div class="col-12 noAccount d-flex justify-content-center align-items-center">
+                <button type="submit" name="preferMine" value="1" class="preferMineLink" style="color: black; background:none; border:none;">I prefer mine</button>
             </div>
         </div>
-
-        <!-- Button -->
-        <div class="col-12 btNext d-flex justify-content-center align-items-center">
-            <a href="done.php"><button type="submit" class="btn btn-warning mt-4">Next</button></a>
-        </div>
-
-        <div class="col-12 noAccount d-flex justify-content-center align-items-center">
-            <a href="percentage.php" class="preferMineLink" style="color: black;">I prefer mine</a>
-        </div>
-    </div>
+    </form>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const chartConfigs = {
-            chart1: { data: [50, 30, 20], labels: ['Needs', 'Wants', 'Savings'], colors: ['#F6D25B', '#C0C0C0', '#44B87D'] },
-            chart2: { data: [60, 20, 20], labels: ['Needs', 'Wants', 'Savings'], colors: ['#F6D25B', '#C0C0C0', '#44B87D'] },
-            chart3: { data: [80, 20], labels: ['Spending', 'Savings'], colors: ['#F6D25B', '#44B87D'] }
-        };
-
+        const ruleData = <?= json_encode(array_values($rules)) ?>;
         const chartInstances = {};
 
-        function createPieChart(id) {
+        function createPieChart(id, data) {
             if (chartInstances[id]) return;
-            const config = chartConfigs[id];
-            chartInstances[id] = new Chart(document.getElementById(id), {
+            const labels = data.map(d => d.category);
+            const values = data.map(d => d.percentage);
+            const colors = ['#F6D25B', '#C0C0C0', '#44B87D', '#8AB4F8', '#E86C6C'];
+            const ctx = document.getElementById('chart' + id);
+            if (!ctx) return;
+            chartInstances[id] = new Chart(ctx, {
                 type: 'pie',
-                data: {
-                    labels: config.labels,
-                    datasets: [{
-                        data: config.data,
-                        backgroundColor: config.colors
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: true, position: 'bottom' } }
-                }
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: colors.slice(0, values.length) }] },
+                options: { responsive: true, plugins: { legend: { display: true, position: 'bottom' } } }
             });
         }
 
-        const accordion = document.getElementById('budgetingRulesAccordion');
-        accordion.addEventListener('shown.bs.collapse', (event) => {
-            const canvas = event.target.querySelector('canvas');
-            if (canvas) createPieChart(canvas.id);
+        document.getElementById('budgetingRulesAccordion').addEventListener('shown.bs.collapse', (event) => {
+            const id = event.target.id.replace('rule', '');
+            const rule = ruleData.find(r => r.id == id);
+            if (rule && rule.allocations) createPieChart(id, rule.allocations);
         });
 
-        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ruleOption"]');
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', () => {
-                checkboxes.forEach(cb => {
-                    if (cb !== checkbox) cb.checked = false;
-                });
+        // Only one checkbox allowed & enable Next button when one selected
+        const checks = document.querySelectorAll('input[type="checkbox"][name="ruleOption"]');
+        const nextBtn = document.getElementById('nextBtn');
+
+        checks.forEach(cb => {
+            cb.addEventListener('change', () => {
+                checks.forEach(other => { if (other !== cb) other.checked = false; });
+                // Enable Next only if any checked
+                const any = Array.from(checks).some(x => x.checked);
+                nextBtn.disabled = !any;
             });
         });
+
+        // Prevent form submit if none selected (server also validates)
+        document.querySelector('form').addEventListener('submit', (e) => {
+            // allow preferMine to submit
+            const prefer = document.activeElement && document.activeElement.name === 'preferMine';
+            if (prefer) return;
+            const any = Array.from(checks).some(x => x.checked);
+            if (!any) {
+                e.preventDefault();
+                showErrorToast('Please select a budget rule before proceeding.');
+            }
+        });
+
+        function showErrorToast(msg) {
+            const existing = document.getElementById('errorToast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.id = 'errorToast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+        }
     </script>
 </body>
 
