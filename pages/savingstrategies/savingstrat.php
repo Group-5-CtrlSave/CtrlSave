@@ -119,10 +119,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
         <h1>Smart Saving Strategies</h1>
         <p class="tagline">Watch. Read. Apply. Save Smart.</p>
       </header>
-
-      <!-- ✅ Added Favorites/Archived buttons here -->
       
-
       <div class="container main-content">
         
 
@@ -295,6 +292,20 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
         console.log("Selected:", this.id);
       });
     });
+
+    document.querySelectorAll(".resource-card").forEach(card => {
+    card.addEventListener("click", function (e) {
+
+      
+      if (e.target.tagName.toLowerCase() === "a") return;
+
+      const link = this.querySelector("a");
+      if (!link) return;
+
+      
+      link.click();
+    });
+  });
   </script>
 
 </body>
