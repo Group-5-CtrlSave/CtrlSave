@@ -79,6 +79,12 @@ if (file_exists($imageServerPath)) {
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+<style>
+  #sidebar, #sidebar * {
+      font-family: 'Roboto', sans-serif !important;
+  }
+</style>
+
 
 </head>
 
@@ -104,7 +110,7 @@ if (file_exists($imageServerPath)) {
            alt="Avatar" 
            class="profile-img">
 
-      <p class="profile-username">@<?= htmlspecialchars($user['userName']); ?></p>
+      <p class="profile-username"style="color: #44B87D;">@<?= htmlspecialchars($user['userName']); ?></p>
 
       <div class="profile-section">
         <p class="profile-label">Achievements:</p>
@@ -123,7 +129,9 @@ if (file_exists($imageServerPath)) {
 
       <div class="profile-section">
         <p class="profile-label">Email:</p>
-        <p class="profile-answer"><?= htmlspecialchars($user['email']); ?></p>
+        <p class="profile-answer" style="color: black;">
+        <?= htmlspecialchars($user['email']); ?></p>
+
       </div>
 
       <!-- Level and XP -->
