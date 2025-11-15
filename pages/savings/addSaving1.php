@@ -10,6 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $icons = [
+    "../../assets/img/shared/categories/expense/Savings.png",
+    "../../assets/img/shared/categories/expense/Phone.png",
+    "../../assets/img/shared/categories/expense/Travel.png",
     "../../assets/img/shared/categories/expense/Car.png",
     "../../assets/img/shared/categories/expense/Dining out.png",
     "../../assets/img/shared/categories/expense/Entertainment.png",
