@@ -15,12 +15,13 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'] ?? 0;
 
-$stmtUser = $conn->prepare("SELECT userName, email FROM tbl_users WHERE userID = ? LIMIT 1");
+$stmtUser = $conn->prepare("SELECT userName, email, displayedBadges, profilePicture FROM tbl_users WHERE userID = ? LIMIT 1");
 $stmtUser->bind_param("i", $userID);
 $stmtUser->execute();
 $userResult = $stmtUser->get_result();
-$user = $userResult->fetch_assoc() ?? ['userName' => 'User', 'email' => ''];
+$user = $userResult->fetch_assoc() ?? ['userName' => 'User', 'email' => '', 'displayedBadges' => '', 'profilePicture' => 'profile_Pic.png'];
 $stmtUser->close();
+
 $stmtLevel = $conn->prepare("SELECT exp, lvl FROM tbl_userLvl WHERE userID = ? LIMIT 1");
 $stmtLevel->bind_param("i", $userID);
 $stmtLevel->execute();
@@ -33,17 +34,35 @@ $currentLevel = $level['lvl'];
 $xpNeeded = 100;
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
-// --- Fetch user achievements safely ---
-$stmtAch = $conn->prepare("
-  SELECT a.achievementName, a.icon
-  FROM tbl_userAchievements ua
-  JOIN tbl_achievements a ON ua.achievementID = a.achievementID
-  WHERE ua.userID = ? AND ua.isClaimed = 1
-");
-$stmtAch->bind_param("i", $userID);
-$stmtAch->execute();
-$achievementsResult = $stmtAch->get_result();
-$stmtAch->close();
+// --- Fetch only the equipped badges (max 3) ---
+$displayedBadges = [];
+if (!empty($user['displayedBadges'])) {
+    $badgeIcons = explode(',', $user['displayedBadges']);
+    $badgeIcons = array_filter(array_map('trim', $badgeIcons)); // Remove empty values
+    
+    if (!empty($badgeIcons)) {
+        // Create placeholders for IN clause
+        $placeholders = implode(',', array_fill(0, count($badgeIcons), '?'));
+        
+        $stmtBadges = $conn->prepare("
+            SELECT achievementName, icon
+            FROM tbl_achievements
+            WHERE icon IN ($placeholders)
+            LIMIT 3
+        ");
+        
+        // Bind parameters dynamically
+        $types = str_repeat('s', count($badgeIcons));
+        $stmtBadges->bind_param($types, ...$badgeIcons);
+        $stmtBadges->execute();
+        $badgesResult = $stmtBadges->get_result();
+        
+        while ($badge = $badgesResult->fetch_assoc()) {
+            $displayedBadges[] = $badge;
+        }
+        $stmtBadges->close();
+    }
+}
 ?>
 
 <!-- Sidebar UI -->
@@ -56,10 +75,17 @@ $stmtAch->close();
          style="z-index: 1055; background-color: white; flex-shrink: 0; box-sizing: border-box;">
 
       <div class="d-flex align-items-center gap-3 mb-2" style="flex-wrap: nowrap;">
-        <!-- Initials -->
-        <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold flex-shrink-0"
-             style="width: 48px; height: 48px; font-size: 1.25rem; min-width: 48px; min-height: 48px; aspect-ratio: 1/1; overflow: hidden;">
-          <?= strtoupper(substr($user['userName'], 0, 2)); ?>
+        <!-- Profile Picture -->
+        <div class="rounded-circle overflow-hidden flex-shrink-0 bg-light"
+             style="width: 48px; height: 48px; min-width: 48px; min-height: 48px;">
+          <?php 
+          $profilePicturePath = !empty($user['profilePicture']) 
+              ? '../../assets/img/profile/' . htmlspecialchars($user['profilePicture']) 
+              : '../../assets/img/shared/profile_Pic.png';
+          ?>
+          <img src="<?= $profilePicturePath; ?>" 
+               alt="Profile" 
+               style="width: 100%; height: 100%; object-fit: cover;">
         </div>
 
         <!-- User Details -->
@@ -71,17 +97,17 @@ $stmtAch->close();
             <?= htmlspecialchars($user['email']); ?>
           </p>
 
-          <!-- Badges -->
+          <!-- Equipped Badges (Max 3) -->
           <div class="d-flex align-items-center gap-1 mt-1 flex-wrap" style="max-width: 150px;">
-            <?php if (mysqli_num_rows($achievementsResult) > 0): ?>
-              <?php while ($badge = mysqli_fetch_assoc($achievementsResult)): ?>
+            <?php if (!empty($displayedBadges)): ?>
+              <?php foreach ($displayedBadges as $badge): ?>
                 <img src="../../assets/img/challenge/<?= htmlspecialchars($badge['icon']); ?>"
                      alt="<?= htmlspecialchars($badge['achievementName']); ?>"
                      title="<?= htmlspecialchars($badge['achievementName']); ?>"
                      style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
-              <?php endwhile; ?>
+              <?php endforeach; ?>
             <?php else: ?>
-              <p class="small text-muted mb-0">No badges yet</p>
+              <p class="small text-muted mb-0">No badges equipped</p>
             <?php endif; ?>
           </div>
         </div>
