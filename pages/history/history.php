@@ -113,7 +113,7 @@ function formatTimeAgo($datetime)
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>History</title>
+  <title>CtrlSave | History</title>
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="stylesheet" href="../../assets/css/history.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
@@ -152,7 +152,7 @@ function formatTimeAgo($datetime)
         } elseif ($row['categoryType'] == 'expense') {
           $iconPath = $basePath . "expense/" . $row['icon'];
         } else { // savings
-          $iconPath = $basePath . "savings/" . $row['icon'];
+          $iconPath = $basePath . "expense/" . $row['icon'];
         }
         ?>
         <div class="entry">
