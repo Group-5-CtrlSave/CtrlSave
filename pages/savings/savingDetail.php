@@ -1,5 +1,11 @@
 <?php
+session_start();
 include '../../assets/shared/connect.php';
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
 $savingGoalID = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($savingGoalID <= 0) {

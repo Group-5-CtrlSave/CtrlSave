@@ -2,6 +2,11 @@
 session_start();
 include '../../assets/shared/connect.php';
 
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['goalName'] = $_POST['goalName'];
     $_SESSION['goalIcon'] = $_POST['goalIcon'];
