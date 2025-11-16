@@ -1,6 +1,12 @@
 <?php
+session_start();
 include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("<p style='color:white; text-align:center;'>Invalid notification.</p>");

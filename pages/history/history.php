@@ -4,7 +4,7 @@ include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['userID'])) {
-    header(header: "Location: ../../login.php");
+    header("Location: ../../pages/login&signup/login.php");
     exit;
 }
 

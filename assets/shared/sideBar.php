@@ -1,16 +1,16 @@
 <?php
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-    session_start();
+  session_start();
 }
 
 include_once '../../assets/shared/connect.php';
 
 // Redirect to login if userID is not set
 if (!isset($_SESSION['userID'])) {
-    if (!headers_sent()) {
-        header('Location: ../../pages/login&signup/login.php');
-        exit();
-    }
+  if (!headers_sent()) {
+    header('Location: ../../pages/login&signup/login.php');
+    exit();
+  }
 }
 
 $userID = $_SESSION['userID'] ?? 0;
@@ -37,55 +37,53 @@ $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 // --- Fetch only the equipped badges (max 3) ---
 $displayedBadges = [];
 if (!empty($user['displayedBadges'])) {
-    $badgeIcons = explode(',', $user['displayedBadges']);
-    $badgeIcons = array_filter(array_map('trim', $badgeIcons)); // Remove empty values
-    
-    if (!empty($badgeIcons)) {
-        // Create placeholders for IN clause
-        $placeholders = implode(',', array_fill(0, count($badgeIcons), '?'));
-        
-        $stmtBadges = $conn->prepare("
+  $badgeIcons = explode(',', $user['displayedBadges']);
+  $badgeIcons = array_filter(array_map('trim', $badgeIcons)); // Remove empty values
+
+  if (!empty($badgeIcons)) {
+    // Create placeholders for IN clause
+    $placeholders = implode(',', array_fill(0, count($badgeIcons), '?'));
+
+    $stmtBadges = $conn->prepare("
             SELECT achievementName, icon
             FROM tbl_achievements
             WHERE icon IN ($placeholders)
             LIMIT 3
         ");
-        
-        // Bind parameters dynamically
-        $types = str_repeat('s', count($badgeIcons));
-        $stmtBadges->bind_param($types, ...$badgeIcons);
-        $stmtBadges->execute();
-        $badgesResult = $stmtBadges->get_result();
-        
-        while ($badge = $badgesResult->fetch_assoc()) {
-            $displayedBadges[] = $badge;
-        }
-        $stmtBadges->close();
+
+    // Bind parameters dynamically
+    $types = str_repeat('s', count($badgeIcons));
+    $stmtBadges->bind_param($types, ...$badgeIcons);
+    $stmtBadges->execute();
+    $badgesResult = $stmtBadges->get_result();
+
+    while ($badge = $badgesResult->fetch_assoc()) {
+      $displayedBadges[] = $badge;
     }
+    $stmtBadges->close();
+  }
 }
 ?>
 
 <!-- Sidebar UI -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel"
-     style="width: 250px; overflow-y: auto; transition: transform 0.3s ease; background-color: #44B87D;">
+  style="width: 250px; overflow-y: auto; transition: transform 0.3s ease; background-color: #44B87D;">
   <div class="offcanvas-body p-0" style="background-color: #44B87D; height: 100vh; overflow-y: auto;">
 
     <!-- User Info Section -->
-    <div class="p-4 border-bottom bg-light shadow-sm position-sticky top-0" 
-         style="z-index: 1055; background-color: white; flex-shrink: 0; box-sizing: border-box;">
+    <div class="p-4 border-bottom bg-light shadow-sm position-sticky top-0"
+      style="z-index: 1055; background-color: white; flex-shrink: 0; box-sizing: border-box;">
 
       <div class="d-flex align-items-center gap-3 mb-2" style="flex-wrap: nowrap;">
         <!-- Profile Picture -->
         <div class="rounded-circle overflow-hidden flex-shrink-0 bg-light"
-             style="width: 48px; height: 48px; min-width: 48px; min-height: 48px;">
-          <?php 
-          $profilePicturePath = !empty($user['profilePicture']) 
-              ? '../../assets/img/profile/' . htmlspecialchars($user['profilePicture']) 
-              : '../../assets/img/shared/profile_Pic.png';
+          style="width: 48px; height: 48px; min-width: 48px; min-height: 48px;">
+          <?php
+          $profilePicturePath = !empty($user['profilePicture'])
+            ? '../../assets/img/profile/' . htmlspecialchars($user['profilePicture'])
+            : '../../assets/img/shared/profile_Pic.png';
           ?>
-          <img src="<?= $profilePicturePath; ?>" 
-               alt="Profile" 
-               style="width: 100%; height: 100%; object-fit: cover;">
+          <img src="<?= $profilePicturePath; ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
 
         <!-- User Details -->
@@ -102,9 +100,9 @@ if (!empty($user['displayedBadges'])) {
             <?php if (!empty($displayedBadges)): ?>
               <?php foreach ($displayedBadges as $badge): ?>
                 <img src="../../assets/img/challenge/<?= htmlspecialchars($badge['icon']); ?>"
-                     alt="<?= htmlspecialchars($badge['achievementName']); ?>"
-                     title="<?= htmlspecialchars($badge['achievementName']); ?>"
-                     style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
+                  alt="<?= htmlspecialchars($badge['achievementName']); ?>"
+                  title="<?= htmlspecialchars($badge['achievementName']); ?>"
+                  style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
               <?php endforeach; ?>
             <?php else: ?>
               <p class="small text-muted mb-0">No badges equipped</p>
@@ -122,7 +120,7 @@ if (!empty($user['displayedBadges'])) {
         <?= $currentXP; ?> XP / <?= $xpNeeded; ?> XP
       </p>
 
-      <form method="post" action="../../pages/login&signup/login.php">
+      <form method="post" action="../../pages/logout/logout.php">
         <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
       </form>
     </div>
@@ -133,7 +131,7 @@ if (!empty($user['displayedBadges'])) {
       $links = [
         ["Home", "home/home.php", "Home_SB.png"],
         ["Income & Expense", "income&expenses/income&expenses.php", "I&E_SB.png"],
-        ["Savings", "savings/savingDetail.php", "Savings_SB.png"],
+        ["Savings Goals", "savings/savingDetail.php", "Savings_SB.png"],
         ["Cointrol", "cointrol/cointrol.php", "Cointrol_SB.png"],
         ["Saving Strategies", "savingstrategies/savingstrat.php", "SavingStrat_SB.png"],
         ["History", "history/history.php", "History_SB.png"],
@@ -144,7 +142,7 @@ if (!empty($user['displayedBadges'])) {
       ];
 
       foreach ($links as [$name, $href, $icon]) {
-          echo "
+        echo "
           <li>
             <a href='../../pages/$href'
               class='d-flex align-items-center text-white fw-bold gap-2 p-2 text-decoration-none rounded'

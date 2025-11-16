@@ -1,9 +1,10 @@
 <?php
 session_start();
-include("../../assets/shared/connect.php");
+include '../../assets/shared/connect.php';
 
 if (!isset($_SESSION['userID'])) {
-    $_SESSION['userID'] = 2; 
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
 }
 
 $userID = intval($_SESSION['userID']);
