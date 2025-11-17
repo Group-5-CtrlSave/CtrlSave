@@ -86,7 +86,7 @@ $stmtRecommendation->execute();
 $recommendationResult = $stmtRecommendation->get_result();
 $recommendation = $recommendationResult->fetch_assoc();
 
-// Fetch resources from the database
+// // Fetch resources from the database
 $sqlResources = "SELECT * FROM tbl_resources ORDER BY dateAdded DESC LIMIT 5";
 $resultResources = $conn->query($sqlResources);
 
