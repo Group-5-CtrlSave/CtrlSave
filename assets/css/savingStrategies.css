@@ -10,7 +10,7 @@ body {
 
 header {
   position: fixed;
-  top: 100px; 
+  top: 75px; 
   left: 0;
   width: 100%;
   background: #44B87D;
@@ -47,7 +47,7 @@ header p.tagline {
 
 
 .main-content {
-  margin-top: 50px; 
+  margin-top: 105px; 
   max-width: 1200px;
   padding: 10px;
   width: 100%;

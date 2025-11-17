@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include("../../assets/shared/connect.php");
@@ -9,7 +10,7 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'] ?? 0;
 
-$userQuery = "SELECT firstName, lastName, userName, email, profilePicture 
+$userQuery = "SELECT firstName, lastName, userName, email, profilePicture, displayedBadges 
               FROM tbl_users 
               WHERE userID = '$userID' 
               LIMIT 1";
@@ -19,10 +20,10 @@ $user = mysqli_fetch_assoc($userResult) ?? [
   'lastName' => '',
   'userName' => '',
   'email' => '',
-  'profilePicture' => 'profile1.png'
+  'profilePicture' => 'profile1.png',
+  'displayedBadges' => ''
 ];
 
-// Combine full name
 $fullName = trim($user['firstName'] . ' ' . $user['lastName']);
 
 // Fetch level and XP info
@@ -35,14 +36,41 @@ $currentLevel = $level['lvl'];
 $xpNeeded = 100;
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
-// Fetch achievements
+// Fetch all claimed achievements for map and auto-select
 $achievementsQuery = "
-  SELECT a.achievementName, a.icon
+  SELECT a.icon, a.achievementName, a.type, ua.claimedDate
   FROM tbl_userAchievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
   WHERE ua.userID = '$userID' AND ua.isClaimed = 1
+  ORDER BY ua.claimedDate ASC
 ";
 $achievementsResult = mysqli_query($conn, $achievementsQuery);
+$achievements = [];
+$achievementMap = [];
+while ($row = mysqli_fetch_assoc($achievementsResult)) {
+  $achievements[] = $row;
+  $achievementMap[$row['icon']] = $row['achievementName'];
+}
+
+// Get displayed badges
+$displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
+$displayedBadgesArray = array_filter(array_map('trim', $displayedBadgesArray));
+
+if (empty($displayedBadgesArray) && !empty($achievements)) {
+  $titles = array_filter($achievements, function($a) { return $a['type'] === 'title'; });
+  $badges = array_filter($achievements, function($a) { return $a['type'] === 'badge'; });
+  $selected = [];
+  if (!empty($titles)) {
+    $selected[] = reset($titles)['icon'];
+  }
+  $badges = array_values($badges);
+  for ($i = 0; $i < 2 && $i < count($badges); $i++) {
+    $selected[] = $badges[$i]['icon'];
+  }
+  $displayedBadgesArray = $selected;
+}
+
+$hasAchievements = !empty($displayedBadgesArray);
 
 // Determine profile picture src with cache busting
 $profilePic = $user['profilePicture'];
@@ -93,7 +121,7 @@ if (file_exists($imageServerPath)) {
   <div class="profile-container d-flex justify-content-center align-items-center w-100 flex-column">
     
 <button 
-  class="btn rounded-pill mb-3 align-self-end"
+  class="btn rounded-pill mb-3 align-self-end me-2"
   style="background-color:#F6D25B; border-color:#F6D25B; color:#000;"
   onclick="window.location.href='achievements.php'">
     <i class="bi bi-trophy"></i> Claim Achievements
@@ -112,13 +140,13 @@ if (file_exists($imageServerPath)) {
       <div class="profile-section">
         <p class="profile-label">Achievements:</p>
 
-        <?php if (mysqli_num_rows($achievementsResult) > 0): ?>
-          <?php while ($badge = mysqli_fetch_assoc($achievementsResult)): ?>
-            <img src="../../assets/img/challenge/<?= htmlspecialchars($badge['icon']); ?>" 
-                 alt="<?= htmlspecialchars($badge['achievementName']); ?>" 
-                 title="<?= htmlspecialchars($badge['achievementName']); ?>" 
+        <?php if ($hasAchievements): ?>
+          <?php foreach ($displayedBadgesArray as $icon): ?>
+            <img src="../../assets/img/challenge/<?= htmlspecialchars($icon); ?>" 
+                 alt="<?= htmlspecialchars($achievementMap[$icon] ?? 'Achievement'); ?>" 
+                 title="<?= htmlspecialchars($achievementMap[$icon] ?? 'Achievement'); ?>" 
                  class="badge-icon">
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         <?php else: ?>
           <p class="text-muted small">No achievements yet</p>
         <?php endif; ?>
