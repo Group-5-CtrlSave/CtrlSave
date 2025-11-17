@@ -64,79 +64,111 @@ if (!empty($user['displayedBadges'])) {
   }
 }
 ?>
-
 <!-- Sidebar UI -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel"
-  style="width: 250px; overflow-y: auto; transition: transform 0.3s ease; background-color: #44B87D;">
-  <div class="offcanvas-body p-0" style="background-color: #44B87D; height: 100vh; overflow-y: auto;">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel" style="width:250px;overflow-y:auto;transition:transform .3s ease;background-color:#44B87D;
+  font-family:'Poppins',sans-serif!important;font-size:14px!important;">
+
+  <div class="offcanvas-body p-0" style="background-color:#44B87D;height:100vh;overflow-y:auto;
+    font-family:'Poppins',sans-serif!important;font-size:14px!important;">
 
     <!-- User Info Section -->
     <div class="p-4 border-bottom bg-light shadow-sm position-sticky top-0"
-      style="z-index: 1055; background-color: white; flex-shrink: 0; box-sizing: border-box;">
+      style="z-index:1055;background-color:white;flex-shrink:0;box-sizing:border-box;">
 
-      <div class="d-flex align-items-center gap-3 mb-2" style="flex-wrap: nowrap;">
+      <div class="d-flex align-items-center gap-3 mb-2" style="flex-wrap:nowrap;">
+
         <!-- Profile Picture -->
         <div class="rounded-circle overflow-hidden flex-shrink-0 bg-light"
-          style="width: 48px; height: 48px; min-width: 48px; min-height: 48px;">
+          style="width:48px;height:48px;min-width:48px;min-height:48px;">
           <?php
           $profilePicturePath = !empty($user['profilePicture'])
             ? '../../assets/img/profile/' . htmlspecialchars($user['profilePicture'])
             : '../../assets/img/shared/profile_Pic.png';
           ?>
-          <img src="<?= $profilePicturePath; ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+          <img src="<?= $profilePicturePath; ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;">
         </div>
 
         <!-- User Details -->
-        <div class="flex-grow-1" style="min-width: 0;">
-          <p class="text-dark fw-semibold mb-0" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        <div class="flex-grow-1" style="min-width:0;">
+
+          <p class="text-dark fw-semibold mb-0" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            font-family:'Poppins',sans-serif!important;font-size:16px!important;">
             <?= htmlspecialchars($user['userName']); ?>
           </p>
-          <p class="text-muted small mb-0" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+
+          <p class="text-muted mb-0" style="white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-family: 'Roboto', sans-serif !important;
+          font-size: 12px !important;
+          font-weight: normal !important;">
             <?= htmlspecialchars($user['email']); ?>
           </p>
 
-          <!-- Equipped Badges (Max 3) -->
-          <div class="d-flex align-items-center gap-1 mt-1 flex-wrap" style="max-width: 150px;">
+
+          <!-- Equipped Badges -->
+          <div class="d-flex align-items-center gap-1 mt-1 flex-wrap" style="max-width:150px;">
+
             <?php if (!empty($displayedBadges)): ?>
               <?php foreach ($displayedBadges as $badge): ?>
                 <img src="../../assets/img/challenge/<?= htmlspecialchars($badge['icon']); ?>"
                   alt="<?= htmlspecialchars($badge['achievementName']); ?>"
                   title="<?= htmlspecialchars($badge['achievementName']); ?>"
-                  style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
+                  style="width:16px;height:16px;object-fit:contain;flex-shrink:0;">
               <?php endforeach; ?>
+
             <?php else: ?>
-              <p class="small text-muted mb-0">No badges equipped</p>
+              <!-- BADGES TEXT -->
+              <p class="text-muted mb-0" style="font-family: 'Roboto', sans-serif !important;
+          font-size: 12px !important;
+          font-weight: normal !important;">
+                No badges equipped
+              </p>
+
             <?php endif; ?>
           </div>
         </div>
       </div>
 
       <!-- Level and XP -->
-      <p class="small text-dark fw-medium mb-1">Level <?= $currentLevel; ?></p>
-      <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height: 8px;">
-        <div class="bg-warning rounded-pill" style="width: <?= $progressPercent; ?>%; height: 8px;"></div>
+      <p class="text-dark mb-1" style="font-family:'Poppins',sans-serif !important;
+          font-size:16px !important;
+          font-weight:bold !important;">
+        Level <?= $currentLevel; ?>
+      </p>
+
+
+      <div class="w-100 bg-secondary bg-opacity-25 rounded-pill" style="height:8px;">
+        <div class="bg-warning rounded-pill" style="width:<?= $progressPercent; ?>%;height:8px;"></div>
       </div>
-      <p class="text-muted mt-1 mb-3 small">
+
+      <p class="text-muted mt-1 mb-3" style="font-family:'Poppins',sans-serif!important;font-size:12px!important;">
         <?= $currentXP; ?> XP / <?= $xpNeeded; ?> XP
       </p>
 
       <form method="post" action="../../pages/logout/logout.php">
-        <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium">Logout</button>
+        <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium"
+          style="font-family:'Poppins',sans-serif!important;font-size:14px!important;">
+          Logout
+        </button>
       </form>
+
     </div>
 
+
     <!-- Sidebar Links -->
-    <ul class="list-unstyled m-0 p-3">
+    <ul class="list-unstyled m-0 p-3"
+      style="font-family:'Roboto',sans-serif!important;font-size:16px;line-height:5px!important;">
       <?php
       $links = [
         ["Home", "home/home.php", "Home_SB.png"],
-        ["Income & Expense", "income&expenses/income&expenses.php", "I&E_SB.png"],
+        ["Income & Expenses", "income&expenses/income&expenses.php", "I&E_SB.png"],
         ["Savings Goals", "savings/savingDetail.php", "Savings_SB.png"],
         ["Cointrol", "cointrol/cointrol.php", "Cointrol_SB.png"],
         ["Saving Strategies", "savingstrategies/savingstrat.php", "SavingStrat_SB.png"],
         ["History", "history/history.php", "History_SB.png"],
         ["Notifications", "notification/notification.php", "Notif_SB.png"],
-        ["Challenge", "challenge/challengeMain.php", "Challenge_SB.png"],
+        ["Challenges", "challenge/challengeMain.php", "Challenge_SB.png"],
         ["Profile", "profile/profile.php", "Profile_SB.png"],
         ["Settings", "settings/settings.php", "Settings_SB.png"]
       ];
