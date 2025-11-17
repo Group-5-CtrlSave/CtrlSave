@@ -42,16 +42,30 @@ $query = "
 
   UNION ALL
 
-  SELECT 
+SELECT 
     'savings' AS type,
     sg.goalName AS name,
     gt.amount AS amount,
     gt.date AS date,
     'savings' AS categoryType,
     sg.icon AS icon
-  FROM tbl_goaltransactions gt
-  JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
-  WHERE sg.userID = '$userID'
+FROM tbl_goaltransactions gt
+JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
+WHERE sg.userID = '$userID'
+
+UNION ALL
+
+SELECT
+    'savings' AS type,
+    sg.goalName AS name,
+    sg.currentAmount AS amount,
+    sg.createdAt AS date,
+    'savings' AS categoryType,
+    sg.icon AS icon
+FROM tbl_savinggoals sg
+LEFT JOIN tbl_goaltransactions gt ON sg.savingGoalID = gt.savingGoalID
+WHERE sg.userID = '$userID' AND gt.goalTransactionID IS NULL
+
   ";
 
 $query = "SELECT * FROM ($query) AS all_data";
@@ -174,7 +188,8 @@ function formatTimeAgo($datetime)
       <?php endwhile; ?>
     <?php else: ?>
       <div class="text-center text-white mt-5">
-        <h5 style="font-size:16px;">You haven’t made any transactions here yet.</h5>
+        <h5 style="font-size:16px;font-family: Roboto, sans-serif;">Your complete transaction history (Income, Expenses,
+          and Savings Goals) will appear here.</h5>
       </div>
     <?php endif; ?>
   </div>

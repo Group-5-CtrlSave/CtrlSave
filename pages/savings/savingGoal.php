@@ -99,6 +99,37 @@ $result = mysqli_query($conn, $query);
     .plus-btn:hover {
       background: #3aa76e;
     }
+
+    .empty-state-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: #FFFFFF;
+      font-family: "Roboto", sans-serif;
+    }
+
+    .empty-state-icon {
+      width: 300px;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+
+    .empty-state-heading {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-family: "Roboto", sans-serif;
+
+    }
+
+    .empty-state-paragraph-14px {
+      font-size: 14px;
+      font-family: "Roboto", sans-serif;
+
+    }
   </style>
 </head>
 
@@ -165,7 +196,22 @@ $result = mysqli_query($conn, $query);
           <?php
         }
       } else {
-        echo '<p class="text-center text-white mt-3">No savings goals found.</p>';
+        ?>
+        <div class="empty-state-container">
+          <img src="../../assets\img\savings\Jar.png" alt="Future Jar Icon" class="empty-state-icon">
+
+          <h4 class="empty-state-heading" style="font-size: 16px;">Ready to Build Your Future?</h4>
+
+          <p class="mb-4 empty-state-paragraph-14px" style="font-size: 14px;">
+            Setting your first goal is like planting the first seed. Nurture it with small, consistent savings and watch
+            your future grow!
+          </p>
+
+          <p class="mb-4 empty-state-paragraph-14px" style="font-size: 14px;">
+            Tap the + button below to set your first goal.
+          </p>
+        </div>
+        <?php
       }
       ?>
     </div>

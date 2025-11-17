@@ -181,7 +181,7 @@ $result = executeQuery($query);
                 <?php
             }
         } else {
-            echo "<p style='font-size:16px; color:white; text-align:center; margin-top:40px;'>No notifications yet.</p>";
+            echo "<p style='font-size:16px;font-family: Roboto, sans-serif; color:white; text-align:center; margin-top:40px;'>No notifications yet.</p>";
         }
         ?>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
