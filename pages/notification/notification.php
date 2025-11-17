@@ -4,7 +4,7 @@ include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['userID'])) {
-    header(header: "Location: ../../login.php");
+    header("Location: ../../pages/logout/logout.php");
     exit;
 }
 
@@ -30,26 +30,27 @@ $result = executeQuery($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CtrlSave | Notifications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
-
         body {
             font-family: "Roboto", sans-serif;
             background-color: #44B87D !important;
             color: #000000;
         }
 
-        .mainHeader {
+        .mainHeader h2 {
             position: sticky;
             top: 0;
             background-color: #44B87D;
             padding: 20px 30px;
             color: #fff;
             font-family: "Poppins", sans-serif;
+            font-weight: bold;
         }
 
         .scrollableContainer {

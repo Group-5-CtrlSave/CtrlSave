@@ -2,7 +2,7 @@
 session_start();
 include_once '../../assets/shared/connect.php';
 
-// ✅ Check Login
+// Check Login
 if (!isset($_SESSION['userID'])) {
   header("Location: ../../pages/login&signup/login.php");
   exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'];
 
-// ✅ Fetch resources grouped by type
+// Fetch resources grouped by type
 $videosQuery = "SELECT * FROM tbl_resources WHERE resourceType = 'video'";
 $videosResult = mysqli_query($conn, $videosQuery);
 
@@ -30,6 +30,7 @@ $completed = mysqli_fetch_assoc($completedResult)['completedCount'];
 
 $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) : 0;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,7 +41,11 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../../assets/img/shared/logo_s.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+    rel="stylesheet">
+
+
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="stylesheet" href="../../assets/css/savingStrategies.css">
 
@@ -56,11 +61,13 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       background: #000;
       text-decoration: none;
     }
+
     .video-thumb img {
       display: block;
       width: 100%;
-      height: auto; 
+      height: auto;
     }
+
     .video-thumb .play-overlay {
       position: absolute;
       left: 50%;
@@ -70,23 +77,26 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       opacity: 0.95;
       pointer-events: none;
     }
+
     .resource-card {
       padding: 12px;
       border-radius: 8px;
       background: #fff;
       margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
+
     .badge {
       float: right;
       margin-top: 5px;
     }
+
     .video-caption {
       margin-top: 8px;
       margin-bottom: 18px;
     }
 
-      .section h4 {
+    .section h4 {
       color: #F6D25B;
       font-size: 20px;
       margin-bottom: 15px;
@@ -94,16 +104,15 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       display: inline-block;
       font-family: 'Poppins', sans-serif;
     }
+
     .section {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-}
-
-
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
   </style>
 </head>
 
@@ -119,9 +128,9 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
         <h1>Smart Saving Strategies</h1>
         <p class="tagline">Watch. Read. Apply. Save Smart.</p>
       </header>
-      
+
       <div class="container main-content">
-        
+
 
         <!-- VIDEOS -->
         <div class="section">
@@ -131,7 +140,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
             <?php while ($video = mysqli_fetch_assoc($videosResult)): ?>
 
               <?php
-              $resourceID = (int)$video['resourceID'];
+              $resourceID = (int) $video['resourceID'];
               $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
                                 WHERE userID = $userID AND resourceID = $resourceID";
               $progressResult = mysqli_query($conn, $progressQuery);
@@ -146,9 +155,10 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
               $watchUrl = $yt_id ? "https://www.youtube.com/watch?v={$yt_id}" : $link;
               ?>
 
-              <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>" id="resource-<?= $resourceID ?>">
+              <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
+                id="resource-<?= $resourceID ?>">
                 <a class="video-thumb" href="<?= htmlspecialchars($watchUrl) ?>" target="_blank"
-                   onclick="markCompleted(<?= $resourceID ?>);">
+                  onclick="markCompleted(<?= $resourceID ?>);">
                   <?php if ($thumb): ?>
                     <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($video['title']) ?>">
                   <?php else: ?>
@@ -183,16 +193,17 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
               <?php while ($article = mysqli_fetch_assoc($articlesResult)): ?>
 
                 <?php
-                $resourceID = (int)$article['resourceID'];
+                $resourceID = (int) $article['resourceID'];
                 $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
                                   WHERE userID = $userID AND resourceID = $resourceID";
                 $progressResult = mysqli_query($conn, $progressQuery);
                 $isCompleted = mysqli_num_rows($progressResult) ? 1 : 0;
                 ?>
 
-                <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>" id="resource-<?= $resourceID ?>">
+                <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
+                  id="resource-<?= $resourceID ?>">
                   <a href="<?= htmlspecialchars($article['link']); ?>" target="_blank"
-                     onclick="markCompleted(<?= $resourceID ?>);">
+                    onclick="markCompleted(<?= $resourceID ?>);">
                     <?= htmlspecialchars($article['title']); ?>
                   </a>
                   <p><?= htmlspecialchars($article['description']); ?></p>
@@ -219,16 +230,17 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
               <?php while ($book = mysqli_fetch_assoc($booksResult)): ?>
 
                 <?php
-                $resourceID = (int)$book['resourceID'];
+                $resourceID = (int) $book['resourceID'];
                 $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
                                   WHERE userID = $userID AND resourceID = $resourceID";
                 $progressResult = mysqli_query($conn, $progressQuery);
                 $isCompleted = mysqli_num_rows($progressResult) ? 1 : 0;
                 ?>
 
-                <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>" id="resource-<?= $resourceID ?>">
+                <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
+                  id="resource-<?= $resourceID ?>">
                   <a href="<?= htmlspecialchars($book['link']); ?>" target="_blank"
-                     onclick="markCompleted(<?= $resourceID ?>);">
+                    onclick="markCompleted(<?= $resourceID ?>);">
                     <?= htmlspecialchars($book['title']); ?>
                   </a>
                   <p><?= htmlspecialchars($book['description']); ?></p>
@@ -262,24 +274,24 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'resourceID=' + encodeURIComponent(resourceID)
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.success) {
-          const badge = document.getElementById('badge-' + resourceID);
-          const card = document.getElementById('resource-' + resourceID);
-          if (badge) {
-            badge.textContent = 'Completed';
-            badge.classList.remove('bg-secondary');
-            badge.classList.add('bg-success');
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success) {
+            const badge = document.getElementById('badge-' + resourceID);
+            const card = document.getElementById('resource-' + resourceID);
+            if (badge) {
+              badge.textContent = 'Completed';
+              badge.classList.remove('bg-secondary');
+              badge.classList.add('bg-success');
+            }
+            if (card) {
+              card.setAttribute('data-status', 'completed');
+            }
           }
-          if (card) {
-            card.setAttribute('data-status', 'completed');
-          }
-        }
-      })
-      .catch(err => {
-        console.error('markCompleted error', err);
-      });
+        })
+        .catch(err => {
+          console.error('markCompleted error', err);
+        });
     }
 
     // ✅ Toggle Favorites / Archived buttons
@@ -294,19 +306,20 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
     });
 
     document.querySelectorAll(".resource-card").forEach(card => {
-    card.addEventListener("click", function (e) {
+      card.addEventListener("click", function (e) {
 
-      
-      if (e.target.tagName.toLowerCase() === "a") return;
 
-      const link = this.querySelector("a");
-      if (!link) return;
+        if (e.target.tagName.toLowerCase() === "a") return;
 
-      
-      link.click();
+        const link = this.querySelector("a");
+        if (!link) return;
+
+
+        link.click();
+      });
     });
-  });
   </script>
 
 </body>
+
 </html>

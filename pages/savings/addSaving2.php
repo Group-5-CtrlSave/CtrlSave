@@ -20,10 +20,15 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     $targetAmount = floatval($_POST['goalAmount']);
     $currentAmount = floatval($_POST['currentBalance']);
     $deadline = mysqli_real_escape_string($conn, $_POST['targetDate']);
-    $reminder = isset($_POST['reminder']) ? 1 : 0;
-    $reminderTime = $_POST['reminderTime'] ?? null;
-    $repeatFrequency = $_POST['repeatFrequency'] ?? null;
+    $remind = isset($_POST['reminder']) ? 1 : 0;
+    $time = $_POST['reminderTime'] ?? null;
+    $frequency = $_POST['repeatFrequency'] ?? null;
     $status = "In Progress";
+
+    if ($currentAmount > $targetAmount) {
+        echo "<script>alert('Current balance cannot exceed goal amount!'); window.history.back();</script>";
+        exit();
+    }
 
     mysqli_begin_transaction($conn);
 
@@ -33,9 +38,9 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
         (userID, goalName, icon, targetAmount, currentAmount, deadline, status, remind, time, frequency, createdAt)
         VALUES (
           '$userID', '$goalName', '$goalIcon', '$targetAmount', '$currentAmount', 
-          '$deadline', '$status', '$reminder',
-          " . ($reminderTime ? "'$reminderTime'" : "NULL") . ", 
-          " . ($repeatFrequency ? "'$repeatFrequency'" : "NULL") . ", 
+          '$deadline', '$status', '$remind',
+          " . ($time ? "'$time'" : "NULL") . ", 
+          " . ($frequency ? "'$frequency'" : "NULL") . ", 
           '$createdAt'
         )
       ";
@@ -63,182 +68,169 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Add Saving — Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
- <style>
-  body {
-    background: #44B87D;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-
-  label {
-    font-size: 14px;
-    color: white;
-    margin-bottom: 4px;
-    font-weight: 600;
-  }
-
-  .input-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #F0f1f6;
-    padding: 14px 20px; 
-    border-radius: 14px; 
-    height: 64px; 
-    margin-bottom: 1.2rem; 
-    width: 100%;
-    max-width: 520px; 
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .input-wrapper input,
-  .input-wrapper select {
-    background: transparent;
-    border: none;
-    outline: none;
-    flex: 1;
-    font-weight: 600;
-    font-size: 15px;
-  }
-
-  .save-btn {
-    background: #F6D25B;
-    border: none;
-    border-radius: 999px;
-    height: 54px;
-    font-size: 16px;
-    font-weight: 600;
-    width: 100%;
-    max-width: 520px;
-    margin: 0 auto;
-    display: block;
-    pointer-events: none;
-    opacity: 0.6;
-    transition: opacity .2s;
-  }
-
-  .fixed-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    z-index: 10;
-    padding: 1rem 0;
-  }
-
-  .content-list {
-    overflow-y: auto;
-    height: calc(100vh - 72px - 88px - 72px);
-    padding: 1rem 1rem 80px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .icon-option {
-    width: 100px; 
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #F0f1f6;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 576px) {
-    .input-wrapper, .save-btn {
-      max-width: 100%;
+  <style>
+    .progress-line { height: 4px; background-color: #F6D25B; width: 100%; animation: fillToFull 1s ease-in-out forwards; }
+    @keyframes fillToFull { from { width: 50%; } to { width: 100%; } }
+    
+    .input-wrapper.error {
+      border: 2px solid #dc3545;
     }
-  }
-</style>
 
+    .error-message {
+      color: #ffcccc;
+      font-size: 13px;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .save-btn {
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity .2s;
+    }
+
+    .save-btn.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .icon-list::-webkit-scrollbar { width: 0px; background: transparent; }
+    .icon-list { scrollbar-width: none; -ms-overflow-style: none; }
+    .icon-list::-webkit-scrollbar-thumb { background: transparent; }
+  </style>
 </head>
-<body>
+<body class="m-0 overflow-hidden" style="background-color: #44B87D; height: 100vh;">
 
-<form method="POST">
- <nav class="bg-white px-4 py-4 d-flex align-items-center shadow sticky-top" style="height: 72px;">
-  <a href="addsaving1.php">
-    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;">
-  </a>
-  <h5 class="m-0 fw-bold text-dark flex-grow-1 text-center" style="transform: translateX(-15px);">Add Goal</h5>
-</nav>
+<form method="POST" id="goalForm">
+  <nav class="bg-white px-4 py-4 d-flex align-items-center shadow sticky-top" style="height: 72px;">
+    <a href="addsaving1.php">
+      <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;">
+    </a>
+    <h5 class="m-0 fw-bold text-dark flex-grow-1 text-center" style="transform: translateX(-15px);">Add Goal</h5>
+  </nav>
 
-  <div class="px-4 pt-3 position-fixed w-100" style="top:72px; background:#44B87D; z-index:15;">
-    <p class="fw-bold text-white fs-5 mb-3">What are the details of your saving goal?</p>
-  </div>
+  <div class="icon-list d-flex flex-column justify-content-between overflow-auto" style="height: calc(100vh - 72px - 88px); padding: 1rem 1rem 20px;">
+    <div>
+      <p class="fw-bold text-white fs-5 mb-2">What are the details of your saving goal?</p>
+      <p class="fw-bold text-white fs-5 mb-2">Saving goal: <?= htmlspecialchars($goalName) ?></p>
 
-  <div class="px-4 content-list" style="margin-top:100px;">
-    <p class="fw-bold text-white fs-5 mb-2">Saving goal: <?= htmlspecialchars($goalName) ?></p>
+      <?php if (!empty($iconFilename)): ?>
+        <div class="text-center mb-3">
+          <div class="bg-white rounded-circle mx-auto d-flex justify-content-center align-items-center" style="width: 100px; height: 100px;">
+            <img src="<?= htmlspecialchars($displayIconRel) ?>" alt="<?= htmlspecialchars($iconFilename) ?>" style="width:80px; height:80px; object-fit:contain;">
+          </div>
+        </div>
+      <?php endif; ?>
 
-    <?php if (!empty($iconFilename)): ?>
-      <div class="text-center mb-3">
-        <div class="icon-option mx-auto">
-          <img src="<?= htmlspecialchars($displayIconRel) ?>" alt="<?= htmlspecialchars($iconFilename) ?>" style="width:100%; height:100%; object-fit:contain;">
+      <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Goal Amount</label>
+      <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;" id="goalAmountWrapper">
+        <input type="number" name="goalAmount" id="goalAmount" placeholder="Enter amount" step="0.01" 
+               class="border-0 bg-transparent fw-semibold flex-grow-1" style="outline: none; font-size: 15px;" required>
+        <span class="text-warning fw-bold">PHP</span>
+      </div>
+
+      <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Current Balance</label>
+      <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;" id="currentBalanceWrapper">
+        <input type="number" name="currentBalance" id="currentBalance" placeholder="Enter balance" step="0.01" 
+               class="border-0 bg-transparent fw-semibold flex-grow-1" style="outline: none; font-size: 15px;" required>
+        <span class="text-warning fw-bold">PHP</span>
+      </div>
+      <div id="balanceError" class="error-message" style="display:none;">Current balance cannot exceed goal amount</div>
+
+      <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Target Date</label>
+      <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-4" style="height: 50px;">
+        <input type="date" name="targetDate" id="targetDate"
+               class="border-0 bg-transparent fw-semibold w-100" style="outline: none; font-size: 15px;" required>
+      </div>
+
+      <p class="fw-bold text-white fs-5 mt-4 mb-3">Need a reminder for your savings?</p>
+      <div class="d-flex justify-content-between align-items-center bg-white rounded-3 px-3 mb-3" style="height: 50px;">
+        <span class="fw-semibold">Enable Reminder</span>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" name="reminder" role="switch" checked>
         </div>
       </div>
-    <?php endif; ?>
 
-    <label>Goal Amount</label>
-    <div class="input-wrapper">
-      <input type="number" name="goalAmount" placeholder="Enter amount" step="0.01" required>
-      <span class="text-warning fw-bold">PHP</span>
-    </div>
-
-    <label>Current Balance</label>
-    <div class="input-wrapper">
-      <input type="number" name="currentBalance" placeholder="Enter balance" step="0.01" required>
-      <span class="text-warning fw-bold">PHP</span>
-    </div>
-
-    <label>Target Date</label>
-    <div class="input-wrapper">
-      <input type="date" name="targetDate" required>
-    </div>
-
-    <p class="fw-bold text-white fs-5 mt-4 mb-3">Need a reminder for your savings?</p>
-    <div class="d-flex justify-content-between align-items-center px-3 py-2 mb-3" style="height:56px; background:#F0f1f6; border-radius:12px;">
-      <span class="fw-semibold text-dark">Enable Reminder</span>
-      <div class="form-check form-switch m-0">
-        <input class="form-check-input" type="checkbox" name="reminder" role="switch" checked>
+      <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Reminder Time</label>
+      <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;">
+        <input type="time" name="reminderTime" value="22:00"
+               class="border-0 bg-transparent fw-semibold w-100" style="outline: none; font-size: 15px;">
       </div>
-    </div>
 
-    <label>Reminder Time</label>
-    <div class="input-wrapper">
-      <input type="time" name="reminderTime" value="22:00">
-    </div>
-
-    <label>Repeat Frequency</label>
-    <div class="input-wrapper">
-      <select name="repeatFrequency" class="border-0 bg-transparent fw-semibold w-100">
-        <option value="daily">Every Day</option>
-        <option value="weekly" selected>Every Week</option>
-        <option value="biweekly">Every 2 Weeks</option>
-        <option value="monthly">Every Month</option>
-        <option value="yearly">Every Year</option>
-      </select>
+      <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Repeat Frequency</label>
+      <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;">
+        <select name="repeatFrequency" class="border-0 bg-transparent fw-semibold w-100" style="outline: none; font-size: 15px;">
+          <option value="daily">Every Day</option>
+          <option value="weekly" selected>Every Week</option>
+          <option value="biweekly">Every 2 Weeks</option>
+          <option value="monthly">Every Month</option>
+          <option value="yearly">Every Year</option>
+        </select>
+      </div>
     </div>
   </div>
 
-  <div class="fixed-footer">
+  <div style="background: white; position: fixed; bottom: 0; width: 100%;">
+    <div class="progress-line"></div>
     <div class="p-3">
-      <button type="submit" name="btnAddGoalConfirmed" class="save-btn d-flex justify-content-center align-items-center w-100">Save</button>
+      <button type="submit" name="btnAddGoalConfirmed" class="btn w-100 fw-semibold d-flex justify-content-center align-items-center save-btn"
+              style="background-color: #F6D25B; border-radius: 999px; height: 50px; font-size: 16px;">
+        Save
+      </button>
     </div>
   </div>
 </form>
 
 <script>
   const saveBtn = document.querySelector(".save-btn");
-  const inputs = document.querySelectorAll('input[name="goalAmount"], input[name="currentBalance"], input[name="targetDate"]');
+  const goalAmount = document.getElementById("goalAmount");
+  const currentBalance = document.getElementById("currentBalance");
+  const targetDate = document.getElementById("targetDate");
+  const balanceError = document.getElementById("balanceError");
+  const currentBalanceWrapper = document.getElementById("currentBalanceWrapper");
+  const goalForm = document.getElementById("goalForm");
 
-  function checkFields(){
-    const allFilled = Array.from(inputs).every(i => i.value.trim() !== "");
-    saveBtn.style.pointerEvents = allFilled ? "auto" : "none";
-    saveBtn.style.opacity = allFilled ? "1" : "0.6";
+  function validateBalance() {
+    const goal = parseFloat(goalAmount.value) || 0;
+    const current = parseFloat(currentBalance.value) || 0;
+    
+    if (current > goal && goal > 0) {
+      balanceError.style.display = "block";
+      currentBalanceWrapper.classList.add("error");
+      return false;
+    } else {
+      balanceError.style.display = "none";
+      currentBalanceWrapper.classList.remove("error");
+      return true;
+    }
   }
 
-  inputs.forEach(i => i.addEventListener("input", checkFields));
+  function checkFields(){
+    const allFilled = goalAmount.value.trim() !== "" && 
+                     currentBalance.value.trim() !== "" && 
+                     targetDate.value.trim() !== "";
+    const balanceValid = validateBalance();
+    
+    if (allFilled && balanceValid) {
+      saveBtn.classList.add("active");
+    } else {
+      saveBtn.classList.remove("active");
+    }
+  }
+
+  goalAmount.addEventListener("input", checkFields);
+  currentBalance.addEventListener("input", checkFields);
+  targetDate.addEventListener("input", checkFields);
+
+  goalForm.addEventListener("submit", function(e) {
+    if (!validateBalance()) {
+      e.preventDefault();
+      alert("Current balance cannot exceed goal amount!");
+    }
+  });
+
   checkFields();
 </script>
 </body>

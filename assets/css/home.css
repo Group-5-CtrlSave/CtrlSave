@@ -85,7 +85,6 @@
       padding: 1rem 1.5rem;
       max-width: 600px;
       height: 100px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
 
@@ -105,11 +104,23 @@
     }
 
     .recommendation-card {
-      width: 392px;
-      height: 143px;
-      background-color: #F0F1F6;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background-color: var(--card-bg, #F0F1F6);
+    border-radius: var(--card-radius, 20px);
+    width: 100%;
+    max-width: 335px;
+    }
+
+    .recommendation-content {
+    justify-content: center;
+    align-items: center;
+    }
+
+    .recommendation-img {
+    width: 90%;         
+    max-width: 300px;   
+    height: auto;      
+    border-radius: var(--card-radius, 20px);
+    object-fit: cover;
     }
 
     .tab-bar {
@@ -179,5 +190,5 @@
       max-width: 100%;
       height: auto;
     }
-
+    
     

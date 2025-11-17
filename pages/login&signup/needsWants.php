@@ -1,3 +1,10 @@
+<?php
+
+include("../../assets/shared/connect.php");
+include("../../pages/login&signup/process/needsWantsBE.php");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +14,6 @@
     <title>CtrlSave</title>
     <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -36,7 +42,7 @@
             justify-content: center;
         }
 
-        .titleCateg{
+        .titleCateg {
             font-family: "Poppins", sans-serif;
             font-weight: bold;
             color: black;
@@ -49,7 +55,6 @@
             font-weight: 500;
         }
 
-        /* Button */
         .btn {
             background-color: #F6D25B;
             color: black;
@@ -75,111 +80,156 @@
             height: 20px;
             cursor: pointer;
             position: relative;
-        
+        }
+
+        /* --- Toast Error Handling (from login) --- */
+        #errorToast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #E63946;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
-        <div class="container-fluid position-relative">
-            <div class="d-flex align-items-start justify-content-start">
-                <a href="pickExpense.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
-                        style="height: 24px;" />
-                </a>
-            </div>
+    <?php if (!empty($error)) : ?>
+        <div id="errorToast">
+            <?= htmlspecialchars($error) ?>
+        </div>
+    <?php endif; ?>
 
-            <div class="position-absolute top-50 start-50 translate-middle">
+     <!-- Navigation Bar -->
+   <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top" style="height: 75px;">
+        <div class="container-fluid position-relative">
+            <div class="position-absolute top-70 start-50 translate-middle">
                 <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Categorize</h2>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container-fluid d-flex flex-column justify-content-between main-container">
 
         <div class="row">
-
-            <!-- Title -->
             <div class="col-12 title mt-5">
                 <h2>Categorize Expenses</h2>
             </div>
-
-            <!-- Description -->
             <div class="col-12 desc mt-2">
                 <p>Categorize it based on Needs and Wants</p>
             </div>
         </div>
 
-        <!-- Need and Wants -->
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center">
-                <div class="p-3 rounded" style="min-width: 300px; height: 250px; background-color: white; border: 2px solid #F6D25B; border-radius: 20px;">
+        <form id="needWantsForm" method="post">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    <div class="p-3 rounded" style="min-width: 300px; height: 350px; background-color: white; border: 2px solid #F6D25B; border-radius: 20px;">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="titleCateg" style="width: 100px;">Expense</div>
+                            <div class="titleCateg">Needs</div>
+                            <div class="titleCateg">Wants</div>
+                        </div>
 
-                    <!-- Table Header -->
-                    <div class="d-flex justify-content-between mb-3">
-                        <div class="titleCateg" style="width: 100px;">Expense</div>
-                        <div class="titleCateg">Needs</div>
-                        <div class="titleCateg">Wants</div>
+                        <div class="row" style="overflow-x: scroll; min-width: 300px; height: 280px;">
+                            <?php if (empty($categories)) : ?>
+                                <div class="text-center">No expenses found.</div>
+                            <?php else : ?>
+                                <?php foreach ($categories as $cat) :
+                                    $id = (int)$cat['userCategoryID'];
+                                    $name = htmlspecialchars($cat['categoryName']);
+                                    $current = strtolower($cat['userNecessityType']);
+                                ?>
+                                    <div class="d-flex justify-content-between mb-2 align-items-center">
+                                        <div class="expenseName"><?= $name ?></div>
+                                        <input type="checkbox" name="check_<?= $id ?>" value="need" onchange="selectOnlyOne(this)" <?= $current === 'need' ? 'checked' : '' ?>>
+                                        <input type="checkbox" name="check_<?= $id ?>" value="want" onchange="selectOnlyOne(this)" <?= $current === 'want' ? 'checked' : '' ?>>
+                                        <input type="hidden" id="hidden_<?= $id ?>" name="necessity[<?= $id ?>]" value="<?= $current ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
                     </div>
-
-                    <!-- Checkboxes -->
-                    <div class="row" style="overflow-x: scroll; min-width: 300px; height: 180px;">
-                        <div class="d-flex justify-content-between mb-2 align-items-center">
-                            <div class="expenseName">Dining Out</div>
-                            <input type="checkbox" name="diningOut"
-                                onchange="selectOnlyOne(this)">
-                            <input type="checkbox" name="diningOut"
-                                onchange="selectOnlyOne(this)">
-                        </div>
-
-                        
-                        <div class="d-flex justify-content-between mb-2 align-items-center">
-                            <div class="expenseName">Electricity</div>
-                            <input type="checkbox" name="electricity"
-                                onchange="selectOnlyOne(this)">
-                            <input type="checkbox" name="electricity"
-                                onchange="selectOnlyOne(this)">
-                        </div>
-
-                        
-                        <div class="d-flex justify-content-between mb-2 align-items-center">
-                            <div class="expenseName">Groceries</div>
-                            <input type="checkbox" name="groceries"
-                                onchange="selectOnlyOne(this)">
-                            <input type="checkbox" name="groceries"
-                                onchange="selectOnlyOne(this)">
-                        </div>
-
-                        
-                        <div class="d-flex justify-content-between mb-2 align-items-center">
-                            <div class="expenseName">Rent</div>
-                            <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
-                            <input type="checkbox" name="rent" onchange="selectOnlyOne(this)">
-                        </div> 
-                        
-                    </div>
-
                 </div>
             </div>
-        </div>
 
-        <!-- Buttons at Bottom -->
-        <div class="col-12 d-flex justify-content-center">
-            <a href="budgetingRule.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
-        </div>
-
+            <div class="col-12 d-flex justify-content-center">
+                <a id="nextBtn" href="#">
+                    <button type="button" class="btn btn-warning mb-3">Next</button>
+                </a>
+            </div>
+        </form>
     </div>
 
     <script>
         function selectOnlyOne(checkbox) {
-            const checkboxes = document.getElementsByName(checkbox.name);
-            checkboxes.forEach((item) => {
+            const boxes = document.getElementsByName(checkbox.name);
+            boxes.forEach(item => {
                 if (item !== checkbox) item.checked = false;
             });
+
+            const id = checkbox.name.split('_')[1];
+            const hidden = document.getElementById('hidden_' + id);
+            hidden.value = checkbox.checked ? checkbox.value : '';
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            let valid = true;
+
+            document.querySelectorAll('[id^="hidden_"]').forEach(h => {
+                if (h.value === '') valid = false;
+            });
+
+            if (!valid) {
+                showErrorToast("Please select Needs or Wants for all expenses.");
+                return;
+            }
+
+            document.getElementById('needWantsForm').submit();
+        });
+
+        // Reusable toast (matches login style)
+        function showErrorToast(message) {
+            const existing = document.getElementById('errorToast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'errorToast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
         }
     </script>
 

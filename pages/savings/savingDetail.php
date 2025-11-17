@@ -1,5 +1,11 @@
 <?php
+session_start();
 include '../../assets/shared/connect.php';
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
 $savingGoalID = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($savingGoalID <= 0) {
@@ -56,6 +62,11 @@ if (isset($_POST['edit_goal'])) {
 
 // Delete the goal
 if (isset($_GET['delete']) && $_GET['delete'] == 1) {
+  $goalQuery = mysqli_query($conn, "SELECT goalName FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID");
+  $goalData = mysqli_fetch_assoc($goalQuery);
+  $goalName = mysqli_real_escape_string($conn, $goalData['goalName']);
+ 
+  mysqli_query($conn, "DELETE FROM tbl_notifications WHERE userID = {$_SESSION['userID']} AND notificationTitle LIKE '%$goalName%'");
   mysqli_query($conn, "DELETE FROM tbl_goaltransactions WHERE savingGoalID = $savingGoalID");
   mysqli_query($conn, "DELETE FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID");
   header("Location: savingGoal.php");
@@ -129,6 +140,18 @@ if ($result && mysqli_num_rows($result) > 0) {
     .transactions-list {
       scrollbar-width: none;
       -ms-overflow-style: none;
+    }
+
+    .input-group.error {
+      border: 2px solid #dc3545;
+      border-radius: 0.375rem;
+    }
+
+    .error-message {
+      color: #ffcccc;
+      font-size: 13px;
+      margin-top: 8px;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -219,7 +242,7 @@ if ($result && mysqli_num_rows($result) > 0) {
   <div class="modal fade" id="addAmountModal" tabindex="-1" aria-labelledby="addAmountModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-4" style="background-color: #44B87D;">
-        <form method="POST" action="">
+        <form method="POST" action="" id="addAmountForm">
           <div class="modal-header border-0 bg-white rounded-top">
             <button type="button" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">
               <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 24px; height: 24px;">
@@ -230,10 +253,11 @@ if ($result && mysqli_num_rows($result) > 0) {
 
           <div class="modal-body p-4">
             <label class="form-label fw-semibold text-white">Amount</label>
-           <div class="input-group mb-3 rounded-3" style="background-color: #F0f1f6;">
+           <div class="input-group mb-3 rounded-3" id="amountInputGroup" style="background-color: #F0f1f6;">
               <input 
                 type="number" 
                 name="amount" 
+                id="amountInput"
                 step="0.01" 
                 required 
                 class="form-control border-0 bg-transparent fw-semibold text-black" 
@@ -241,15 +265,19 @@ if ($result && mysqli_num_rows($result) > 0) {
               <span class="input-group-text border-0 bg-transparent text-warning fw-bold">PHP</span>
             </div>
 
+            <div id="amountError" class="error-message" style="display:none;">
+              Amount exceeds your goal limit
+            </div>
+
             <?php if (!empty($errorMessage)): ?>
-              <p class="text-warning fw-semibold mt-1 mb-0">
+              <p class="error-message mt-1 mb-0">
                 <?php echo htmlspecialchars($errorMessage); ?>
               </p>
             <?php endif; ?>
           </div>
 
           <div class="modal-footer border-0 bg-white rounded-bottom justify-content-center">
-            <button type="submit" name="add_amount" class="btn fw-bold text-dark"
+            <button type="submit" name="add_amount" id="saveAmountBtn" class="btn fw-bold text-dark"
               style="background-color: #F6D25B; padding: 10px 30px; border-radius: 30px;">
               Save
             </button>
@@ -317,6 +345,52 @@ if ($result && mysqli_num_rows($result) > 0) {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
   
+  <script>
+    const currentAmount = <?php echo $currentAmount; ?>;
+    const targetAmount = <?php echo $targetAmount; ?>;
+    const amountInput = document.getElementById('amountInput');
+    const amountInputGroup = document.getElementById('amountInputGroup');
+    const amountError = document.getElementById('amountError');
+    const addAmountForm = document.getElementById('addAmountForm');
+    const saveAmountBtn = document.getElementById('saveAmountBtn');
+
+    function validateAmount() {
+      const inputAmount = parseFloat(amountInput.value) || 0;
+      const newTotal = currentAmount + inputAmount;
+
+      if (newTotal > targetAmount && inputAmount > 0) {
+        amountError.style.display = 'block';
+        amountInputGroup.classList.add('error');
+        saveAmountBtn.disabled = true;
+        saveAmountBtn.style.opacity = '0.6';
+        return false;
+      } else {
+        amountError.style.display = 'none';
+        amountInputGroup.classList.remove('error');
+        saveAmountBtn.disabled = false;
+        saveAmountBtn.style.opacity = '1';
+        return true;
+      }
+    }
+
+    amountInput.addEventListener('input', validateAmount);
+
+    addAmountForm.addEventListener('submit', function(e) {
+      if (!validateAmount()) {
+        e.preventDefault();
+        alert('Amount exceeds your goal limit!');
+      }
+    });
+
+    document.getElementById('addAmountModal').addEventListener('hidden.bs.modal', function () {
+      amountInput.value = '';
+      amountError.style.display = 'none';
+      amountInputGroup.classList.remove('error');
+      saveAmountBtn.disabled = false;
+      saveAmountBtn.style.opacity = '1';
+    });
+  </script>
+
   <?php if (!empty($errorMessage)): ?>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -324,7 +398,7 @@ if ($result && mysqli_num_rows($result) > 0) {
       addAmountModal.show();
     });
   </script>
-<?php endif; ?>
+  <?php endif; ?>
 
 </body>
 </html>

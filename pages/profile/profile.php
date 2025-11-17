@@ -1,13 +1,10 @@
 <?php
 session_start();
-include_once '../../assets/shared/connect.php';
+include("../../assets/shared/connect.php");
 
-// ✅ Check if user is logged in
 if (!isset($_SESSION['userID'])) {
-  if (!headers_sent()) {
-    header('Location: ../../pages/login&signup/login.php');
-    exit();
-  }
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
 }
 
 $userID = $_SESSION['userID'] ?? 0;
@@ -25,10 +22,10 @@ $user = mysqli_fetch_assoc($userResult) ?? [
   'profilePicture' => 'profile1.png'
 ];
 
-// ✅ Combine full name
+// Combine full name
 $fullName = trim($user['firstName'] . ' ' . $user['lastName']);
 
-// ✅ Fetch level and XP info
+// Fetch level and XP info
 $levelQuery = "SELECT exp, lvl FROM tbl_userLvl WHERE userID = '$userID' LIMIT 1";
 $levelResult = mysqli_query($conn, $levelQuery);
 $level = mysqli_fetch_assoc($levelResult) ?? ['exp' => 0, 'lvl' => 1];
@@ -38,7 +35,7 @@ $currentLevel = $level['lvl'];
 $xpNeeded = 100;
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
-// ✅ Fetch achievements
+// Fetch achievements
 $achievementsQuery = "
   SELECT a.achievementName, a.icon
   FROM tbl_userAchievements ua
@@ -47,7 +44,7 @@ $achievementsQuery = "
 ";
 $achievementsResult = mysqli_query($conn, $achievementsQuery);
 
-// ✅ Determine profile picture src with cache busting
+// Determine profile picture src with cache busting
 $profilePic = $user['profilePicture'];
 if (!empty($profilePic)) {
   $imageServerPath = __DIR__ . '/../../assets/img/profile/' . $profilePic;
@@ -154,7 +151,7 @@ if (file_exists($imageServerPath)) {
       
       <button class="btn edit-btn mb-2" style="margin-top: 1px;" onclick="window.location.href='editProfile.php'">Edit Profile</button>
       
-      <form method="post" action="../../pages/login&signup/login.php" class="d-flex justify-content-center">
+      <form method="post" action="../../pages/logout/logout.php" class="d-flex justify-content-center">
       <button type="submit" class="btn logout-btn">Logout</button>
       </form>
 

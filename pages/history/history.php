@@ -4,8 +4,8 @@ include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['userID'])) {
-    header(header: "Location: ../../login.php");
-    exit;
+  header("Location: ../../pages/login&signup/login.php");
+  exit;
 }
 
 $userID = $_SESSION['userID'];
@@ -114,12 +114,13 @@ function formatTimeAgo($datetime)
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CtrlSave | History</title>
-  <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="stylesheet" href="../../assets/css/history.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+    rel="stylesheet">
 
 </head>
 
@@ -128,8 +129,11 @@ function formatTimeAgo($datetime)
   <?php include("../../assets/shared/sideBar.php") ?>
 
   <div class="mainHeader">
-    <h2>History</h2>
+    <h2 style="font-weight: bold !important;">
+      History
+    </h2>
   </div>
+
 
   <div class="filter-buttons">
     <button type="button" data-bs-toggle="modal" data-bs-target="#selectRangeModal" id="rangeBtn">

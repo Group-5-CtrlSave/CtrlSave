@@ -2,6 +2,11 @@
 session_start();
 include '../../assets/shared/connect.php';
 
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['goalName'] = $_POST['goalName'];
     $_SESSION['goalIcon'] = $_POST['goalIcon'];
@@ -44,6 +49,17 @@ $icons = [
     .icon-list::-webkit-scrollbar { width: 0px; background: transparent; }
     .icon-list { scrollbar-width: none; -ms-overflow-style: none; }
     .icon-list::-webkit-scrollbar-thumb { background: transparent; }
+    
+    #continueBtn {
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    
+    #continueBtn.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="m-0 overflow-hidden" style="background-color: #44B87D; height: 100vh;">
@@ -57,14 +73,14 @@ $icons = [
 </nav>
 
 <!-- Main Content -->
-<form method="POST" class="d-flex flex-column justify-content-between" style="height: calc(100vh - 72px); overflow: hidden;">
+<form method="POST" id="goalForm" class="d-flex flex-column justify-content-between" style="height: calc(100vh - 72px); overflow: hidden;">
   <div class="px-4 py-3" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-    <p class="fw-bold text-white fs-5 mb-2">What’s your saving goal?</p>
+    <p class="fw-bold text-white fs-5 mb-2">What's your saving goal?</p>
     <input type="text" name="goalName" id="goalNameInput" class="form-control mb-4 rounded-3" placeholder="e.g. House"
            style="height: 50px; font-size: 16px;" required>
 
     <p class="fw-bold text-white fs-5 mb-4">Pick an icon for your goal</p>
-    <input type="hidden" name="goalIcon" id="goalIconInput">
+    <input type="hidden" name="goalIcon" id="goalIconInput" required>
     <div class="icon-list row row-cols-3 g-3 flex-grow-1 overflow-auto" style="max-height: 100%; padding-bottom: 120px;">
       <?php foreach($icons as $icon): ?>
         <div class="col text-center">
@@ -93,15 +109,45 @@ $icons = [
 <script>
   const icons = document.querySelectorAll(".icon-option");
   const goalIconInput = document.getElementById("goalIconInput");
+  const goalNameInput = document.getElementById("goalNameInput");
+  const continueBtn = document.getElementById("continueBtn");
+  const goalForm = document.getElementById("goalForm");
 
-    icons.forEach(icon => {
-      icon.addEventListener("click", () => {
-          icons.forEach(i => i.classList.remove("selected"));
-          icon.classList.add("selected");
-          const src = icon.querySelector("img").getAttribute("src"); // relative path
-          goalIconInput.value = src; // store relative path
-      });
+  function checkFields() {
+    const nameValid = goalNameInput.value.trim() !== "";
+    const iconValid = goalIconInput.value !== "";
+    
+    if (nameValid && iconValid) {
+      continueBtn.classList.add("active");
+    } else {
+      continueBtn.classList.remove("active");
+    }
+  }
+
+  icons.forEach(icon => {
+    icon.addEventListener("click", () => {
+      icons.forEach(i => i.classList.remove("selected"));
+      icon.classList.add("selected");
+      const src = icon.querySelector("img").getAttribute("src");
+      goalIconInput.value = src;
+      checkFields();
+    });
   });
+
+  goalNameInput.addEventListener("input", checkFields);
+
+  goalForm.addEventListener("submit", function(e) {
+    if (goalIconInput.value === "") {
+      e.preventDefault();
+      alert("Please select an icon for your goal!");
+    } else if (goalNameInput.value.trim() === "") {
+      e.preventDefault();
+      alert("Please enter a goal name!");
+    }
+  });
+
+  // Initial check
+  checkFields();
 </script>
 </body>
 </html>
