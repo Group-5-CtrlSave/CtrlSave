@@ -38,7 +38,7 @@ $result = mysqli_query($conn, $query);
       top: 70px;
       left: 0;
       width: 100%;
-      height: calc(100vh - 70px);
+      height: calc(100vh - 80px);
       background-color: #44B87D;
       display: flex;
       flex-direction: column;
