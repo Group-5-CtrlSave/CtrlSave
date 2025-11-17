@@ -159,21 +159,21 @@ html, body {
   }
 
   .profile-name {
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
   .profile-username {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .profile-label,
   .profile-answer {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .edit-btn,
   .logout-btn {
     width: 180px;
     padding: 8px 18px;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 }
