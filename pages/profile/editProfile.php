@@ -3,7 +3,7 @@
 session_start();
 include_once '../../assets/shared/connect.php';
 
-// Check if user is logged in
+
 if (!isset($_SESSION['userID'])) {
   if (!headers_sent()) {
     header('Location: ../../pages/login&signup/login.php');
@@ -13,7 +13,7 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'] ?? 0;
 
-// Handle AJAX request for updating badges
+
 if (isset($_POST['updateBadges'])) {
   $badges = mysqli_real_escape_string($conn, $_POST['badges'] ?? '');
   $updateQuery = "UPDATE tbl_users SET displayedBadges = '$badges' WHERE userID = '$userID'";
@@ -25,7 +25,7 @@ if (isset($_POST['updateBadges'])) {
   exit();
 }
 
-// Check if displayedBadges column exists, add if not
+
 $checkColumnQuery = "SHOW COLUMNS FROM tbl_users LIKE 'displayedBadges'";
 $checkResult = mysqli_query($conn, $checkColumnQuery);
 if (mysqli_num_rows($checkResult) == 0) {
@@ -33,11 +33,11 @@ if (mysqli_num_rows($checkResult) == 0) {
   mysqli_query($conn, $addColumnQuery);
 }
 
-// Ensure displayedBadges allows NULL and has default NULL
+
 $modifyColumnQuery = "ALTER TABLE tbl_users MODIFY COLUMN displayedBadges VARCHAR(255) DEFAULT NULL";
 mysqli_query($conn, $modifyColumnQuery);
 
-// Check if type column exists in tbl_achievements, add if not
+
 $checkTypeQuery = "SHOW COLUMNS FROM tbl_achievements LIKE 'type'";
 $checkTypeResult = mysqli_query($conn, $checkTypeQuery);
 if (mysqli_num_rows($checkTypeResult) == 0) {
@@ -45,7 +45,7 @@ if (mysqli_num_rows($checkTypeResult) == 0) {
   mysqli_query($conn, $addTypeQuery);
 }
 
-// Check if claimedDate column exists in tbl_userAchievements, add if not
+
 $checkClaimedDateQuery = "SHOW COLUMNS FROM tbl_userAchievements LIKE 'claimedDate'";
 $checkClaimedDateResult = mysqli_query($conn, $checkClaimedDateQuery);
 if (mysqli_num_rows($checkClaimedDateResult) == 0) {
@@ -129,7 +129,7 @@ $user = mysqli_fetch_assoc($userResult) ?? [
 
 // Fetch claimed achievements sorted by claimedDate ASC
 $achievementsQuery = "
-  SELECT a.achievementID, a.achievementName, a.icon, a.type
+  SELECT a.achievementID, a.achievementName, a.icon, a.type, ua.claimedDate
   FROM tbl_userAchievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
   WHERE ua.userID = '$userID' AND ua.isClaimed = 1
@@ -153,14 +153,39 @@ if (is_null($user['displayedBadges']) && !empty($achievements)) {
   for ($i = 0; $i < 2 && $i < count($badges); $i++) {
     $selected[] = $badges[$i]['icon'];
   }
+  // Sort selected by claimedDate ASC
+  $selectedDates = [];
+  foreach ($selected as $icon) {
+    foreach ($achievements as $ach) {
+      if ($ach['icon'] === $icon) {
+        $selectedDates[$icon] = $ach['claimedDate'];
+        break;
+      }
+    }
+  }
+  usort($selected, function($a, $b) use ($selectedDates) {
+    return strtotime($selectedDates[$a]) <=> strtotime($selectedDates[$b]);
+  });
   $displayedBadges = implode(',', $selected);
   $updateQuery = "UPDATE tbl_users SET displayedBadges = '$displayedBadges' WHERE userID = '$userID'";
   mysqli_query($conn, $updateQuery);
   $user['displayedBadges'] = $displayedBadges;
 }
 
-// Current displayed badges
+// Current displayed badges, sorted by claimedDate ASC
 $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
+$displayedBadgesArray = array_filter($displayedBadgesArray);
+if (!empty($displayedBadgesArray)) {
+  $iconToDate = [];
+  foreach ($achievements as $row) {
+    $iconToDate[$row['icon']] = $row['claimedDate'];
+  }
+  usort($displayedBadgesArray, function($a, $b) use ($iconToDate) {
+    $dateA = $iconToDate[trim($a)] ?? '';
+    $dateB = $iconToDate[trim($b)] ?? '';
+    return strtotime($dateA) <=> strtotime($dateB);
+  });
+}
 ?>
 
 <!DOCTYPE html>
@@ -174,31 +199,32 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/editProfile.css">
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
 </head>
 
 <body>
 
-  <!-- Navigation Bar -->
-  <nav class="bg-white px-4 py-3 d-flex justify-content-center align-items-center shadow sticky-top">
-    <div class="container-fluid position-relative">
-      <div class="d-flex align-items-start justify-content-start">
-        <a href="profile.php">
-          <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;" />
-        </a>
-      </div>
-      <div class="position-absolute top-50 start-50 translate-middle">
-        <h4 class="m-0 text-center fw-bold">Edit Profile</h4>
-      </div>
+<!-- Navigation Bar -->
+<nav class="bg-white px-4 py-3 d-flex justify-content-center align-items-center shadow sticky-top">
+  <div class="container-fluid position-relative">
+    <div class="d-flex align-items-start justify-content-start">
+      <a href="profile.php">
+        <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;" />
+      </a>
     </div>
-  </nav>
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <h4 class="m-0 text-center fw-bold" style="font-family: 'Roboto', sans-serif; display: inline;">Edit Profile</h4>
+    </div>
+  </div>
+</nav>
 
   <!-- Edit Profile Form -->
   <div class="container-box">
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="selectedProfile" id="selectedProfileInput">
-      <input type="hidden" name="selectedBadges" id="selectedBadgesInput">
+      <input type="hidden" name="selectedBadges" id="selectedBadgesInput" value="<?php echo htmlspecialchars($user['displayedBadges']); ?>">
       <input type="file" name="profileUpload" id="fileInput" class="d-none" accept="image/*" onchange="previewUpload(event)">
 
       <div class="row g-3 align-items-center">
@@ -218,7 +244,7 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
             </button>
             <div id="badgePreviewContainer" class="badge-preview-container mt-2 d-flex justify-content-center">
               <?php
-              if (!empty($displayedBadgesArray) && $displayedBadgesArray[0] !== '') {
+              if (!empty($displayedBadgesArray)) {
                 foreach ($displayedBadgesArray as $icon) {
                   if (!empty($icon)) {
                     echo '<img src="../../assets/img/challenge/' . htmlspecialchars(trim($icon)) . '" alt="Badge" width="40" height="40">';
@@ -342,7 +368,7 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
             <?php foreach ($achievements as $achievement): ?>
               <?php if ($achievement['type'] === 'title'): ?>
                 <div class="col text-center">
-                  <div class="icon-option border p-2 bg-white mx-auto" style="width: 80px; height: 80px;" data-icon="<?php echo htmlspecialchars($achievement['icon']); ?>" data-type="<?php echo htmlspecialchars($achievement['type']); ?>" onclick="selectBadge(event, '<?php echo htmlspecialchars($achievement['icon']); ?>')">
+                  <div class="icon-option border p-2 bg-white mx-auto" style="width: 80px; height: 80px;" data-icon="<?php echo htmlspecialchars($achievement['icon']); ?>" data-type="<?php echo htmlspecialchars($achievement['type']); ?>" data-claimed-date="<?php echo htmlspecialchars($achievement['claimedDate']); ?>" onclick="selectBadge(event, '<?php echo htmlspecialchars($achievement['icon']); ?>')">
                     <img src="../../assets/img/challenge/<?php echo htmlspecialchars($achievement['icon']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
                   </div>
                   <p class="mt-1 small"><?php echo htmlspecialchars($achievement['achievementName']); ?></p>
@@ -356,7 +382,7 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
             <?php foreach ($achievements as $achievement): ?>
               <?php if ($achievement['type'] === 'badge'): ?>
                 <div class="col text-center">
-                  <div class="icon-option border p-2 bg-white mx-auto" style="width: 80px; height: 80px;" data-icon="<?php echo htmlspecialchars($achievement['icon']); ?>" data-type="<?php echo htmlspecialchars($achievement['type']); ?>" onclick="selectBadge(event, '<?php echo htmlspecialchars($achievement['icon']); ?>')">
+                  <div class="icon-option border p-2 bg-white mx-auto" style="width: 80px; height: 80px;" data-icon="<?php echo htmlspecialchars($achievement['icon']); ?>" data-type="<?php echo htmlspecialchars($achievement['type']); ?>" data-claimed-date="<?php echo htmlspecialchars($achievement['claimedDate']); ?>" onclick="selectBadge(event, '<?php echo htmlspecialchars($achievement['icon']); ?>')">
                     <img src="../../assets/img/challenge/<?php echo htmlspecialchars($achievement['icon']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
                   </div>
                   <p class="mt-1 small"><?php echo htmlspecialchars($achievement['achievementName']); ?></p>
@@ -401,6 +427,14 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
       <?php 
       foreach ($achievements as $ach) {
         echo "'" . htmlspecialchars($ach['icon']) . "': '" . htmlspecialchars($ach['type']) . "',";
+      }
+      ?>
+    };
+
+    let achievementClaimedDates = {
+      <?php 
+      foreach ($achievements as $ach) {
+        echo "'" . htmlspecialchars($ach['icon']) . "': '" . htmlspecialchars($ach['claimedDate']) . "',";
       }
       ?>
     };
@@ -488,6 +522,7 @@ $displayedBadgesArray = explode(',', $user['displayedBadges'] ?? '');
       const badgePreviewContainer = document.getElementById('badgePreviewContainer');
       const selectedBadgesInput = document.getElementById('selectedBadgesInput');
       badgePreviewContainer.innerHTML = '';
+      selectedBadges.sort((a, b) => new Date(achievementClaimedDates[a]) - new Date(achievementClaimedDates[b]));
       if (selectedBadges.length > 0) {
         selectedBadges.forEach(icon => {
           const img = document.createElement('img');

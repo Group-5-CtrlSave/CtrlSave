@@ -24,7 +24,6 @@ $user = mysqli_fetch_assoc($userResult) ?? [
   'displayedBadges' => ''
 ];
 
-// Combine full name
 $fullName = trim($user['firstName'] . ' ' . $user['lastName']);
 
 // Fetch level and XP info
@@ -122,7 +121,7 @@ if (file_exists($imageServerPath)) {
   <div class="profile-container d-flex justify-content-center align-items-center w-100 flex-column">
     
 <button 
-  class="btn rounded-pill mb-3 align-self-end"
+  class="btn rounded-pill mb-3 align-self-end me-2"
   style="background-color:#F6D25B; border-color:#F6D25B; color:#000;"
   onclick="window.location.href='achievements.php'">
     <i class="bi bi-trophy"></i> Claim Achievements
