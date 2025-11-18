@@ -33,7 +33,7 @@ body {
     min-width: 80px;
 }
 
-.sortButton.selected {
+.selected {
     background-color: #F3F3F3 !important;
     color: #F6D25B !important;
 }
@@ -43,6 +43,10 @@ body {
     background-color: #F3F3F3;
     height: 100px;
 }
+
+/* .opacity{
+    opacity: 80%;
+} */
 
 .categoryImgContainer {
     text-align: center;
@@ -56,6 +60,7 @@ body {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+
 
 }
 
@@ -80,8 +85,16 @@ body {
 
 }
 
-.time {
+.time, .dueDate {
     color: #44B87D;
+   
+}
+.time{
+     font-weight: 700;
+}
+
+.errorHandling{
+    color: white;
 }
 
 .addIncomebtn {

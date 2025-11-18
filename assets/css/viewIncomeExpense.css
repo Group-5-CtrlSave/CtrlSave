@@ -28,13 +28,20 @@ body {
     border-radius: 20px;
 }
 
+.paidButton{
+    border-radius: 20px !important;
+    background-color: #F6D25B !important;
+    min-width: 250px;
+
+}
+
 .yesButton {
     background-color: #F6D25B !important;
     color: black !important;
 }
 
 
-.details {
+.details, .time {
     color: #44B87D;
     font-size: 24px;
     font-weight: 600;

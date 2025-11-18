@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2025 at 04:13 PM
+-- Generation Time: Nov 05, 2025 at 12:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -189,7 +189,7 @@ CREATE TABLE `tbl_income` (
   `amount` decimal(15,2) NOT NULL,
   `dateReceived` timestamp NOT NULL DEFAULT current_timestamp(),
   `note` varchar(200) NOT NULL,
-  `categoryID` int(11) NOT NULL,
+  `userCategoryID` int(11) NOT NULL,
   `userBudgetversionID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -257,7 +257,7 @@ CREATE TABLE `tbl_savinggoals` (
   `status` varchar(20) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `remind` tinyint(1) NOT NULL,
-  `frequency` varchar(30) NOT NULL,
+  `repeatFrequency` varchar(20) NOT NULL,
   `time` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

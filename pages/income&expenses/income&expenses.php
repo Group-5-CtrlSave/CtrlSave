@@ -1,3 +1,17 @@
+<?php include("../../assets/shared/connect.php"); ?>
+
+<?php include("process/incomeandexpenseprocess.php"); ?>
+
+<?php
+$type = '';
+if (isset($_GET['type'])) {
+    $type = $_GET['type'];
+} else {
+    $type = 'all';
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,12 +45,15 @@
             <h2 class="title m-0">Income and Expenses</h2>
         </div>
         <div class="container-fluid d-flex align-items-center justify-content-center p-2">
-            <button type="button" class="btn custom-btn sortButton allButton selected"
-                onclick="selectButton(this)"><b>All</b></button>
-            <button type="button" class="btn custom-btn sortButton incomeButton"
-                onclick="selectButton(this)"><b>Income</b></button>
-            <button type="button" class="btn custom-btn sortButton expenseButton"
-                onclick="selectButton(this)"><b>Expenses</b></button>
+            <button type="button"
+                class="btn custom-btn sortButton allButton <?php echo ($type == 'all') ? 'selected' : '' ?>"
+                onclick="window.location.href='income&expenses.php?type=all';"><b>All</b></button>
+            <button type="button"
+                class="btn custom-btn sortButton incomeButton <?php echo ($type == 'income') ? 'selected' : '' ?>"
+                onclick="window.location.href='income&expenses.php?type=income';"><b>Income</b></button>
+            <button type="button"
+                class="btn custom-btn sortButton expenseButton <?php echo ($type == 'expense') ? 'selected' : '' ?>"
+                onclick="window.location.href='income&expenses.php?type=expense';"><b>Expenses</b></button>
         </div>
 
 
@@ -58,7 +75,7 @@
                             <a href="addExpenses.php"><button type="button"
                                     class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button></a>
                         </div>
-            
+
                     </div>
                 </div>
             </div>
@@ -69,91 +86,143 @@
         <!-- Income and Expense Row -->
         <div class="scrollable-container">
             <div class="row">
-                <a href="viewIncomeExpense.php" style="text-decoration: none; color:black">
-                    <div class="col-12">
-                        <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-                            <div class="container categoryImgContainer p-1">
-                                <img class="img-fluid" src="../../assets/img/shared/categories/expense/Dining Out.png">
-                            </div>
-                            <div class="container categoryTextContainer p-1">
-                                <p class="category m-0"><b>Dining Out</b></p>
-                                <p class="notes m-0">Notes: Jollibee
-                                <p>
-                            </div>
+                <?php
 
-                            <div class="container iePriceContainer p-1">
-                                <h5 class="price m-0">- ₱300</h5>
-                                <p class="time m-0"><b>6:40 PM</b>
-                                <p>
-                            </div>
+                $mergedResults = [];
+                $hasIncome = false;
+                $hasExpense = false;
 
+                if (mysqli_num_rows($incomeResult) > 0) {
+                     $hasIncome = true;
+                    while ($income = mysqli_fetch_assoc($incomeResult)) {
+                        $mergedResults[] = $income;
+                       
+                    }
+                } else{
+                    $hasIncome = false;
+                }
+
+                if (mysqli_num_rows($expenseResult) > 0) {
+                    $hasExpense = true;
+                    while ($expense = mysqli_fetch_assoc($expenseResult)) {
+                        $mergedResults[] = $expense;
+                    }
+                }else{
+                    $hasExpense = false;
+                }
+
+                usort($mergedResults, function ($a, $b) {
+                    $hasDueDateA = isset($a['dueDate']);
+                    $hasDueDateB = isset($b['dueDate']);
+
+                    // If both have dueDate, sort by soonest due date first (ascending)
+                    if ($hasDueDateA && $hasDueDateB) {
+                        return strtotime($a['dueDate']) <=> strtotime($b['dueDate']);
+                    }
+
+                    // If only A has dueDate, it comes first
+                    if ($hasDueDateA && !$hasDueDateB) {
+                        return -1;
+                    }
+
+                    // If only B has dueDate, it comes first
+                    if (!$hasDueDateA && $hasDueDateB) {
+                        return 1;
+                    }
+
+                    // Neither has dueDate: then sort by dateReceived or dateSpent, newest first (descending)
+                    $dateA = $a['dateReceived'] ?? $a['dateSpent'] ?? null;
+                    $dateB = $b['dateReceived'] ?? $b['dateSpent'] ?? null;
+
+                    $timeA = $dateA ? strtotime($dateA) : 0;
+                    $timeB = $dateB ? strtotime($dateB) : 0;
+
+                    return $timeB <=> $timeA; // newest first
+                });
+
+                ?>
+
+
+
+            <?php 
+
+            if (!empty($mergedResults)){
+                foreach ($mergedResults as $entry) {
+                    if ($type == 'all' || $entry['type'] == $type) {
+                        ?>
+                        <div class="col-12">
+                            <a style="text-decoration: none; color: black;"
+                                href="viewIncomeExpense.php?type=<?php echo $entry['type'] ?>&id=<?php echo $entry[$entry['type'] . '' . 'ID'] ?>">
+
+                                <div class="container-fluid ieContainer <?php echo ($entry['type'] == 'expense' && $entry['dueDate'] == '') ? 'opacity' : '' ?> d-flex justify-content-center align-items-center my-2">
+                                    <div class="container categoryImgContainer p-1">
+                                        <img class="img-fluid"
+                                            src="../../assets/img/shared/categories/<?php echo $entry['type']; ?>/<?php echo $entry['icon'] ?>">
+                                    </div>
+                                    <div class="container categoryTextContainer p-1">
+                                        <p class="category m-0"><b><?php echo $entry['categoryName'] ?></b></p>
+                                        <p class="notes m-0">Notes: <?php echo $entry['note'] ?></p>
+                                    </div>
+
+                                    <div class="container iePriceContainer p-1">
+                                        <h5 class="price m-0">
+                                            <?php
+                                            echo ($entry['type'] == 'income' ? '+' : '-') . ' ₱' . $entry['amount'];
+                                            ?>  
+                                        </h5>
+                                        <?php if ($entry['type'] == 'expense' && $entry['dueDate'] != '') { ?>
+                                            <p class="dueDate m-0">
+                                                Due Date:
+                                            </p>
+                                            <?php
+                                        } ?>
+                                        <p class="time m-0 p-0" id='time' 
+                                       <?php echo ($entry['type'] == 'income')? 'data-datetime="' . $entry['dateReceived'] .'"' : (empty($entry['dueDate']) ? 'data-datetime="' . $entry['dateSpent'] .'"' : 'data-duedate="' . $entry['dueDate'] . '"'  ) ?>>
+
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </a>
                         </div>
-                    </div>
-                </a>
-
-                <div class="col-12">
-                    <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-                        <div class="container categoryImgContainer p-1">
-                            <img class="img-fluid" src="../../assets/img/shared/categories/expense/Transportation.png">
-                        </div>
-                        <div class="container categoryTextContainer p-1">
-                            <p class="category m-0"><b>Transportation</b></p>
-                            <p class="notes m-0">Notes: Pamasahe tasdasdo...
-                            <p>
-                        </div>
-
-                        <div class="container iePriceContainer p-1">
-                            <h5 class="price m-0">- ₱200000000000</h5>
-                            <p class="time m-0"><b>9:51 PM</b>
-                            <p>
-                        </div>
-
-                    </div>
+                        <?php
+                    }
+                }
+            }
+            ?>
+            <?php
+             if (!$hasIncome && $type == 'income') {
+            ?>
+                <div class="col-12 text-center">
+                    <p class="errorHandling my-5" >
+                        "No Income found."
+                    </p>
                 </div>
-
-                <div class="col-12">
-                    <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-                        <div class="container categoryImgContainer p-1">
-                            <img class="img-fluid" src="../../assets/img/shared/categories/income/Allowance.png">
-                        </div>
-                        <div class="container categoryTextContainer p-1">
-                            <p class="category m-0"><b>Allowance</b></p>
-                            <p class="notes m-0">Notes: Bigay ni Mama
-                            <p>
-                        </div>
-
-                        <div class="container iePriceContainer p-1">
-                            <h5 class="price m-0">+ ₱4000</h5>
-                            <p class="time m-0"><b>12:51 PM</b>
-                            <p>
-                        </div>
-
-                    </div>
+            <?php
+            }else if (!$hasExpense && $type == 'expense') {
+            ?>
+                <div class="col-12 text-center">
+                    <p class="errorHandling my-5" >
+                        "No Expenses found."
+                    </p>
                 </div>
-
-                <div class="col-12">
-                    <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-                        <div class="container categoryImgContainer p-1">
-                            <img class="img-fluid" src="../../assets/img/shared/categories/income/Allowance.png">
-                        </div>
-                        <div class="container categoryTextContainer p-1">
-                            <p class="category m-0"><b>Allowance</b></p>
-                            <p class="notes m-0">Notes: Bigay ni Papa
-                            <p>
-                        </div>
-
-                        <div class="container iePriceContainer p-1">
-                            <h5 class="price m-0">+ ₱5000</h5>
-                            <p class="time m-0"><b>12:51 PM</b>
-                            <p>
-                        </div>
-
-                    </div>
+            <?php   
+            }else if ((!$hasIncome && !$hasExpense) && $type == 'all') {
+            ?>
+              <div class="col-12 text-center">
+                    <p class="errorHandling my-5" >
+                        "No Income or Expenses found."
+                    </p>
                 </div>
+            <?php
+            }
+            ?>
+
+             </div>
+         </div>
 
 
-            </div>
-        </div>
+
 
 
 
@@ -161,13 +230,18 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function selectButton(clickedButton) {
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(btn => btn.classList.remove('selected'));
-            clickedButton.classList.add('selected');
-        }
-    </script>
+
+    <script src="../../assets/js/calculateElapsedTime.js"></script>
+    <script src="../../assets/js/calculateRemainingDays.js"></script>
+
+  
+
+
+
+
+
+
+
 
 </body>
 

@@ -1,3 +1,7 @@
+<?php include("../../assets/shared/connect.php"); ?>
+
+<?php include ("process/addincomeprocess.php");?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,27 +44,27 @@
     <div class="container-fluid mainContainer">
         <div class="scrollable-container" id="scrollableContainer">
             <div class="row py-2">
-                <div class="col-4 d-flex justify-content-center align-items-center">
-                    <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                        <img class="img-fluid categoryPic"
-                            src="../../assets/img/shared/categories/income/Allowance.png">
-                        <p class="categoryName py-2"><b>Allowance</b></p>
-                    </button>
-                </div>
-                <div class="col-4 d-flex justify-content-center align-items-center">
-                    <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                        <img class="img-fluid categoryPic" src="../../assets/img/shared/categories/income/Money.png">
-                        <p class="categoryName py-2"><b>Salary</b></p>
-                    </button>
-                </div>
-                <div class="col-4 d-flex justify-content-center align-items-center">
-                    <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                        <img class="img-fluid categoryPic"
-                            src="../../assets/img/shared/categories/income/Scholarship.png">
-                        <p class="categoryName py-2"><b>Scholarship</b></p>
-                    </button>
-                </div>
-              
+                <?php
+
+                if (mysqli_num_rows($incomeCategoriesResult) > 0) {
+                    while ($incomeCategories = mysqli_fetch_assoc($incomeCategoriesResult)) {
+                        ?>
+                        <div class="col-4 d-flex justify-content-center align-items-center">
+                            <button onclick="categoryButton(this); sendID(this);" type="button"
+                                class="btn p-0 m-0 text-center categoryButton"
+                                data-categoryID='<?php echo $incomeCategories['userCategoryID'] ?>'>
+                                <img class="img-fluid categoryPic"
+                                    src="../../assets/img/shared/categories/income/<?php echo $incomeCategories['icon'] ?>">
+                                <p class="categoryName py-2"><b><?php echo $incomeCategories['categoryName'] ?></b></p>
+                            </button>
+                        </div>
+
+                        <?php
+                    }
+                }
+                ?>
+
+
                 <div class="col-4 d-flex justify-content-center align-items-center">
                     <a style="text-decoration: none;" href="addIncomeCategory.php">
                         <div class="container p-0 mt-1 text-center">
@@ -72,35 +76,41 @@
 
         </div>
 
+        <form method="POST">
+            <div class="container-fluid incomeForm fixed-bottom flex-grow-1 p-0 m-0 d-none" id="incomeForm">
+                <div class="container-fluid inputHover" id="formContent">
+                    <div class="container py-2">
+                        <label class="form-check-label label" for="amount"><b>Amount:</b></label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" step="0.01" inputmode="decimal" class="form-control form-control-lg" id="amount"
+                                placeholder="Enter amount" name="amount" required>
+                        </div>
+                    </div>
 
-        <div class="container-fluid incomeForm fixed-bottom flex-grow-1 p-0 m-0 d-none" id="incomeForm">
+                    <div class="container py-2">
+                        <label class="form-check-label label" for="amount"><b>Notes</b></label>
+                        <input type="text" class="form-control form-control-lg" id="note" placeholder="Enter Note" name="note">
+                    </div>
 
-            <div class="container-fluid inputHover" id="formContent">
-                <div class="container py-2">
-                    <label class="form-check-label label" for="amount"><b>Amount</b></label>
-                    <div class="input-group input-group-lg">
-                        <span class="input-group-text">₱</span>
-                        <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount">
+                    <div class="container py-2">
+                        <label class="form-check-label label" for="date"><b>Date</b></label>
+                        <input type="date" class="form-control form-control-lg" id="date" name="date" max="">
+                    </div>
+
+
+                    <input id="catID" type="hidden" name="categoryID">
+                 
+
+
+                    <div class="container py-5 text-center">
+                        <button class="btn btn-lg btnSave" type="submit" name="addIncome"><b>Save</b></button>
                     </div>
                 </div>
 
-                <div class="container py-2">
-                    <label class="form-check-label label" for="amount"><b>Notes</b></label>
-                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter Note">
-                </div>
-
-                <div class="container py-2">
-                    <label class="form-check-label label" for="date"><b>Date</b></label>
-                    <input type="date" class="form-control form-control-lg" id="date" name="date">
-                </div>
-
-
-                <div class="container py-5 text-center">
-                    <button class="btn btn-lg btnSave"><b>Save</b></button>
-                </div>
             </div>
 
-        </div>
+        </form>
 
 
 
@@ -147,8 +157,8 @@
             const isFormVisible = form.getAttribute('data-visible') === 'true';
             const scrollableContainer = document.getElementById('scrollableContainer');
 
-            if (isFormVisible){
-                scrollableContainer.style.height= '40vh';
+            if (isFormVisible) {
+                scrollableContainer.style.height = '40vh';
             }
 
             if (!isFormVisible) return;
@@ -160,8 +170,8 @@
                 form.classList.remove('d-block');
                 form.classList.add('d-none');
                 form.setAttribute('data-visible', 'false');
-                scrollableContainer.style.height= '90vh';
-                
+                scrollableContainer.style.height = '90vh';
+
 
                 document.querySelectorAll('.categoryPic').forEach(btn =>
                     btn.classList.remove('selected-category')
@@ -169,6 +179,24 @@
             }
         });
 
+    </script>
+
+    <script>
+        function sendID(catButton) {
+            let categoryID = catButton.getAttribute('data-categoryID');
+            let catID = document.getElementById('catID')
+            catID.value = categoryID
+            
+        }   
+
+    </script>
+
+    
+
+    <script>
+        const today = new Date().toISOString().split('T')[0];
+        let date = document.getElementById('date')
+        date.setAttribute('max', today);
     </script>
 
 </body>
