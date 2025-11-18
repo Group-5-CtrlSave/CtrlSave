@@ -1,27 +1,26 @@
 <?php
 session_start();
 
-// NOTE: Assuming $conn is already defined and is a valid mysqli connection object
-
-// Ensure logged in
+// Make sure user is logged in
 if (!isset($_SESSION['userID'])) {
     header("Location: ../../pages/login&signup/login.php");
     exit();
 }
 
 $error = "";
-$userID = $_SESSION['userID'];
+$userID = (int) $_SESSION['userID'];
+// $conn assumed existing
 
 // Handle form submit
 if (isset($_POST['submit'])) {
 
     $raw_balance = trim($_POST['balance']);
 
-    // Data cleaning logic (removing symbols/formatting)
+    // Clean formatting
     $clean = str_replace(['₱', ',', ' '], '', $raw_balance);
     $clean = preg_replace('/[^\d.]/', '', $clean);
 
-    // Validation logic
+    // Validation
     if ($clean === "") {
         $error = "Please enter your starting balance.";
     } else if (!is_numeric($clean)) {
@@ -32,54 +31,79 @@ if (isset($_POST['submit'])) {
 
         $balance = floatval($clean);
 
-        // --- CORE DATABASE OPERATIONS (LOOKUP, UPDATE, INSERT) ---
+        // ======================================
+        // 1. Get Active Budget Version
+        // ======================================
+        $sqlBudget = "
+            SELECT userBudgetversionID 
+            FROM tbl_userbudgetversion 
+            WHERE userID = $userID AND isActive = 1 
+            LIMIT 1
+        ";
 
-        // 1. Find the active budget version ID (prepared by signupBE.php)
-        $budgetStmt = $conn->prepare("SELECT userBudgetversionID FROM tbl_userbudgetversion WHERE userID = ? AND isActive = 1 LIMIT 1");
-        $budgetStmt->bind_param("i", $userID);
-        $budgetStmt->execute();
-        $budgetResult = $budgetStmt->get_result();
-        
-        if ($budgetResult->num_rows === 0) {
+        $rBudget = $conn->query($sqlBudget);
+
+        if (!$rBudget || $rBudget->num_rows === 0) {
             $error = "System error: Budget version not found.";
         } else {
-            $budgetRow = $budgetResult->fetch_assoc();
-            $userBudgetversionID = $budgetRow['userBudgetversionID'];
-            $budgetStmt->close();
 
-            // 2. Find the Allowance category ID (defaultCategoryID = 1, prepared by signupBE.php)
-            $categoryStmt = $conn->prepare("SELECT userCategoryID FROM tbl_usercategories WHERE userID = ? AND defaultCategoryID = 1 LIMIT 1");
-            $categoryStmt->bind_param("i", $userID);
-            $categoryStmt->execute();
-            $categoryResult = $categoryStmt->get_result();
+            $budgetRow = $rBudget->fetch_assoc();
+            $userBudgetversionID = (int)$budgetRow['userBudgetversionID'];
 
-            if ($categoryResult->num_rows === 0) {
-                 $error = "System error: 'Allowance' category not found. Setup failed at signup.";
+            // ======================================
+            // 2. Get Allowance Category (defaultCategoryID = 1)
+            // ======================================
+            $sqlCategory = "
+                SELECT userCategoryID 
+                FROM tbl_usercategories 
+                WHERE userID = $userID AND defaultCategoryID = 1
+                LIMIT 1
+            ";
+            $rCategory = $conn->query($sqlCategory);
+
+            if (!$rCategory || $rCategory->num_rows === 0) {
+                $error = "System error: 'Allowance' category not found. Setup failed at signup.";
             } else {
-                $categoryRow = $categoryResult->fetch_assoc();
-                $allowanceCategoryID = $categoryRow['userCategoryID'];
-                $categoryStmt->close();
 
-                // 3. Update the existing budget version with the initial balance
-                $updateBudgetStmt = $conn->prepare("UPDATE tbl_userbudgetversion SET balance = ? WHERE userBudgetversionID = ?");
-                $updateBudgetStmt->bind_param("di", $balance, $userBudgetversionID);
-                $updateSuccess = $updateBudgetStmt->execute();
-                $updateBudgetStmt->close();
+                $catRow = $rCategory->fetch_assoc();
+                $allowanceCategoryID = (int)$catRow['userCategoryID'];
 
-                // 4. Record the initial balance as an Income transaction into tbl_income
-                $note = "Allowance";
-                $insertIncomeStmt = $conn->prepare("
+                // ======================================
+                // 3. Update budget version balance
+                // ======================================
+                $balanceEsc = $conn->real_escape_string($balance);
+
+                $updateSql = "
+                    UPDATE tbl_userbudgetversion 
+                    SET balance = $balanceEsc 
+                    WHERE userBudgetversionID = $userBudgetversionID
+                ";
+
+                $updateSuccess = $conn->query($updateSql);
+
+                // ======================================
+                // 4. Insert income transaction
+                // ======================================
+                $note = $conn->real_escape_string("Allowance");
+
+                $insertIncomeSql = "
                     INSERT INTO tbl_income 
-                    (userID, amount, note, categoryID, userBudgetversionID) 
-                    VALUES (?, ?, ?, ?, ?)
-                ");
-                $insertIncomeStmt->bind_param("idsii", $userID, $balance, $note, $allowanceCategoryID, $userBudgetversionID);
-                $incomeSuccess = $insertIncomeStmt->execute();
-                $insertIncomeStmt->close();
+                    (userID, amount, note, categoryID, userBudgetversionID)
+                    VALUES (
+                        $userID,
+                        $balanceEsc,
+                        '$note',
+                        $allowanceCategoryID,
+                        $userBudgetversionID
+                    )
+                ";
 
-                // 5. Final check and redirect
+                $incomeSuccess = $conn->query($insertIncomeSql);
+
+                // ======================================
+                // 5. Final redirect
+                // ======================================
                 if ($updateSuccess && $incomeSuccess) {
-                    // Redirect to the next step: pickExpense.php
                     header("Location: pickExpense.php");
                     exit();
                 } else {

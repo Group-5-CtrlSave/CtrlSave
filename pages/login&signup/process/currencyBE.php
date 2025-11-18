@@ -10,16 +10,26 @@ if (!isset($_SESSION['userID'])) {
 }
 
 if (isset($_POST['setCurrency'])) {
-    $currency = $_POST['currency'] ?? "";
-    $userID = $_SESSION['userID'];
 
+    $currency = $_POST['currency'] ?? "";
+    $userID   = (int) $_SESSION['userID']; // type safety
+
+    // Validate selection
     if ($currency !== "PHP" && $currency !== "USD") {
         $error = "Please choose a valid currency.";
     } else {
-        $update = $conn->prepare("UPDATE tbl_users SET currencyCode = ? WHERE userID = ?");
-        $update->bind_param("si", $currency, $userID);
 
-        if ($update->execute()) {
+        // Escape currency for safety
+        $currencyEsc = $conn->real_escape_string($currency);
+
+        // Query version (no prepare)
+        $updateSql = "
+            UPDATE tbl_users 
+            SET currencyCode = '$currencyEsc' 
+            WHERE userID = $userID
+        ";
+
+        if ($conn->query($updateSql)) {
             header("Location: balance.php");
             exit();
         } else {
