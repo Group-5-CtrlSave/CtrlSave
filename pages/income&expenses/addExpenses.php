@@ -1,3 +1,6 @@
+<?php include ('../../assets/shared/connect.php')?>
+<?php include ('process/addexpenseprocess.php')?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,31 +39,25 @@
     <div class="container-fluid mainContainer d-flex flex-column">
         <div class="scrollable-container" id="scrollableContainer">
             <div class="row py-3">
+            <?php 
+            if (mysqli_num_rows($expenseCategoriesResult)>0){
+                while ($expenseCategory = mysqli_fetch_assoc($expenseCategoriesResult)){
+            ?>
+            
+            
             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic" src="../../assets/img/shared/categories/expense/Dining Out.png">
-                    <p class="categoryName py-2"><b>Dining Out</b></p>
+                <button onclick="categoryButton(this); sendID(this)" type="button" class="btn p-0 m-0 text-center categoryButton" data-categoryID="<?php echo $expenseCategory['userCategoryID']?>">
+                    <img class="img-fluid categoryPic" src="../../assets/img/shared/categories/expense/<?php echo $expenseCategory['icon']?>">
+                    <p class="categoryName py-2"><b><?php echo $expenseCategory['categoryName']?></b></p>
                 </button>
             </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic" src="../../assets/img/shared/categories/expense/Electricity.png">
-                    <p class="categoryName py-2"><b>Electricity</b></p>
-                </button>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic" src="../../assets/img/shared/categories/expense/Groceries.png">
-                    <p class="categoryName py-2"><b>Groceries</b></p>
-                </button>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button onclick="categoryButton(this)" type="button" class="btn p-0 m-0 text-center categoryButton">
-                    <img class="img-fluid categoryPic"
-                        src="../../assets/img/shared/categories/expense/Transportation.png">
-                    <p class="categoryName py-2"><b>Transportation</b></p>
-                </button>
-            </div>
+
+            <?php
+                 }
+            }
+            ?>
+
+            
           
             <div class="col-4 d-flex justify-content-center align-items-center">
                 <a style="text-decoration: none;" href="addExpensesCategory.php">
@@ -73,41 +70,49 @@
         </div>
         
     </div>
-
+    <form method="POST">
     <div class="container-fluid d-flex flex-column fixed-bottom p-0 m-0 d-none" id="incomeForm">
         <div class="container-fluid inputHover" id="formContent">
-            <div class="container py-2">
+            <div class="container py-1">
                 <label class="form-check-label label" for="amount"><b>Amount</b></label>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text">₱</span>
-                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount">
+                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount">
                 </div>
             </div>
 
-            <div class="container py-2">
+            <div class="container py-1">
                 <label class="form-check-label label" for="amount"><b>Notes</b></label>
-                <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter Note">
+                <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter Note" name="note">
             </div>
 
-            <div class="container py-2">
+            <div class="container py-1">
                 <label class="form-check-label label" for="date"><b>Due Date</b></label>
                 <input type="date" class="form-control form-control-lg" id="date" name="dueDate">
             </div>
             <div class="container py-2">
-
-                <input class="checkBox" type="checkbox" id="recurringPayment" value="Yes">
+                <input class="checkBox" type="checkbox" id="recurringPayment" value="1" name="recurringPayment">
                 <label class="checkBoxLabel" for="recurringPayment">Recurring Payment</label>
             </div>
+             <div class="container py-1">
+                <select class="form-select" id="frequencySelect" name="frequency" disabled>
+                    <option disabled selected hidden>Choose Frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
 
-
-            <div class="container py-2 text-center">
-                <button class="btn btn-lg btnSave"><b>Save</b></button>
+                </select>
             </div>
 
+            <input type="hidden" id="categoryID" name="categoryID" value="">
 
 
+            <div class="container my-3 text-center">
+                <button class="btn btn-lg btnSave" type="submit" name="addExpense"><b>Save</b></button>
+            </div>
         </div>
     </div>
+     </form>
 
 
 
@@ -159,6 +164,31 @@
         });
 
     </script>
+
+    <script>
+        function sendID(catButton){
+            let categoryID = catButton.getAttribute('data-categoryID');
+            document.getElementById('categoryID').value = categoryID;
+        }
+    </script>
+
+    <script>
+        let recurringPayment = document.getElementById('recurringPayment');
+        let frequencySelect = document.getElementById('frequencySelect');
+
+        recurringPayment.addEventListener("change", function(){
+            if (recurringPayment.checked){
+                frequencySelect.removeAttribute('disabled');
+            } else {
+                frequencySelect.setAttribute('disabled', true);
+            }
+        })
+
+    </script>
+
+  
+
+
 
 </body>
 

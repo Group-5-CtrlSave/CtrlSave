@@ -88,7 +88,7 @@ if (isset($_POST['submit'])) {
 
                 $insertIncomeSql = "
                     INSERT INTO tbl_income 
-                    (userID, amount, note, categoryID, userBudgetversionID)
+                    (userID, amount, note, userCategoryID, userBudgetversionID)
                     VALUES (
                         $userID,
                         $balanceEsc,
