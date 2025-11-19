@@ -46,10 +46,10 @@ if (mysqli_num_rows($checkTypeResult) == 0) {
 }
 
 
-$checkClaimedDateQuery = "SHOW COLUMNS FROM tbl_userAchievements LIKE 'claimedDate'";
+$checkClaimedDateQuery = "SHOW COLUMNS FROM tbl_userachievements LIKE 'claimedDate'";
 $checkClaimedDateResult = mysqli_query($conn, $checkClaimedDateQuery);
 if (mysqli_num_rows($checkClaimedDateResult) == 0) {
-  $addClaimedDateQuery = "ALTER TABLE tbl_userAchievements ADD COLUMN claimedDate DATETIME DEFAULT CURRENT_TIMESTAMP";
+  $addClaimedDateQuery = "ALTER TABLE tbl_userachievements ADD COLUMN claimedDate DATETIME DEFAULT CURRENT_TIMESTAMP";
   mysqli_query($conn, $addClaimedDateQuery);
 }
 
