@@ -5,285 +5,338 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home Page</title>
+
+  <!-- Bootstrap & Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS Files -->
   <link rel="stylesheet" href="../../assets/css/home.css">
-  <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="stylesheet" href="../../assets/css/income&expenses.css">
+  <link rel="icon" href="../../assets/img/shared/logo_s.png">
+
+  <style>
+    * {
+      font-family: "Roboto", sans-serif;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .summary-card {
+      background-color: white;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 93%;
+      max-width: none;
+    }
+
+    .vertical-divider {
+      width: 1.5px;
+      height: 60px;
+      background-color: #44B87D;
+    }
+
+    .today-text {
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .categoryImgContainer {
+      margin-left: -10px;
+    }
+
+    .recommendation-card,
+    .challenge-card {
+      background-color: #F0F1F6;
+      border-radius: 20px;
+      width: 335px;
+    }
+
+    .recommendation-img {
+      width: 300px;
+      height: 85px;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: auto;
+      background-color: white;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      z-index: 1000;
+    }
+
+    .tab-item {
+      flex: 1;
+      padding-top: 15px;
+      text-align: center;
+    }
+
+    .tab-icon {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .tab-label {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    #plusBtn {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #F6D25B;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+      z-index: 1100;
+    }
+
+    #plusBtn:hover {
+      background: #3aa76e;
+    }
+  </style>
 
 </head>
 
 <body>
 
   <!-- Navigation Bar -->
-  <?php include ("../../assets/shared/navigationBar.php") ?>
-  <!-- Sidebar content-->
-  <?php include ("../../assets/shared/sideBar.php")?>
+  <?php include("../../assets/shared/navigationBar.php") ?>
 
-  <!-- Page Background -->
-  <div style="min-height: 100vh; padding-bottom: 80px; background-color: #44B87D;">
-  <div class="flex-grow-1 overflow-y-auto">
+  <!-- Sidebar -->
+  <?php include("../../assets/shared/sideBar.php") ?>
 
-    <!-- Main Content -->
-    <div class="container" style="margin-top: 120px; padding-bottom: 80px;">
+  <div style="min-height: 100vh; padding-bottom: 20px; background-color: #44B87D;">
+    <div class="flex-grow-1 overflow-y-auto">
 
+      <div class="container" style="margin-top: 120px; padding-bottom: 120px;">
 
-      <!-- Summary Card -->
-<div style="
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 160px; /* adjust height kung gusto mo mas mataas */
-  background-color: #44B87D; /* same color as top background */
-  z-index: 998;">
-</div>
+        <!-- Fixed Bg -->
+        <div
+          style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
+        </div>
 
-<!-- Expense, Income, Balance Summary Card -->
-<div class="summary-card d-flex justify-content-around align-items-center mx-auto py-2 position-fixed top-0 start-50 translate-middle-x shadow"
-     style="width: 90%; background-color: #F0F1F6; border-radius: 20px; margin-top: 80px; z-index: 1000;">
-     
-  <!-- Expenses -->
-  <div class="summary-item text-center">
-    <div class="fw-semibold text-black d-flex flex-column align-items-center">
-      <div class="d-flex align-items-center justify-content-center mb-1">
-        <span style="color: #d60000; font-size: 1rem;" class="me-1">↓</span>
-        <i class="bi bi-arrow-down-circle-fill text-danger me-1"></i>
-        Expenses
+        <!-- Income|Expense|Balance -->
+        <div class="summary-card position-fixed top-0 start-50 translate-middle-x mx-auto"
+          style="margin-top: 80px; z-index: 1000;">
+          <div class="d-flex justify-content-around align-items-end w-100">
+            <div class="text-center">
+              <span class="text-danger" style="font-size: 25px;">↓</span>
+              <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Expenses</span>
+              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱2,700
+              </div>
+            </div>
+            <div class="vertical-divider"></div>
+            <div class="text-center">
+              <span class="text-success" style="font-size: 25px;">↑</span>
+              <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Income</span>
+              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱10,200
+              </div>
+            </div>
+            <div class="vertical-divider"></div>
+            <div class="text-center">
+              <span style="font-size: 25px; visibility: hidden;">↑</span>
+              <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Balance</span>
+              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱7,500
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="position-fixed" style="top: 200px; left: 20px; z-index: 999;">
+          <span class="today-text">Today May 07 Wed</span>
+        </div>
+
+        <!-- Income & Expense Items -->
+        <div class="scrollable-container mt-4" style="margin-top: 160px !important;">
+          <div class="row justify-content-center">
+
+            <!-- Allowance -->
+            <div class="col-12 col-md-8">
+              <div class="container-fluid ieContainer d-flex align-items-center my-2">
+                <div class="container categoryImgContainer p-1">
+                  <img src="../../assets/img/shared/categories/income/Allowance.png" class="img-fluid">
+                </div>
+                <div class="container categoryTextContainer p-1">
+                  <p class="category m-0"><b>Allowance</b></p>
+                  <p class="notes m-0">Notes: Bigay ni Mama</p>
+                </div>
+                <div class="container iePriceContainer p-1">
+                  <h5 class="price m-0">+ ₱4,000</h5>
+                  <p class="time m-0"><b>12:51 PM</b></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dining Out -->
+            <div class="col-12 col-md-8">
+              <div class="container-fluid ieContainer d-flex align-items-center my-2">
+                <div class="container categoryImgContainer p-1">
+                  <img src="../../assets/img/shared/categories/expense/Dining Out.png" class="img-fluid">
+                </div>
+                <div class="container categoryTextContainer p-1">
+                  <p class="category m-0"><b>Dining Out</b></p>
+                  <p class="notes m-0">Notes: Jollibee</p>
+                </div>
+                <div class="container iePriceContainer p-1">
+                  <h5 class="price m-0">- ₱300</h5>
+                  <p class="time m-0"><b>6:40 PM</b></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transportation -->
+            <div class="col-12 col-md-8">
+              <div class="container-fluid ieContainer d-flex align-items-center my-2">
+                <div class="container categoryImgContainer p-1">
+                  <img src="../../assets/img/shared/categories/expense/Transportation.png" class="img-fluid">
+                </div>
+                <div class="container categoryTextContainer p-1">
+                  <p class="category m-0"><b>Transportation</b></p>
+                  <p class="notes m-0">Notes: Pamasahe otw Manila</p>
+                </div>
+                <div class="container iePriceContainer p-1">
+                  <h5 class="price m-0">- ₱2,000</h5>
+                  <p class="time m-0"><b>9:50 PM</b></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- See more -->
+            <div class="text-end" style="margin-top: -5px;">
+              <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0"
+                style="font-size: 16px;">See more</a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Recommendation Card -->
+        <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
+          <div class="recommendation-card p-3">
+            <h2 class="fw-semibold mb-2" style="color: #44B87D; font-size: 16px;">Recommendation</h2>
+            <div class="d-flex justify-content-center">
+              <img src="../../assets/img/home/InsiteBg.png" class="recommendation-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Watch / Challenge Section -->
+        <div class="d-flex justify-content-center align-items-start flex-wrap gap-3 mt-4">
+
+          <!-- Watch Section -->
+          <div class="challenge-card p-3">
+            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Watch. Read. Apply. Save Smart</h2>
+
+            <div class="position-relative mb-3">
+              <img src="../../assets/img/home/videosample.png" class="img-fluid rounded"
+                style="height: 180px; width: 100%; object-fit: cover;">
+              <span class="position-absolute top-50 start-50 translate-middle text-white fs-1">&#9658;</span>
+            </div>
+
+            <button class="btn bg-white border w-100 mb-3 text-start fw-semibold" style="border-radius: 20px;">Simple
+              ways to save money for the future</button>
+            <button class="btn bg-white border w-100 text-start fw-semibold" style="border-radius: 20px;">28 Proven Ways
+              to Save Money</button>
+
+            <div class="text-end mt-2">
+              <a href="../savingstrategies/savingstrat.php" class="text-success fw-semibold text-decoration-none">See
+                More...</a>
+            </div>
+          </div>
+
+          <!-- Daily Challenge -->
+          <div class="challenge-card p-3">
+            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Daily Saving Challenge</h2>
+
+            <div
+              class="d-flex justify-content-between align-items-center bg-white px-3 py-2 rounded-pill shadow-sm mb-2"
+              style="height: 45px;">
+              <span class="fw-medium text-dark">Login to CtrlSave</span>
+              <button class="btn btn-sm fw-bold"
+                style="background-color: #F6D25B; border-radius: 20px; color: black;">Claim</button>
+            </div>
+
+            <div class="text-end mt-2">
+              <a href="../challenge/challengeMain.php" class="text-success fw-semibold text-decoration-none">See
+                more...</a>
+            </div>
+          </div>
+
+        </div>
+
       </div>
-      <div class="fw-bold" style="color: #F6D25B;">₱2,700</div>
     </div>
   </div>
 
-  <!-- Divider -->
-  <div class="vertical-divider"></div>
+  <!-- Bottom Nav Bar -->
+  <div class="tab-bar d-flex align-items-center">
+    <div class="tab-item">
+      <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
+        <img src="../../assets/img/home/cointrol_Icon.png" class="tab-icon">
+        <div class="tab-label">Cointrol</div>
+      </a>
+    </div>
 
-  <!-- Income -->
-  <div class="summary-item text-center">
-    <div class="fw-semibold text-black d-flex flex-column align-items-center">
-      <div class="d-flex align-items-center justify-content-center mb-1">
-        <span style="color: #44B87D; font-size: 1rem;" class="me-1">↑</span>
-        <i class="bi bi-arrow-up-circle-fill text-success me-1"></i>
-        Income
+    <div class="tab-item">
+      <a href="../home/calculator.php" class="text-decoration-none text-dark d-block">
+        <img src="../../assets/img/home/calculator.png" class="tab-icon">
+        <div class="tab-label">Calculator</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Plus btn -->
+  <button id="plusBtn" data-bs-toggle="modal" data-bs-target="#plusModal">
+    <img src="../../assets/img/shared/plus.png" style="width:24px;height:24px;">
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="plusModal" tabindex="-1" aria-labelledby="addIncomeExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addIncomeExpenseModalLabel">Add Income or Expense</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex justify-content-center align-items-center">
+          <a href="../income&expenses/addIncome.php">
+            <button type="button" class="btn custom-btn btn-lg addIncomebtn mx-3"><b>Add Income</b></button>
+          </a>
+          <a href="../income&expenses/addExpenses.php">
+            <button type="button" class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button>
+          </a>
+        </div>
       </div>
-      <div class="fw-bold" style="color: #F6D25B;">₱10,200</div>
     </div>
   </div>
 
-  <!-- Divider -->
-  <div class="vertical-divider"></div>
-
-  <!-- Balance -->
-  <div class="summary-item text-center">
-    <div class="fw-semibold text-black mb-1">Balance</div>
-    <div class="fw-bold" style="color: #F6D25B;">₱7,500</div>
-  </div>
-</div>
-
-      <!-- Date -->
-      <div class="today-text">Today May 07 Wed</div>
-
-<!-- Income and Expense Row -->
-<div class="scrollable-container mt-4">
-  <div class="row justify-content-center">
-
-    <style>
-  .categoryImgContainer {
-    margin-left: -10px; 
-  }
-</style>
-
-<!-- Allowance (Mama) -->
-<div class="col-12 col-md-8">
-  <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-    <div class="container categoryImgContainer p-1">
-      <img class="img-fluid" src="../../assets/img/shared/categories/income/Allowance.png">
-    </div>
-    <div class="container categoryTextContainer p-1">
-      <p class="category m-0"><b>Allowance</b></p>
-      <p class="notes m-0">Notes: Bigay ni Mama</p>
-    </div>
-    <div class="container iePriceContainer p-1">
-      <h5 class="price m-0">+ ₱4,000</h5>
-      <p class="time m-0"><b>12:51 PM</b></p>
-    </div>
-  </div>
-</div>
-
-<!-- Dining Out -->
-<div class="col-12 col-md-8">
-  <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-    <div class="container categoryImgContainer p-1">
-      <img class="img-fluid" src="../../assets/img/shared/categories/expense/Dining Out.png">
-    </div>
-    <div class="container categoryTextContainer p-1">
-      <p class="category m-0"><b>Dining Out</b></p>
-      <p class="notes m-0">Notes: Jollibee</p>
-    </div>
-    <div class="container iePriceContainer p-1">
-      <h5 class="price m-0">- ₱300</h5>
-      <p class="time m-0"><b>6:40 PM</b></p>
-    </div>
-  </div>
-</div>
-
-<!-- Transportation -->
-<div class="col-12 col-md-8">
-  <div class="container-fluid ieContainer d-flex justify-content-center align-items-center my-2">
-    <div class="container categoryImgContainer p-1">
-      <img class="img-fluid" src="../../assets/img/shared/categories/expense/Transportation.png">
-    </div>
-    <div class="container categoryTextContainer p-1">
-      <p class="category m-0"><b>Transportation</b></p>
-      <p class="notes m-0">Notes: Pamasahe otw Manila</p>
-    </div>
-    <div class="container iePriceContainer p-1">
-      <h5 class="price m-0">- ₱2,000</h5>
-      <p class="time m-0"><b>9:50 PM</b></p>
-    </div>
-  </div>
-</div>
-
-    <!-- Move See More inside -->
-    <div class="text-end" style="margin-top: -5px;">
-      <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0"
-        style="font-size: 0.9rem;">See more</a>
-    </div>
-
-  </div>
-</div>
-
-<!-- Recommendation Card -->
-<div class="d-flex justify-content-center position-relative" style="margin-top: -80px !important;">
-  <div class="recommendation-card p-2 px-3 position-relative"
-    style="background-color: #F0F1F6; border-radius: 20px; width: 335px;">
-    
-    <!-- Title -->
-    <h2 class="fw-semibold mb-2 text-start" style="color: #44B87D;">Recommendation</h2>
-
-    <!-- Image (centered) -->
-    <div class="d-flex justify-content-center">
-      <img src="../../assets/img/home/InsiteBg.png" alt="Recommendation Image"
-        style="width: 300px; height: 85px; border-radius: 20px; object-fit: cover;">
-    </div>
-  </div>
-</div>
-
-<!-- Container for Watch. Read. Apply. Save Smart + Daily Saving Challenge -->
-<div class="d-flex justify-content-center align-items-start flex-wrap gap-3 mt-4">
-
-  <!-- Watch. Read. Apply. Save Smart Section -->
-
-  <div class="challenge-card p-3" style="background-color: #F0F1F6; border-radius: 20px; width: 335px;">
-    <h2 class="fw-semibold mb-3" style="color: #44B87D;">Watch. Read. Apply. Save Smart</h2>
-
-
-    <!-- Video thumbnail -->
-    <div class="position-relative mb-3">
-      <img src="../../assets/img/home/videosample.png" alt="Video" class="img-fluid rounded"
-           style="height: 180px; width: 100%; object-fit: cover;">
-      <span class="position-absolute top-50 start-50 translate-middle text-white fs-1">&#9658;</span>
-    </div>
-
-    <!-- Text Buttons -->
-    <button class="btn bg-white border w-100 mb-2 text-start fw-semibold" style="border-radius: 20px;">
-      Simple ways to save money for the future
-    </button>
-    <button class="btn bg-white border w-100 text-start fw-semibold" style="border-radius: 20px;">
-      28 Proven Ways to Save Money
-    </button>
-
-    <!-- See More -->
-    <div class="text-end mt-2">
-      <a href="../savingstrategies/savingstrat.php" class="text-success fw-semibold text-decoration-none">See More...</a>
-    </div>
-  </div>
-
-
-  <!-- Daily Saving Challenge -->
-  <div class="challenge-card p-3" style="background-color: #F0F1F6; border-radius: 20px; width: 335px;">
-    <h2 class="fw-semibold mb-3" style="color: #44B87D;">Daily Saving Challenge</h2>
-
-    <div class="d-flex justify-content-between align-items-center bg-white px-3 py-2 rounded-pill shadow-sm mb-2"
-         style="height: 45px;">
-      <span class="fw-medium text-dark">Login to CtrlSave</span>
-      <button class="btn btn-sm fw-bold"
-              style="background-color: #F6D25B; border-radius: 20px; color: black;">Claim</button>
-    </div>
-
-    <!-- Show More -->
-    <div class="text-end mt-2">
-      <a href="../challenge/challengeMain.php"
-         class="text-success fw-semibold text-decoration-none">Show more...</a>
-    </div>
-
-  </div>
-
-</div>
-
-
-
-  <!-- Bottom Tab Navigation -->
-  <div class="tab-bar d-flex justify-content-around align-items-center position-fixed bottom-0 start-0 end-0 bg-white shadow" style="height: 65px; z-index: 999;">
-  
-  <!-- Cointrol -->
-<div class="tab-item text-center" style="margin-top: -10px;"> 
-  <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
-    <img src="../../assets/img/home/cointrol_Icon.png" 
-         alt="Cointrol" 
-         class="tab-icon mb-1"
-         style="width: 36px; height: 36px;">
-    <div class="tab-label fw-bold" style="font-size: 0.9rem;">Cointrol</div>
-  </a>
-</div>
-
-
-  <!-- Plus Button -->
-<button
-    style="position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);
-           width:56px;height:56px;border-radius:50%;background:#F6D25B;border:none;
-           display:flex;align-items:center;justify-content:center;
-           box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:0.3s;z-index:9999;"
-    onmouseover="this.style.background='#3aa76e';"
-    onmouseout="this.style.background='#F6D25B';"
-    data-bs-toggle="modal" data-bs-target="#plusModal">
-    <img src="../../assets/img/shared/plus.png" alt="Add" style="width:24px;height:24px;">
-</button>
-
-  <!-- Calculator -->
-  <a href="../home/calculator.php" 
-     class="tab-item text-center" 
-     style="margin-top: -10px; text-decoration: none; color: inherit; flex: 1;">
-    <img src="../../assets/img/home/calculator.png" 
-         alt="Calculator" 
-         class="tab-icon mb-1"
-         style="width: 36px; height: 36px; object-fit: contain;"> 
-  <div class="tab-label fw-bold" style="font-size: 0.9rem;">Calculator</div>
-</a>
-
-</div>
-
-
-  <!-- Bootstrap JS for Offcanvas & other components -->
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
- <!-- Scripts -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // "See More" Button Logic
-    const seeMoreBtn = document.getElementById("seeMoreBtn");
-    const moreCards = document.getElementById("more-cards");
-    let expanded = false;
-
-    if (seeMoreBtn && moreCards) {
-      seeMoreBtn.addEventListener("click", () => {
-        expanded = !expanded;
-        moreCards.classList.toggle("d-none", !expanded);
-        seeMoreBtn.textContent = expanded ? "See less" : "See more";
-      });
-    }
-  });
-</script>
 
 </body>
 
