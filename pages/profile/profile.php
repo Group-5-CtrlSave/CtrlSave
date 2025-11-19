@@ -38,11 +38,11 @@ $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
 // Fetch all claimed achievements for map and auto-select
 $achievementsQuery = "
-  SELECT a.icon, a.achievementName, a.type, ua.claimedDate
+  SELECT a.icon, a.achievementName, a.type, ua.date
   FROM tbl_userAchievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
   WHERE ua.userID = '$userID' AND ua.isClaimed = 1
-  ORDER BY ua.claimedDate ASC
+  ORDER BY ua.date ASC
 ";
 $achievementsResult = mysqli_query($conn, $achievementsQuery);
 $achievements = [];
