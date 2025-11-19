@@ -143,7 +143,7 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 
     .input-group.error {
-      border: 2px solid #dc3545;
+      border: 2px solid #E63946;
       border-radius: 0.375rem;
     }
 
