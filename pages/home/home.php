@@ -1,3 +1,47 @@
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['userID'])) {
+  header("Location: ../../pages/login&signup/login.php");
+  exit;
+}
+
+$userID = $_SESSION['userID'];
+
+// date today
+$todayDate = date('Y-m-d');
+$displayToday = "Today, " . date('M d D');
+
+// total income
+$incomeQuery = "
+  SELECT SUM(amount) AS totalIncome
+  FROM tbl_income
+  WHERE userID = '$userID'
+";
+$incomeResult = executeQuery($incomeQuery);
+$incomeRow = mysqli_fetch_assoc($incomeResult);
+$todayIncome = $incomeRow['totalIncome'] !== null ? $incomeRow['totalIncome'] : 0;
+
+// total expense
+$expenseQuery = "
+  SELECT SUM(amount) AS totalExpense
+  FROM tbl_expense
+  WHERE userID = '$userID'
+";
+$expenseResult = executeQuery($expenseQuery);
+$expenseRow = mysqli_fetch_assoc($expenseResult);
+$todayExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
+
+// total balance
+$todayBalance = $todayIncome - $todayExpense;
+
+// income and expense
+//query here BOTH INCOME AND EXPENSE DAPAT SHOW HERE
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -111,7 +155,7 @@
       justify-content: center;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: 0.3s;
-      z-index: 1100;
+      z-index: 1000;
     }
 
     #plusBtn:hover {
@@ -134,7 +178,7 @@
 
       <div class="container" style="margin-top: 120px; padding-bottom: 120px;">
 
-        <!-- Fixed Bg -->
+        <!-- Bg -->
         <div
           style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
         </div>
@@ -146,21 +190,24 @@
             <div class="text-center">
               <span class="text-danger" style="font-size: 25px;">↓</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Expenses</span>
-              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱2,700
+              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+                ₱<?php echo number_format($todayExpense, 2); ?>
               </div>
             </div>
             <div class="vertical-divider"></div>
             <div class="text-center">
               <span class="text-success" style="font-size: 25px;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Income</span>
-              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱10,200
+              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+                ₱<?php echo number_format($todayIncome, 2); ?>
               </div>
             </div>
             <div class="vertical-divider"></div>
             <div class="text-center">
               <span style="font-size: 25px; visibility: hidden;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Balance</span>
-              <div class="fw-medium text-warning" style="font-size: 20px; font-family: 'Roboto', sans-serif;">₱7,500
+              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+                ₱<?php echo number_format($todayBalance, 2); ?>
               </div>
             </div>
           </div>
@@ -168,9 +215,10 @@
 
         <!-- Date -->
         <div class="position-fixed" style="top: 200px; left: 20px; z-index: 999;">
-          <span class="today-text">Today May 07 Wed</span>
+          <span class="today-text"><?php echo $displayToday; ?></span>
         </div>
 
+        <!-- WALA PANG BE -->
         <!-- Income & Expense Items -->
         <div class="scrollable-container mt-4" style="margin-top: 160px !important;">
           <div class="row justify-content-center">
