@@ -36,10 +36,6 @@ $todayExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense
 
 // total balance
 $todayBalance = $todayIncome - $todayExpense;
-
-// income and expense
-//query here BOTH INCOME AND EXPENSE DAPAT SHOW HERE
-
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +44,7 @@ $todayBalance = $todayIncome - $todayExpense;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home Page</title>
+  <title>CtrlSave | Home</title>
 
   <!-- Bootstrap & Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -218,71 +214,102 @@ $todayBalance = $todayIncome - $todayExpense;
           <span class="today-text"><?php echo $displayToday; ?></span>
         </div>
 
-        <!-- WALA PANG BE -->
         <!-- Income & Expense Items -->
         <div class="scrollable-container mt-4" style="margin-top: 160px !important;">
           <div class="row justify-content-center">
 
-            <!-- Allowance -->
-            <div class="col-12 col-md-8">
-              <div class="container-fluid ieContainer d-flex align-items-center my-2">
-                <div class="container categoryImgContainer p-1">
-                  <img src="../../assets/img/shared/categories/income/Allowance.png" class="img-fluid">
-                </div>
-                <div class="container categoryTextContainer p-1">
-                  <p class="category m-0"><b>Allowance</b></p>
-                  <p class="notes m-0">Notes: Bigay ni Mama</p>
-                </div>
-                <div class="container iePriceContainer p-1">
-                  <h5 class="price m-0">+ ₱4,000</h5>
-                  <p class="time m-0"><b>12:51 PM</b></p>
-                </div>
-              </div>
-            </div>
+            <?php
+            // SQL for income and expense limit by 3
+            $recentQuery = "
+        (
+            SELECT 
+                i.incomeID AS id,
+                i.amount,
+                i.note,
+                uc.icon AS icon,
+                uc.categoryName AS categoryName,
+                'income' AS type,
+                i.dateReceived AS dateCreated
+            FROM tbl_income i
+            JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
+            WHERE i.userID = '$userID'
+        )
+        UNION ALL
+        (
+            SELECT 
+                e.expenseID AS id,
+                e.amount,
+                e.note,
+                uc.icon AS icon,
+                uc.categoryName AS categoryName,
+                'expense' AS type,
+                e.dateSpent AS dateCreated
+            FROM tbl_expense e
+            JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
+            WHERE e.userID = '$userID'
+        )
+        ORDER BY dateCreated DESC
+        LIMIT 3
+        ";
 
-            <!-- Dining Out -->
-            <div class="col-12 col-md-8">
-              <div class="container-fluid ieContainer d-flex align-items-center my-2">
-                <div class="container categoryImgContainer p-1">
-                  <img src="../../assets/img/shared/categories/expense/Dining Out.png" class="img-fluid">
-                </div>
-                <div class="container categoryTextContainer p-1">
-                  <p class="category m-0"><b>Dining Out</b></p>
-                  <p class="notes m-0">Notes: Jollibee</p>
-                </div>
-                <div class="container iePriceContainer p-1">
-                  <h5 class="price m-0">- ₱300</h5>
-                  <p class="time m-0"><b>6:40 PM</b></p>
-                </div>
-              </div>
-            </div>
+            $recentResult = executeQuery($recentQuery);
 
-            <!-- Transportation -->
-            <div class="col-12 col-md-8">
-              <div class="container-fluid ieContainer d-flex align-items-center my-2">
-                <div class="container categoryImgContainer p-1">
-                  <img src="../../assets/img/shared/categories/expense/Transportation.png" class="img-fluid">
+            if (mysqli_num_rows($recentResult) > 0) {
+              while ($item = mysqli_fetch_assoc($recentResult)) {
+
+                // path (income / expense)
+                $folder = $item['type'] == 'income' ? 'income' : 'expense';
+                ?>
+
+                <div class="col-12 col-md-8">
+                  <div class="container-fluid ieContainer d-flex align-items-center my-2">
+
+                    <!-- Category Image -->
+                    <div class="container categoryImgContainer p-1">
+                      <img src="../../assets/img/shared/categories/<?php echo $folder; ?>/<?php echo $item['icon']; ?>"
+                        class="img-fluid">
+                    </div>
+
+                    <!-- Text -->
+                    <div class="container categoryTextContainer p-1">
+                      <p class="category m-0"><b><?php echo $item['categoryName']; ?></b></p>
+                      <p class="notes m-0">Notes: <?php echo $item['note']; ?></p>
+                    </div>
+
+                    <!-- Price + Time -->
+                    <div class="container iePriceContainer p-1">
+                      <h5 class="price m-0">
+                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], 2); ?>
+                      </h5>
+
+                      <p class="time m-0">
+                        <b><?php echo date("h:i A", strtotime($item['dateCreated'])); ?></b>
+                      </p>
+                    </div>
+
+                  </div>
                 </div>
-                <div class="container categoryTextContainer p-1">
-                  <p class="category m-0"><b>Transportation</b></p>
-                  <p class="notes m-0">Notes: Pamasahe otw Manila</p>
-                </div>
-                <div class="container iePriceContainer p-1">
-                  <h5 class="price m-0">- ₱2,000</h5>
-                  <p class="time m-0"><b>9:50 PM</b></p>
-                </div>
+                <?php
+              }
+            } else {
+              ?>
+              <div class="col-12 text-center mt-3">
+                <p class="text-white fw-bold">No recent income or expenses found.</p>
               </div>
-            </div>
+              <?php
+            }
+            ?>
 
             <!-- See more -->
-            <div class="text-end" style="margin-top: -5px;">
+            <div class="text-end mt-1">
               <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0"
-                style="font-size: 16px;">See more</a>
+                style="font-size: 16px;">See more...</a>
             </div>
 
           </div>
         </div>
 
+        <!-- HARDCODED PA -->
         <!-- Recommendation Card -->
         <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
           <div class="recommendation-card p-3">
@@ -293,30 +320,75 @@ $todayBalance = $todayIncome - $todayExpense;
           </div>
         </div>
 
-        <!-- Watch / Challenge Section -->
+        <?php
+        $watchQuery = "
+    SELECT r.resourceID, r.title, r.resourceType, r.link, r.description
+    FROM tbl_resources r
+    LEFT JOIN tbl_user_resource_progress p 
+        ON r.resourceID = p.resourceID AND p.userID = $userID
+    WHERE p.isCompleted = 0 OR p.isCompleted IS NULL
+    ORDER BY r.resourceID ASC
+";
+        $watchResult = executeQuery($watchQuery);
+
+        // array
+        $watchItems = [];
+        if (mysqli_num_rows($watchResult) > 0) {
+          while ($row = mysqli_fetch_assoc($watchResult)) {
+            $watchItems[] = $row;
+          }
+        }
+
+        $firstItem = isset($watchItems[0]) ? $watchItems[0] : null;
+        $otherItems = array_slice($watchItems, 1);
+        ?>
+
         <div class="d-flex justify-content-center align-items-start flex-wrap gap-3 mt-4">
 
-          <!-- Watch Section -->
+          <!-- Watch / Read / Apply Section -->
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Watch. Read. Apply. Save Smart</h2>
+            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">
+              Watch. Read. Apply. Save Smart
+            </h2>
 
-            <div class="position-relative mb-3">
-              <img src="../../assets/img/home/videosample.png" class="img-fluid rounded"
-                style="height: 180px; width: 100%; object-fit: cover;">
-              <span class="position-absolute top-50 start-50 translate-middle text-white fs-1">&#9658;</span>
-            </div>
+            <?php if ($firstItem): ?>
+              <!-- img first card YT-->
+              <div class="position-relative mb-3">
+                <a href="<?php echo $firstItem['link']; ?>" target="_blank">
+                  <img src="../../assets/img/home/videosample.png" class="img-fluid rounded"
+                    style="height: 180px; width: 100%; object-fit: cover;">
+                  <span class="position-absolute top-50 start-50 translate-middle text-white fs-1">
+                    &#9658;
+                  </span>
+                </a>
+              </div>
 
-            <button class="btn bg-white border w-100 mb-3 text-start fw-semibold" style="border-radius: 20px;">Simple
-              ways to save money for the future</button>
-            <button class="btn bg-white border w-100 text-start fw-semibold" style="border-radius: 20px;">28 Proven Ways
-              to Save Money</button>
+              <button class="btn bg-white border w-100 mb-3 text-start fw-semibold" style="border-radius: 20px;"
+                onclick="window.open('<?php echo $firstItem['link']; ?>', '_blank')">
+                <?php echo $firstItem['title']; ?>
+              </button>
+
+
+            <?php else: ?>
+              <p class="text-center text-muted">No available resources.</p>
+            <?php endif; ?>
+
+            <!-- other small items (mixed since it's just preview) -->
+            <?php foreach ($otherItems as $item): ?>
+              <button class="btn bg-white border w-100 mb-2 text-start fw-semibold" style="border-radius: 20px;"
+                onclick="window.open('<?php echo $item['link']; ?>', '_blank')">
+                <?php echo $item['title']; ?>
+              </button>
+            <?php endforeach; ?>
 
             <div class="text-end mt-2">
-              <a href="../savingstrategies/savingstrat.php" class="text-success fw-semibold text-decoration-none">See
-                More...</a>
+              <a href="../savingstrategies/savingstrat.php" class="text-success fw-semibold text-decoration-none">
+                See more...
+              </a>
             </div>
           </div>
 
+          <!-- HARDCODED PA -->
           <!-- Daily Challenge -->
           <div class="challenge-card p-3">
             <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Daily Saving Challenge</h2>
