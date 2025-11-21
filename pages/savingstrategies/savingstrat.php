@@ -9,22 +9,44 @@ if (!isset($_SESSION['userID'])) {
 }
 
 $userID = $_SESSION['userID'];
+$type = $_GET['type'] ?? 'all';
+
+// Base query for resources
+$baseQuery = "SELECT r.*, COALESCE(p.isCompleted, 0) AS isCompleted, 
+              COALESCE(p.isFavorited, 0) AS isFavorited, 
+              COALESCE(p.isArchived, 0) AS isArchived 
+              FROM tbl_resources r 
+              LEFT JOIN tbl_user_resource_progress p 
+              ON p.resourceID = r.resourceID AND p.userID = $userID";
+
+// Modify query based on type
+$whereClause = "";
+if ($type === 'all') {
+  $whereClause = " WHERE COALESCE(p.isFavorited, 0) = 0 AND COALESCE(p.isArchived, 0) = 0";
+} elseif ($type === 'favorite') {
+  $whereClause = " WHERE p.isFavorited = 1";
+} elseif ($type === 'archive') {
+  $whereClause = " WHERE p.isArchived = 1";
+}
 
 // Fetch resources grouped by type
-$videosQuery = "SELECT * FROM tbl_resources WHERE resourceType = 'video'";
+$videosQuery = "$baseQuery $whereClause " . ($whereClause ? "AND" : "WHERE") . " r.resourceType = 'video'";
 $videosResult = mysqli_query($conn, $videosQuery);
 
-$articlesQuery = "SELECT * FROM tbl_resources WHERE resourceType = 'article'";
+$articlesQuery = "$baseQuery $whereClause " . ($whereClause ? "AND" : "WHERE") . " r.resourceType = 'article'";
 $articlesResult = mysqli_query($conn, $articlesQuery);
 
-$booksQuery = "SELECT * FROM tbl_resources WHERE resourceType = 'book'";
+$booksQuery = "$baseQuery $whereClause " . ($whereClause ? "AND" : "WHERE") . " r.resourceType = 'book'";
 $booksResult = mysqli_query($conn, $booksQuery);
 
-$totalResources = mysqli_num_rows($videosResult) + mysqli_num_rows($articlesResult) + mysqli_num_rows($booksResult);
+// Total resources is always all, regardless of type (for percentage)
+$allResourcesQuery = "SELECT COUNT(*) AS total FROM tbl_resources";
+$allResourcesResult = mysqli_query($conn, $allResourcesQuery);
+$totalResources = mysqli_fetch_assoc($allResourcesResult)['total'];
 
 $completedQuery = "SELECT COUNT(*) AS completedCount 
                    FROM tbl_user_resource_progress 
-                   WHERE userID = $userID";
+                   WHERE userID = $userID AND isCompleted = 1";
 $completedResult = mysqli_query($conn, $completedQuery);
 $completed = mysqli_fetch_assoc($completedResult)['completedCount'];
 
@@ -41,10 +63,13 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
     rel="stylesheet">
-
 
   <link rel="stylesheet" href="../../assets/css/sideBar.css">
   <link rel="stylesheet" href="../../assets/css/savingStrategies.css">
@@ -84,6 +109,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       background: #fff;
       margin-bottom: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: relative;
     }
 
     .badge {
@@ -113,6 +139,75 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s;
     }
+
+    /* Favorite + Archive Button Styling OUTSIDE CARD */
+    .resource-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      border: none;
+      background: #F6D25B;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #44B87D;
+      color: white;
+    }
+
+    .action-btn i {
+      margin-right: 6px;
+    }
+
+    .action-btn.active {
+      background: #44B87D;
+    }
+
+    .action-btn.active:hover {
+      background: #F6D25B;
+    }
+
+    /* Base styles for custom buttons */
+    .custom-btn {
+      border-color: #F3F3F3 !important;
+      border-style: solid;
+      color: #F3F3F3 !important;
+      min-width: 80px;
+    }
+
+    .custom-btn:hover {
+      background-color: #F3F3F3 !important;
+      color: #F6D25B !important;
+    }
+
+    .custom-btn.selected {
+      background-color: #F3F3F3;
+      border-color: #007bff;
+      color: #F6D25B !important;
+      font-weight: bold;
+    }
+
+    .allButton {
+      border-radius: 20px 0px 0px 20px;
+    }
+
+    .favoriteButton {
+      position: relative;
+      border-radius: 0px;
+    }
+
+    .archiveButton {
+      border-radius: 0px 20px 20px 0px;
+    }
   </style>
 </head>
 
@@ -127,10 +222,23 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       <header>
         <h1>Smart Saving Strategies</h1>
         <p class="tagline">Watch. Read. Apply. Save Smart.</p>
+
+        <div class="container-fluid d-flex align-items-center justify-content-center p-2">
+          <button type="button"
+              class="btn custom-btn sortButton allButton <?php echo ($type == 'all') ? 'selected' : '' ?>"
+              onclick="window.location.href='?type=all';"><b>All</b></button>
+
+          <button type="button"
+              class="btn custom-btn sortButton favoriteButton <?php echo ($type == 'favorite') ? 'selected' : '' ?>"
+              onclick="window.location.href='?type=favorite';"><b>Favorite</b></button>
+
+          <button type="button"
+              class="btn custom-btn sortButton archiveButton <?php echo ($type == 'archive') ? 'selected' : '' ?>"
+              onclick="window.location.href='?type=archive';"><b>Archive</b></button>
+        </div>
       </header>
 
       <div class="container main-content">
-
 
         <!-- VIDEOS -->
         <div class="section">
@@ -141,10 +249,9 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
               <?php
               $resourceID = (int) $video['resourceID'];
-              $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
-                                WHERE userID = $userID AND resourceID = $resourceID";
-              $progressResult = mysqli_query($conn, $progressQuery);
-              $isCompleted = mysqli_num_rows($progressResult) ? 1 : 0;
+              $isCompleted = $video['isCompleted'];
+              $isFavorited = $video['isFavorited'];
+              $isArchived = $video['isArchived'];
 
               $link = $video['link'];
               $yt_id = null;
@@ -157,13 +264,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
               <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
                 id="resource-<?= $resourceID ?>">
+
                 <a class="video-thumb" href="<?= htmlspecialchars($watchUrl) ?>" target="_blank"
                   onclick="markCompleted(<?= $resourceID ?>);">
+
                   <?php if ($thumb): ?>
                     <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($video['title']) ?>">
                   <?php else: ?>
                     <div style="padding:56% 0 0 0;"></div>
                   <?php endif; ?>
+
                   <div class="play-overlay">▶</div>
                 </a>
 
@@ -177,6 +287,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
                     <span class="badge bg-secondary" id="badge-<?= $resourceID ?>">Not Viewed</span>
                   <?php endif; ?>
                 </h5>
+              </div>
+
+              <!-- Buttons OUTSIDE the clickable card -->
+              <div class="resource-actions">
+                <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
+                  <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                </button>
+                <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
+                  <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                </button>
               </div>
 
             <?php endwhile; ?>
@@ -194,18 +314,19 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
                 <?php
                 $resourceID = (int) $article['resourceID'];
-                $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
-                                  WHERE userID = $userID AND resourceID = $resourceID";
-                $progressResult = mysqli_query($conn, $progressQuery);
-                $isCompleted = mysqli_num_rows($progressResult) ? 1 : 0;
+                $isCompleted = $article['isCompleted'];
+                $isFavorited = $article['isFavorited'];
+                $isArchived = $article['isArchived'];
                 ?>
 
                 <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
                   id="resource-<?= $resourceID ?>">
+
                   <a href="<?= htmlspecialchars($article['link']); ?>" target="_blank"
                     onclick="markCompleted(<?= $resourceID ?>);">
                     <?= htmlspecialchars($article['title']); ?>
                   </a>
+
                   <p><?= htmlspecialchars($article['description']); ?></p>
 
                   <?php if ($isCompleted): ?>
@@ -213,6 +334,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
                   <?php else: ?>
                     <span class="badge bg-secondary" id="badge-<?= $resourceID ?>">Not Viewed</span>
                   <?php endif; ?>
+                </div>
+
+                <!-- Buttons OUTSIDE the clickable card -->
+                <div class="resource-actions">
+                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
+                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                  </button>
+                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
+                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                  </button>
                 </div>
 
               <?php endwhile; ?>
@@ -231,18 +362,19 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
                 <?php
                 $resourceID = (int) $book['resourceID'];
-                $progressQuery = "SELECT isCompleted FROM tbl_user_resource_progress 
-                                  WHERE userID = $userID AND resourceID = $resourceID";
-                $progressResult = mysqli_query($conn, $progressQuery);
-                $isCompleted = mysqli_num_rows($progressResult) ? 1 : 0;
+                $isCompleted = $book['isCompleted'];
+                $isFavorited = $book['isFavorited'];
+                $isArchived = $book['isArchived'];
                 ?>
 
                 <div class="resource-card" data-status="<?= $isCompleted ? 'completed' : 'notCompleted' ?>"
                   id="resource-<?= $resourceID ?>">
+
                   <a href="<?= htmlspecialchars($book['link']); ?>" target="_blank"
                     onclick="markCompleted(<?= $resourceID ?>);">
                     <?= htmlspecialchars($book['title']); ?>
                   </a>
+
                   <p><?= htmlspecialchars($book['description']); ?></p>
 
                   <?php if ($isCompleted): ?>
@@ -250,6 +382,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
                   <?php else: ?>
                     <span class="badge bg-secondary" id="badge-<?= $resourceID ?>">Not Viewed</span>
                   <?php endif; ?>
+                </div>
+
+                <!-- Buttons OUTSIDE the clickable card -->
+                <div class="resource-actions">
+                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
+                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                  </button>
+                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
+                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                  </button>
                 </div>
 
               <?php endwhile; ?>
@@ -267,7 +409,6 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-
     function markCompleted(resourceID) {
       fetch('markCompleted.php', {
         method: 'POST',
@@ -294,27 +435,45 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
         });
     }
 
-    // ✅ Toggle Favorites / Archived buttons
-    document.querySelectorAll(".fav-archive-btn").forEach(btn => {
-      btn.addEventListener("click", function () {
-        document.querySelectorAll(".fav-archive-btn").forEach(b => b.classList.remove("selected"));
-        this.classList.add("selected");
+    function toggleFavorite(resourceID) {
+      fetch('toggleFavorite.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'resourceID=' + encodeURIComponent(resourceID)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success) {
+            window.location.reload();
+          }
+        })
+        .catch(err => {
+          console.error('toggleFavorite error', err);
+        });
+    }
 
-        // Add filtering logic here if needed
-        console.log("Selected:", this.id);
-      });
-    });
+    function toggleArchive(resourceID) {
+      fetch('toggleArchive.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'resourceID=' + encodeURIComponent(resourceID)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success) {
+            window.location.reload();
+          }
+        })
+        .catch(err => {
+          console.error('toggleArchive error', err);
+        });
+    }
 
     document.querySelectorAll(".resource-card").forEach(card => {
       card.addEventListener("click", function (e) {
-
-
         if (e.target.tagName.toLowerCase() === "a") return;
-
         const link = this.querySelector("a");
         if (!link) return;
-
-
         link.click();
       });
     });

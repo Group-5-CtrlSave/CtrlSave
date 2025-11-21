@@ -47,7 +47,7 @@ header p.tagline {
 
 
 .main-content {
-  margin-top: 105px; 
+  margin-top: 250px; 
   max-width: 1200px;
   padding: 10px;
   width: 100%;
@@ -132,6 +132,10 @@ header p.tagline {
   .section {
     padding: 25px;
   }
+   .main-content {
+    margin-top: 160px;
+    padding: 15px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -149,7 +153,7 @@ header p.tagline {
   }
 
   .main-content {
-    margin-top: 180px;
+    margin-top: 160px;
     padding: 15px;
   }
 
@@ -172,7 +176,7 @@ header p.tagline {
   }
 
   .main-content {
-    margin-top: 100px;
+    margin-top: 160px;
     padding: 10px;
   }
 
