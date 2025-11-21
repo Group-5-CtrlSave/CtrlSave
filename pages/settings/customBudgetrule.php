@@ -7,8 +7,8 @@ $error = "";
 
 // ---------------- FETCH USER DATA ----------------
 
-// Fetch categories for this user
-$stmt = $conn->prepare("SELECT * FROM tbl_usercategories WHERE userID = ?");
+// Fetch categories that user has selected (isSelected = 1) and are expenses
+$stmt = $conn->prepare("SELECT * FROM tbl_usercategories WHERE userID = ? AND isSelected = 1 AND type = 'expense'");
 $stmt->bind_param("i", $userID);
 $stmt->execute();
 $categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
