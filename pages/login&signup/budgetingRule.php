@@ -1,131 +1,5 @@
 <?php
-session_start();
-include("../../assets/shared/connect.php");
-
-$error = "";
-
-/* ---------------- SESSION CHECK ---------------- */
-if (!isset($_SESSION['userID'])) {
-    // Onboarding requires a logged-in (or session-set) user. If your signup sets the session immediately,
-    // this will let the onboarding continue. Adjust redirect if needed.
-    header("Location: ../login&signup/login.php");
-    exit;
-}
-$userID = (int) $_SESSION['userID'];
-
-/* ---------------- FETCH RULES + ALLOCATIONS ----------------
-   tbl_defaultbudgetrule:
-     - defaultBudgetruleID, ruleName, ruleDescription, createdAt
-   tbl_defaultallocation:
-     - defaultAllocationID, defaultBudgetruleID, defaultnecessityType, value
-------------------------------------------------------------*/
-$sql = "
-    SELECT r.defaultBudgetruleID, r.ruleName, r.ruleDescription,
-           a.defaultnecessityType AS category, a.value AS percentage
-    FROM tbl_defaultbudgetrule r
-    LEFT JOIN tbl_defaultallocation a
-        ON r.defaultBudgetruleID = a.defaultBudgetruleID
-    ORDER BY r.defaultBudgetruleID, a.defaultAllocationID
-";
-$res = $conn->query($sql);
-
-$rules = [];
-while ($row = $res->fetch_assoc()) {
-    $id = $row['defaultBudgetruleID'];
-    if (!isset($rules[$id])) {
-        $rules[$id] = [
-            'id' => $id,
-            'ruleName' => $row['ruleName'],
-            'ruleDescription' => $row['ruleDescription'],
-            'allocations' => []
-        ];
-    }
-    if ($row['category'] !== null) {
-        $rules[$id]['allocations'][] = [
-            'category' => $row['category'],
-            'percentage' => (int)$row['percentage']
-        ];
-    }
-}
-
-/* ---------------- HANDLE FORM SUBMIT ---------------- */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // If user prefers own percentages
-    if (isset($_POST['preferMine'])) {
-        header("Location: percentage.php");
-        exit;
-    }
-
-    // Validate selected rule
-    if (empty($_POST['ruleOption'])) {
-        $error = "Please select a budget rule before proceeding.";
-    } else {
-        $selectedRule = (int) $_POST['ruleOption'];
-
-        // Confirm selected rule exists in fetched rules
-        if (!isset($rules[$selectedRule])) {
-            $error = "Invalid rule selected.";
-        } else {
-            // Begin transaction
-            $conn->begin_transaction();
-
-            try {
-                $ruleName = $rules[$selectedRule]['ruleName'];
-
-                // Upsert into tbl_userbudgetrule
-                // Check if user already has a budget rule
-                $check = $conn->prepare("SELECT userBudgetRuleID FROM tbl_userbudgetrule WHERE userID = ?");
-                $check->bind_param("i", $userID);
-                $check->execute();
-                $chkRes = $check->get_result();
-
-                if ($chkRes->num_rows > 0) {
-                    // update existing: set isSelected = 0 for all first (safety), then update this
-                    // (optional) set others to isSelected=0 if your app supports multiple userBudgetrule rows
-                    $existingRow = $chkRes->fetch_assoc();
-                    $userBudgetRuleID = (int) $existingRow['userBudgetRuleID'];
-
-                    // Update existing row to reflect chosen ruleName and isSelected=1
-                    $upd = $conn->prepare("UPDATE tbl_userbudgetrule SET ruleName = ?, isSelected = 1 WHERE userBudgetRuleID = ?");
-                    $upd->bind_param("si", $ruleName, $userBudgetRuleID);
-                    $upd->execute();
-                } else {
-                    // Insert a new userBudgetRule row
-                    $ins = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected) VALUES (?, ?, NOW(), 1)");
-                    $ins->bind_param("is", $userID, $ruleName);
-                    $ins->execute();
-                    $userBudgetRuleID = $conn->insert_id;
-                }
-
-                // Delete any existing allocations for this userBudgetRuleID (to avoid duplicates)
-                $del = $conn->prepare("DELETE FROM tbl_userallocation WHERE userBudgetruleID = ?");
-                $del->bind_param("i", $userBudgetRuleID);
-                $del->execute();
-
-                // Insert allocations from default into tbl_userallocation
-                $insertAlloc = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, ?, 0, ?)");
-                foreach ($rules[$selectedRule]['allocations'] as $alloc) {
-                    $necessity = $alloc['category'];   // e.g., 'need', 'want', 'saving' or similar
-                    $value = (int) $alloc['percentage'];
-                    $insertAlloc->bind_param("isi", $userBudgetRuleID, $necessity, $value); // but types must match: need string,int
-                    // bind_param types must be "isi": integer, string, integer
-                    // However PHP requires variable types matching — ensure $necessity is string
-                    $insertAlloc->execute();
-                }
-
-                $conn->commit();
-                header("Location: done.php");
-                exit;
-            } catch (Exception $ex) {
-                $conn->rollback();
-                $error = "Failed to save selected rule. Please try again.";
-                // For debugging uncomment the next line (don't show on production)
-                // $error .= " (".$ex->getMessage().")";
-            }
-        }
-    }
-}
+include("../../pages/login&signup/process/budgetingRuleBE.php");
 ?>
 
 <!DOCTYPE html>
@@ -134,13 +8,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CtrlSave</title>
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <title>CtrlSave | Pick Budget Rule</title>
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
         body,
         html {

@@ -2,6 +2,8 @@
 
 session_start();
 
+include("../../assets/shared/connect.php");
+
 if (isset($_POST['btnLogin'])) {
 
     $emailUsername = trim($_POST['emailUsername']);
