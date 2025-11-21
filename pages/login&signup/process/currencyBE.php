@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include("../../assets/shared/connect.php");
+
 $error = "";
 
 // Make sure user is logged in

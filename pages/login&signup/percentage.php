@@ -1,22 +1,20 @@
 <?php
-// Include the new backend logic file
 include("../../pages/login&signup/process/percentageBE.php");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CtrlSave</title>
+    <title>CtrlSave | Own Budget Rule</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ... (Your original CSS styles, including the error toast and prompt modal) ... */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nanum+Myeongjo&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
-        /* --- Error Toast CSS (from login.php) --- */
+        /* --- Error Toast CSS --- */
         #errorToast {
             position: fixed;
             top: 20px;
@@ -35,7 +33,6 @@ include("../../pages/login&signup/process/percentageBE.php");
             text-align: center;
         }
 
-        /* Fade Animation: stays visible → fades out smoothly */
         @keyframes fadeInOut {
             0% {
                 opacity: 0;
@@ -56,7 +53,6 @@ include("../../pages/login&signup/process/percentageBE.php");
                 transform: translateX(-50%) translateY(-5px);
             }
         }
-        /* --- END Error Toast CSS --- */
 
         body {
             background-color: #44B87D;
