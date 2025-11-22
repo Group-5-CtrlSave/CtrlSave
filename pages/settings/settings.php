@@ -132,7 +132,7 @@ $cards = [
 <!-- MODALS -->
 
 <!-- Currency Modal -->
-<div id="currencyModal" class="modalOverlay" onclick="overlayClose(event,'currency')">
+<div id="currencyModal" class="modalOverlay" onclick="overlayClose(event,'currency')" style="backdrop-filter: none !important; -webkit-backdrop-filter: none !important;">
     <div class="modalBox" onclick="event.stopPropagation()">
         <h5 class="fw-bold text-white mb-3">Edit Currency</h5>
         <form method="POST" action="">
@@ -147,12 +147,12 @@ $cards = [
 </div>
 
 <!-- Needs & Wants Modal -->
-<div id="needsWantsModal" class="modalOverlay" onclick="overlayClose(event,'needsWants')">
+<div id="needsWantsModal" class="modalOverlay" onclick="overlayClose(event,'needsWants')" style="backdrop-filter: none !important; -webkit-backdrop-filter: none !important;">
     <div class="modalBox" onclick="event.stopPropagation()">
         <h5 class="fw-bold text-white mb-3">Edit Needs & Wants</h5>
         <form method="POST" action="">
-            <div class="needs-wants-table">
-                <div class="row fw-bold text-center mb-2 pb-2" style="border-bottom: 2px solid #F6D25B;">
+            <div class="needs-wants-table" style="max-height: 400px; overflow-y: auto;">
+                <div class="row fw-bold text-center mb-2 pb-2" style="border-bottom: 2px solid #F6D25B; position: sticky; top: 0; background-color: #F0f1f6; z-index: 1;">
                     <div class="col-6 text-start">Expense</div>
                     <div class="col-3">Needs</div>
                     <div class="col-3">Wants</div>
@@ -175,7 +175,7 @@ $cards = [
 </div>
 
 <!-- Budget Rule Modal -->
-<div id="budgetRuleModal" class="modalOverlay" onclick="overlayClose(event,'budgetRule')">
+<div id="budgetRuleModal" class="modalOverlay" onclick="overlayClose(event,'budgetRule')" style="backdrop-filter: none !important; -webkit-backdrop-filter: none !important;">
     <div class="modalBox" onclick="event.stopPropagation()">
         <h5 class="fw-bold text-white mb-3">Edit Budget Rule</h5>
         <div class="form-check mb-2 p-3 rounded" style="background-color:#F0F1F6;">
