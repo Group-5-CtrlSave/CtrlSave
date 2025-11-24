@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include("../../assets/shared/connect.php");
+
 // Make sure user is logged in
 if (!isset($_SESSION['userID'])) {
     header("Location: ../../pages/login&signup/login.php");

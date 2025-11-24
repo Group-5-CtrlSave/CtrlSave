@@ -1,8 +1,5 @@
 <?php
-
-include("../../assets/shared/connect.php");
 include("../../pages/login&signup/process/balanceBE.php");
-
 ?>
 
 <!DOCTYPE html>
@@ -11,10 +8,11 @@ include("../../pages/login&signup/process/balanceBE.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CtrlSave</title>
+     <title>CtrlSave | Set balance</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
-    <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&family=Nanum+Myeongjo&family=Roboto&display=swap');
@@ -64,7 +62,7 @@ include("../../pages/login&signup/process/balanceBE.php");
             box-shadow: 0 12px 16px rgba(0, 0, 0, .24), 0 17px 50px rgba(0, 0, 0, .19);
         }
 
-        /* Red login-style toast */
+        /* Error Handling */
         #errorToast {
             position: fixed;
             top: 20px;

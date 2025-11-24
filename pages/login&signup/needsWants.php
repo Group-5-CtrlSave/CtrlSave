@@ -1,8 +1,5 @@
 <?php
-
-include("../../assets/shared/connect.php");
 include("../../pages/login&signup/process/needsWantsBE.php");
-
 ?>
 
 <!DOCTYPE html>
@@ -11,12 +8,13 @@ include("../../pages/login&signup/process/needsWantsBE.php");
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CtrlSave</title>
-    <link rel="icon" href="../assets/imgs/ctrlsaveLogo.png">
+    <title>CtrlSave | Needs or Wants</title>
+    <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
         body,
         html {
@@ -82,7 +80,7 @@ include("../../pages/login&signup/process/needsWantsBE.php");
             position: relative;
         }
 
-        /* --- Toast Error Handling (from login) --- */
+        /* --- Toast Error Handling --- */
         #errorToast {
             position: fixed;
             top: 20px;

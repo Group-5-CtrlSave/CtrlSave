@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include("../../assets/shared/connect.php");
+
 $error = "";
 
 if (!isset($_SESSION['userID'])) {

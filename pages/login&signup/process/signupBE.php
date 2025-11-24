@@ -1,8 +1,9 @@
 <?php
 session_start();
-$error = "";
 
-// $conn is already defined
+include("../../assets/shared/connect.php");
+
+$error = "";
 
 if (isset($_POST['signup'])) {
 
@@ -29,9 +30,7 @@ if (isset($_POST['signup'])) {
 
         try {
 
-            // ====================================================
-            // 1) INSERT USER
-            // ====================================================
+            // INSERT USER
             $insertUserSql = "
                 INSERT INTO tbl_users (userName, firstName, lastName, email, password)
                 VALUES ('$username', '$fname', '$lname', '$email', '$hashedPassword')
@@ -44,13 +43,11 @@ if (isset($_POST['signup'])) {
             $newUserID = $conn->insert_id;
             $_SESSION['userID'] = $newUserID;
 
-            // ====================================================
-            // 2) INITIALIZE USER CATEGORIES USING ONLY WHILE
-            // ====================================================
-
+            // INITIALIZE USER CATEGORIES USING ONLY WHILE
+            
             $categoriesToInsert = [];
 
-            // --- A) Income categories ---
+            // Income categories 
             $sqlIncome = "
                 SELECT categoryName, type, icon, defaultCategoryID, defaultNecessityType, defaultIsFlexible
                 FROM tbl_defaultcategories
@@ -67,11 +64,11 @@ if (isset($_POST['signup'])) {
                     $row['defaultCategoryID'],
                     $row['defaultNecessityType'],
                     $row['defaultIsFlexible'],
-                    1 // pre-selected
+                    1 
                 ];
             }
 
-            // --- B) Savings category ---
+            // Savings category 
             $sqlSavings = "
                 SELECT defaultCategoryID, icon, defaultnecessityType
                 FROM tbl_defaultcategories
@@ -103,10 +100,7 @@ if (isset($_POST['signup'])) {
                 ];
             }
 
-            // ====================================================
-            // 3) INSERT USER CATEGORIES USING QUERY()
-            // ====================================================
-
+            // INSERT USER CATEGORIES USING QUERY
             foreach ($categoriesToInsert as $cat) {
 
                 $catName      = $conn->real_escape_string($cat[0]);
@@ -137,10 +131,7 @@ if (isset($_POST['signup'])) {
                 }
             }
 
-            // ====================================================
-            // 4) CREATE BUDGET VERSION
-            // ====================================================
-
+            // CREATE BUDGET VERSION
             $insertBudgetSql = "
                 INSERT INTO tbl_userbudgetversion (userID, balance, isActive)
                 VALUES ($newUserID, 0.00, 1)
