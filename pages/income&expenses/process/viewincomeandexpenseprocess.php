@@ -1,5 +1,4 @@
 <?php
-session_start();
 $type = '';
 $id = '';
 if (isset($_GET['type']) && isset($_GET['id'])) {
@@ -30,6 +29,7 @@ switch ($type) {
     case 'income':
         if (mysqli_num_rows($incomeResult2) > 0) {
             $income = mysqli_fetch_assoc($incomeResult2);
+            $userCategoryID = $income['userCategoryID'];
             $amount = $income['amount'];
             $date = $income['dateReceived'];
             $note = $income['note'];

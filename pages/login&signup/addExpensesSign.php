@@ -1,3 +1,11 @@
+<?php include ("../../assets/shared/connect.php");?>
+<?php session_start();?>
+<?php include ("process/addExpenseSignBE.php")?>
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -295,6 +303,7 @@
 
     <!-- Add New Expenses -->
     <div class="container-fluid main-container d-flex justify-content-center align-items-center mt-4">
+        <form method="POST">
         <div class="row main-row">
 
             <!-- Title -->
@@ -305,7 +314,7 @@
             <!-- New Expenses Name -->
             <div class="col-12 expenseName">
                 <label class="label">Enter category name:</label>
-                <input type="text" class="form-control" placeholder="e.g. Netflix" required>
+                <input type="text" class="form-control" placeholder="e.g. Netflix" name="categoryName" required>
             </div>
 
             <!-- New Expenses Icons -->
@@ -318,94 +327,24 @@
 
                     <div class="dropdown-options" id="dropdownOptions">
 
-                        <div class="dropdown-option" id="uploadIconOption">
-                            <i class="bi bi-cloud-upload" style="font-size: 1.8rem; color: #3a644e; margin-left: 8px;"></i>
-                            <input type="file" id="customIconInput" accept="image/*" style="display: none;">
-                        </div>
+                        <?php 
+                        if (mysqli_num_rows($expenseCategoriesIconResult) > 0){
+                            while($expenseCategoryIcon = mysqli_fetch_assoc($expenseCategoriesIconResult)){
+                                 $icon = $expenseCategoryIcon['icon'];
 
-                        <div class="dropdown-option" data-value="car">
-                            <img src="../../assets/img/shared/categories/expense/Car.png" width="40">
+    
+                        ?>
+                        <div class="dropdown-option" data-value="<?php echo $icon ?>">
+                            <img src="../../assets/img/shared/categories/expense/<?php echo $icon?>" width="40">
                         </div>
+                        <?php
+                                }
+                        }    
+                        ?>
 
-                        <div class="dropdown-option" data-value="clothes">
-                            <img src="../../assets/img/shared/categories/expense/Clothes.png" width="40">
-                        </div>
+                      
 
-                        <div class="dropdown-option" data-value="coffee">
-                            <img src="../../assets/img/shared/categories/expense/Coffee.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="dinning">
-                            <img src="../../assets/img/shared/categories/expense/Dining Out.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="electricity">
-                            <img src="../../assets/img/shared/categories/expense/Electricity.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="entertainment">
-                            <img src="../../assets/img/shared/categories/expense/Entertainment.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="gift">
-                            <img src="../../assets/img/shared/categories/expense/Gift.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="groceries">
-                            <img src="../../assets/img/shared/categories/expense/Groceries.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="health">
-                            <img src="../../assets/img/shared/categories/expense/Health.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="house">
-                            <img src="../../assets/img/shared/categories/expense/House.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="wifi">
-                            <img src="../../assets/img/shared/categories/expense/Internet Connection.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="laundry">
-                            <img src="../../assets/img/shared/categories/expense/Laundry.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="party">
-                            <img src="../../assets/img/shared/categories/expense/Party.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="rent">
-                            <img src="../../assets/img/shared/categories/expense/Rent.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="schoolNeeds">
-                            <img src="../../assets/img/shared/categories/expense/School Needs.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="selfCare">
-                            <img src="../../assets/img/shared/categories/expense/Selfcare.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="shopping">
-                            <img src="../../assets/img/shared/categories/expense/Shopping.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="subscriptions">
-                            <img src="../../assets/img/shared/categories/expense/Subscriptions.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="transportation">
-                            <img src="../../assets/img/shared/categories/expense/Transportation.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="tuition">
-                            <img src="../../assets/img/shared/categories/expense/Tuition.png" width="40">
-                        </div>
-
-                        <div class="dropdown-option" data-value="water">
-                            <img src="../../assets/img/shared/categories/expense/Water.png" width="40">
-                        </div>
+                    
 
                     </div>
                 </div>
@@ -418,14 +357,14 @@
             <div class="col-12 needWants">
                 <label class="label">Is this expense a Need or a Want?</label>
                 <div class="form-check fs-4">
-                    <input class="form-check-input me-2 forms" type="radio" name="category" id="needs" value="needs">
+                    <input class="form-check-input me-2 forms" type="radio" name="necessityType" id="needs" value="need">
                     <label class="form-check-label" for="needs">
                         Needs
                     </label>
                 </div>
 
                 <div class="form-check fs-4">
-                    <input class="form-check-input me-2 forms" type="radio" name="category" id="wants" value="wants">
+                    <input class="form-check-input me-2 forms" type="radio" name="necessityType" id="wants" value="want">
                     <label class="form-check-label" for="wants">
                         Wants
                     </label>
@@ -436,14 +375,14 @@
             <div class="col-12 limitTrack">
                 <label class="label">Do you want to Limit or Track this expense?</label>
                 <div class="form-check fs-4">
-                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="limit" value="limit">
+                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="limit" value="1">
                     <label class="form-check-label" for="imit">
                         Limit
                     </label>
                 </div>
 
                 <div class="form-check fs-4">
-                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="track" value="track">
+                    <input class="form-check-input me-2 forms" type="radio" name="limits" id="track" value="0">
                     <label class="form-check-label" for="track">
                         Track
                     </label>
@@ -452,10 +391,11 @@
 
             <!-- Button -->
             <div class="col-12 btNext d-flex justify-content-center align-items-center">
-                <a href="pickExpense.php"><button type="submit" class="btn btn-warning">Save</button></a>
+                <button type="submit" class="btn btn-warning" name="btnSaveExpense">Save</button>
             </div>
 
         </div>
+          </form>
 
 
 
@@ -493,34 +433,7 @@
         });
     </script>
 
-    <script>
-        const uploadIconOption = document.getElementById('uploadIconOption');
-        const customIconInput = document.getElementById('customIconInput');
 
-        // When user clicks upload option
-        uploadIconOption.addEventListener('click', () => {
-            customIconInput.click();
-        });
-
-        // Handle image upload
-        customIconInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.width = 40;
-
-                    selectedOption.innerHTML = '';
-                    selectedOption.appendChild(img);
-                    selectedIconInput.value = 'custom-' + file.name; // mark as custom upload
-                    dropdownOptions.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
 
 
 

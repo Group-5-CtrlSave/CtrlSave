@@ -1,6 +1,6 @@
 <?php include("../../assets/shared/connect.php"); ?>
-
-<?php include ("process/addincomeprocess.php");?>
+<?php session_start() ?>
+<?php include("process/addIncomeprocess.php"); ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +20,7 @@
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
-                <a href="income&expenses.php">
+                <a href="income_expenses.php">
                     <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
                         style="height: 24px;" />
                 </a>
@@ -43,6 +43,7 @@
 
     <div class="container-fluid mainContainer">
         <div class="scrollable-container" id="scrollableContainer">
+            <?php include("process/successtag.php") ?>
             <div class="row py-2">
                 <?php
 
@@ -83,14 +84,15 @@
                         <label class="form-check-label label" for="amount"><b>Amount:</b></label>
                         <div class="input-group input-group-lg">
                             <span class="input-group-text">₱</span>
-                            <input type="number" step="0.01" inputmode="decimal" class="form-control form-control-lg" id="amount"
-                                placeholder="Enter amount" name="amount" required>
+                            <input type="number" step="0.01" inputmode="decimal" class="form-control form-control-lg"
+                                id="amount" placeholder="Enter amount" name="amount" required>
                         </div>
                     </div>
 
                     <div class="container py-2">
                         <label class="form-check-label label" for="amount"><b>Notes</b></label>
-                        <input type="text" class="form-control form-control-lg" id="note" placeholder="Enter Note" name="note">
+                        <input type="text" class="form-control form-control-lg" id="note" placeholder="Enter Note"
+                            name="note">
                     </div>
 
                     <div class="container py-2">
@@ -100,7 +102,7 @@
 
 
                     <input id="catID" type="hidden" name="categoryID">
-                 
+
 
 
                     <div class="container py-5 text-center">
@@ -186,18 +188,27 @@
             let categoryID = catButton.getAttribute('data-categoryID');
             let catID = document.getElementById('catID')
             catID.value = categoryID
-            
-        }   
+
+        }
 
     </script>
 
-    
+
 
     <script>
         const today = new Date().toISOString().split('T')[0];
         let date = document.getElementById('date')
         date.setAttribute('max', today);
     </script>
+
+      <script>
+        setTimeout(function () {
+            var alertElement = document.getElementById('myAlert');
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }, 2000); 
+    </script>
+
 
 </body>
 

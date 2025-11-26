@@ -1,5 +1,15 @@
 <?php
-$getExpensesCategoriesQuery = "SELECT userCategoryID, categoryName, icon FROM tbl_usercategories WHERE userID= 1 AND type = 'expense' AND isSelected = 1";
+// userID
+$userID = '';
+if (isset($_SESSION['userID'])){
+    $userID = $_SESSION['userID'];
+   
+}
+?>
+
+
+<?php
+$getExpensesCategoriesQuery = "SELECT userCategoryID, categoryName, icon FROM tbl_usercategories WHERE userID= $userID AND type = 'expense' AND isSelected = 1";
 $expenseCategoriesResult = executeQuery($getExpensesCategoriesQuery);
 ?>
 
@@ -48,19 +58,23 @@ if (isset($_POST['addExpense'])) {
             break;
     }
 }
-     ($isRecurring) ? $addRecurringTransactionQuery = "INSERT INTO `tbl_recurringtransactions`(`userID`, `type`, `userCategoryID`, `amount`, `note`, `frequency`, `nextDuedate`, `isActive`) 
-    VALUES ('1','expenses','$categoryID','$amount','$note','$frequency',$nextDueDate,'1')": '';
+     ($isRecurring) ? $addRecurringTransactionQuery = "INSERT INTO `tbl_recurringtransactions`(`userID`, `type`, `userCategoryID`, `amount`, `note`, `frequency`, `nextDuedate`) 
+    VALUES ('$userID','expenses','$categoryID','$amount','$note','$frequency',$nextDueDate)": '';
     ($isRecurring) ?  executeQuery($addRecurringTransactionQuery) : '';
 
     $lastRecurringID = mysqli_insert_id($conn) ?? '';
 
 
     (!empty($dueDate)) ? $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`, `recurringID`,`userBudgetversionID`) 
-        VALUES ('1','$amount','$categoryID','','$dueDate','$isRecurring','$note', '$lastRecurringID', '1')" :  $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
-        VALUES ('1','$amount','$categoryID',NULL,'$isRecurring','$note', '$lastRecurringID' , '1')" ;
+        VALUES ('$userID','$amount','$categoryID','','$dueDate','$isRecurring','$note', '$lastRecurringID', '1')" :  $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
+        VALUES ('$userID','$amount','$categoryID',NULL,'$isRecurring','$note', '$lastRecurringID' , '1')" ;
     
    
     executeQuery($addExpensesQuery);
+    $_SESSION["successtag"] = "Expense succefully added!";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+    
 
    
 

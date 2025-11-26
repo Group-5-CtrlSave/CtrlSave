@@ -1,3 +1,7 @@
+<?php include("../../assets/shared/connect.php"); ?>
+<?php session_start() ?>
+<?php include("process/updateCharts.php") ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -67,7 +71,7 @@
             <div class="container my-3 py-3 tableContainer">
                 <div class="container py-1 text-center">
                     <h5 class="visualTitle m-0 p-0" id="expensesTable"></h5>
-               
+
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
@@ -79,31 +83,21 @@
                             </tr>
                         </thead>
                         <tbody class="text-center">
-                            <tr>
-                                <td><strong>Groceries</strong></td>
-                                <td>3,500</td>
-                                <td>35%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Dining Out</strong></td>
-                                <td>2,000</td>
-                                <td>20%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Electricity</strong></td>
-                                <td>2,000</td>
-                                <td>15%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Transportation</strong></td>
-                                <td>1,500</td>
-                                <td>15%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Savings</strong></td>
-                                <td>1,000</td>
-                                <td>10%</td>
-                            </tr>
+                            <?php foreach ($expenseList as $expenseCategory) {
+                                $categoryAmount = $expenseCategory["amount"];
+                                $percentage = ($overallTotal > 0 ) ? $categoryAmount / $overallTotal * 100 : 0 ;
+                                $percentage = round($percentage, 2 )
+                                ?>
+                                <tr>
+                                    <td><strong><?php echo $expenseCategory['categoryName']?></strong></td>
+                                    <td><?php echo $categoryAmount ?></td>
+                                    <td><?php echo $percentage?>%</td>
+                                </tr>
+                                <?php
+
+                            } ?>
+
+
                         </tbody>
                     </table>
                 </div>
@@ -165,7 +159,7 @@
         let spendingReport = document.getElementById("spendingReport")
         let expensesTable = document.getElementById("expensesTable")
         let analysisForecast = document.getElementById("analysisForecast")
-     
+
         function changeMonth(num) {
             // Get the presentDate
             let presentDate = new Date()
@@ -210,32 +204,29 @@
             // Show the Months in Texts
             let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            if (count == 1){
+            if (count == 1) {
                 monthYear.innerHTML = "1 Month Forecast"
                 spendingReport.innerHTML = "1 Month Financial Forecast"
                 expensesTable.innerHTML = "1 Month Forecast Expenses"
                 analysisForecast.innerHTML = "Financial Forecast"
-            }else if (count == 2){
+            } else if (count == 2) {
                 monthYear.innerHTML = "3 Months Forecast"
                 spendingReport.innerHTML = "3 Months Financial Forecast"
                 expensesTable.innerHTML = "3 Months Forecast Expenses"
                 analysisForecast.innerHTML = "Financial Forecast"
-            }else if (count == 3) {
+            } else if (count == 3) {
                 monthYear.innerHTML = "6 Months Forecast"
                 spendingReport.innerHTML = "6 Months Financial Forecast"
                 expensesTable.innerHTML = "6 Months Forecast Expenses"
                 analysisForecast.innerHTML = "Financial Forecast"
-            } else{
-               monthYear.innerHTML = months[newMonth - 1] + " " + newYear;
-               spendingReport.innerHTML = "Monthly Spending Report"
-               expensesTable.innerHTML = months[newMonth - 1] + " " + newYear+" "+"Expenses"
-               analysisForecast.innerHTML = "Analysis and Recommendations"
-               
-              
+            } else {
+                monthYear.innerHTML = months[newMonth - 1] + " " + newYear;
+                spendingReport.innerHTML = "Monthly Spending Report"
+                expensesTable.innerHTML = months[newMonth - 1] + " " + newYear + " " + "Expenses"
+                analysisForecast.innerHTML = "Analysis and Recommendations"
+
+
             }
-                
-            
-  
 
 
 
@@ -245,7 +236,10 @@
 
 
 
-            
+
+
+
+
 
         }
     </script>
@@ -262,7 +256,7 @@
             monthYear.innerHTML = months[presentMonth - 1] + " " + presentYear;
 
             spendingReport.innerHTML = "Monthly Spending Report"
-            expensesTable.innerHTML = months[presentMonth - 1] + " " + presentYear +" "+"Expenses"
+            expensesTable.innerHTML = months[presentMonth - 1] + " " + presentYear + " " + "Expenses"
 
         }
 
@@ -272,56 +266,72 @@
     <!-- Bar Chart -->
 
     <script>
+        const monthlySpending = <?php echo $monthlyDataJSON; ?>;
+
         const ctx = document.getElementById('monthlySpendingChart');
 
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
                     label: 'Monthly Spending',
-                    data: [30, 15, 60, 65, 60, 65, 43],
+                    data: monthlySpending,
                     backgroundColor: '#77D09A',
                     borderRadius: 5,
-                    barPercentage: 0.9,
-                    categoryPercentage: 0.8
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.7
                 }]
             },
-            options: {
-
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            stepSize: 20
-                        },
-                        grid: {
-                            color: '#c0c0c0',
-                            lineWidth: 2
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                stepSize: 1000
+            },
+            grid: {
+                color: '#c0c0c0',
+                lineWidth: 2
             }
+        },
+        x: {
+            grid: {
+                display: false
+            },
+            ticks: {
+                autoSkip: false,      
+                maxRotation: 45,      
+                minRotation: 0,
+                color: '#000',
+                font: {
+                    size: 14,        
+                    family: 'Roboto, Arial, sans-serif'
+                },
+                padding: 5        
+            }
+        }
+    }
+}
         });
     </script>
+
 
     <!-- Pie Chart -->
 
     <script>
         const expensesCtx = document.getElementById('expensesChart');
+        const expenseCategories = <?php echo $categoriesJSON; ?>;
+        const dataCategories = <?php echo $dataJSON; ?>;
 
         new Chart(expensesCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Savings', 'Dining out', 'Electricity', 'Transportation', 'Groceries'],
+                labels: expenseCategories,
                 datasets: [{
-                    data: [10, 20, 20, 15, 35],
+                    data: dataCategories,
                     backgroundColor: ['#2a9d8f', '#f4a261', '#2ecc71', '#45a29e', '#208b8d'],
                     borderWidth: 0
                 }]

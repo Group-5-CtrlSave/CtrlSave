@@ -1,5 +1,6 @@
 <?php include ('../../assets/shared/connect.php')?>
-<?php include ('process/addexpenseprocess.php')?>
+<?php session_start() ?>
+<?php include ('process/addExpenseprocess.php')?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +20,7 @@
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
-                <a href="income&expenses.php">
+                <a href="income_expenses.php">
                     <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
                         style="height: 24px;" />
                 </a>
@@ -38,6 +39,7 @@
 
     <div class="container-fluid mainContainer d-flex flex-column">
         <div class="scrollable-container" id="scrollableContainer">
+             <?php include ("process/successtag.php")?>
             <div class="row py-3">
             <?php 
             if (mysqli_num_rows($expenseCategoriesResult)>0){
@@ -72,12 +74,13 @@
     </div>
     <form method="POST">
     <div class="container-fluid d-flex flex-column fixed-bottom p-0 m-0 d-none" id="incomeForm">
+       
         <div class="container-fluid inputHover" id="formContent">
             <div class="container py-1">
                 <label class="form-check-label label" for="amount"><b>Amount</b></label>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text">₱</span>
-                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount">
+                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount" required>
                 </div>
             </div>
 
@@ -95,8 +98,9 @@
                 <label class="checkBoxLabel" for="recurringPayment">Recurring Payment</label>
             </div>
              <div class="container py-1">
-                <select class="form-select" id="frequencySelect" name="frequency" disabled>
-                    <option disabled selected hidden>Choose Frequency</option>
+                <select class="form-select" id="frequencySelect" name="frequency" disabled required>
+
+                <option value=" " disabled selected hidden>Choose Frequency</option>
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
@@ -184,6 +188,14 @@
             }
         })
 
+    </script>
+
+    <script>
+        setTimeout(function () {
+            var alertElement = document.getElementById('myAlert');
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }, 2000); 
     </script>
 
   

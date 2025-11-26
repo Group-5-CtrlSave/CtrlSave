@@ -302,7 +302,7 @@ $todayBalance = $todayIncome - $todayExpense;
 
             <!-- See more -->
             <div class="text-end mt-1">
-              <a href="../income&expenses/income&expenses.php" class="btn btn-link text-white fw-semibold p-0"
+              <a href="../income&expenses/income_expenses.php" class="btn btn-link text-white fw-semibold p-0"
                 style="font-size: 16px;">See more...</a>
             </div>
 

@@ -1,8 +1,7 @@
 <?php include("../../assets/shared/connect.php"); ?>
-
-<?php include("process/incomeandexpenseprocess.php"); ?>
-
 <?php
+session_start();
+
 $type = '';
 if (isset($_GET['type'])) {
     $type = $_GET['type'];
@@ -10,6 +9,7 @@ if (isset($_GET['type'])) {
     $type = 'all';
 }
 ?>
+<?php include("process/incomeandexpenseprocess.php"); ?>
 
 
 <!DOCTYPE html>
@@ -47,13 +47,13 @@ if (isset($_GET['type'])) {
         <div class="container-fluid d-flex align-items-center justify-content-center p-2">
             <button type="button"
                 class="btn custom-btn sortButton allButton <?php echo ($type == 'all') ? 'selected' : '' ?>"
-                onclick="window.location.href='income&expenses.php?type=all';"><b>All</b></button>
+                onclick="window.location.href='income_expenses.php?type=all';"><b>All</b></button>
             <button type="button"
                 class="btn custom-btn sortButton incomeButton <?php echo ($type == 'income') ? 'selected' : '' ?>"
-                onclick="window.location.href='income&expenses.php?type=income';"><b>Income</b></button>
+                onclick="window.location.href='income_expenses.php?type=income';"><b>Income</b></button>
             <button type="button"
                 class="btn custom-btn sortButton expenseButton <?php echo ($type == 'expense') ? 'selected' : '' ?>"
-                onclick="window.location.href='income&expenses.php?type=expense';"><b>Expenses</b></button>
+                onclick="window.location.href='income_expenses.php?type=expense';"><b>Expenses</b></button>
         </div>
 
 
@@ -85,6 +85,7 @@ if (isset($_GET['type'])) {
 
         <!-- Income and Expense Row -->
         <div class="scrollable-container">
+            <?php include ("process/successtag.php")?>
             <div class="row">
                 <?php
 
@@ -233,6 +234,14 @@ if (isset($_GET['type'])) {
 
     <script src="../../assets/js/calculateElapsedTime.js"></script>
     <script src="../../assets/js/calculateRemainingDays.js"></script>
+
+    <script>
+        setTimeout(function () {
+            var alertElement = document.getElementById('myAlert');
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }, 2000); 
+    </script>
 
   
 
