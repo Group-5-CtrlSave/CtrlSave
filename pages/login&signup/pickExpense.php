@@ -1,3 +1,10 @@
+<?php include("../../assets/shared/connect.php") ?>
+<?php session_start() ?>
+
+<?php include('process/pickExpenseBE.php') ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,8 +15,9 @@
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <style>
         body,
         html {
@@ -97,7 +105,6 @@
             padding-bottom: 12px;
             font-size: 14px;
         }
-
     </style>
 </head>
 
@@ -128,77 +135,83 @@
             </div>
         </div>
 
-        <!-- Expense Section -->
-        <div class="scrollable-container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Dining Out</label>
-                        <img src="../../assets/img/shared/categories/expense/Dining Out.png" alt="Dining"
-                            class="expense-icon" />
-                    </div>
+        <form method="POST">
+            <div class="scrollable-container">
+                <div class="row">
+                    <?php
+                    $counter = 0;
+                    $extraCategories = [];
+
+                    foreach ($allCategories as $category) {
+                        $checked = '';
+                        if (isset($category['source']) && $category['source'] === 'user' && $category['isSelected']) {
+                            $checked = 'checked';
+                        }
+
+                        if ($counter < 4) {
+                            ?>
+                            <div class="col-12">
+                                <div class="expense-option">
+                                    <label class="expense-label">
+                                        <input type="checkbox" name="userCategories[]"
+                                            value="<?php echo $category['categoryID']; ?>" <?php echo $checked; ?> />
+                                        <?php echo $category['categoryName']; ?>
+                                    </label>
+                                    <img src="../../assets/img/shared/categories/expense/<?php echo $category['icon']; ?>"
+                                        alt="<?php echo $category['categoryName']; ?>" class="expense-icon" />
+                                </div>
+                            </div>
+                            <?php
+                        } else {
+                            $extraCategories[] = $category;
+                        }
+
+                        $counter++;
+                    }
+                    ?>
+
+                    <?php if (!empty($extraCategories)) { ?>
+                        <div class="col-12">
+                            <a id="seeMoreButton" onclick="seeMoreCateg()" style="color: #fff; display: block;">
+                                <span class="expense-label">See more...</span>
+                            </a>
+                        </div>
+                    <?php } ?>
                 </div>
 
-                <div class="col-12">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Electricity</label>
-                        <img src="../../assets/img/shared/categories/expense/Electricity.png" alt="Electricity"
-                            class="expense-icon" />
+                <!-- Extra Expense Section -->
+                <div class="row" id="moreCateg" style="display: none;">
+                    <?php foreach ($extraCategories as $category) {
+                        $checked = '';
+                        if (isset($category['source']) && $category['source'] === 'user' && $category['isSelected']) {
+                            $checked = 'checked';
+                        }
+                        ?>
+                        <div class="col-12">
+                            <div class="expense-option">
+                                <label class="expense-label">
+                                    <input type="checkbox" name="userCategories[]"
+                                        value="<?php echo $category['categoryID']; ?>" <?php echo $checked; ?> />
+                                    <?php echo $category['categoryName']; ?>
+                                </label>
+                                <img src="../../assets/img/shared/categories/expense/<?php echo $category['icon']; ?>"
+                                    alt="<?php echo $category['categoryName']; ?>" class="expense-icon" />
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <div class="col-12">
+                        <a id="hideButton" onclick="hideMoreCateg()" style="color: #fff; display: none;">
+                            <span class="expense-label">Hide</span>
+                        </a>
                     </div>
-                </div>
-
-                <div class="col-12">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Groceries</label>
-                        <img src="../../assets/img/shared/categories/expense/Groceries.png" alt="Groceries"
-                            class="expense-icon" />
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Rent</label>
-                        <img src="../../assets/img/shared/categories/expense/Rent.png" alt="Rent"
-                            class="expense-icon" />
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <a id="seeMoreButton" onclick="seeMoreCateg()" style="color: #ffffffff; display: block;"><span
-                            class="expense-label">See
-                            more...</span></a>
                 </div>
             </div>
 
-            <!-- Extra Expense Section -->
-            <div class="row" id="moreCateg" style="display: none;">
-                <div class="col-12">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Wifi</label>
-                        <img src="../../assets/img/shared/categories/expense/Internet Connection.png" alt="Dining"
-                            class="expense-icon" />
-                    </div>
-                </div>
-
-                <div class="col-12 pt-1">
-                    <div class="expense-option">
-                        <label class="expense-label"><input type="checkbox" /> Water</label>
-                        <img src="../../assets/img/shared/categories/expense/Water.png" alt="Electricity"
-                            class="expense-icon" />
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <a id="hideButton" onclick="hideMoreCateg()" style="color: #ffffffff; display: none;"><span
-                            class="expense-label">Hide</span></a>
-                </div>
+            <div class="col-12 pb-3 d-flex justify-content-center">
+                <button type="submit" name="btnSaveCategories" class="btn btn-warning mt-4">Next</button>
             </div>
-        </div>
+        </form>
 
-        <!-- Button -->
-        <div class="col-12 pb-3 d-flex justify-content-center">
-            <a href="needsWants.php"><button type="submit" class="btn btn-warning mt-4">Next</button></a>
-        </div>
 
         <!-- Add more Expenses -->
         <div class="col-12 mt-1 d-flex justify-content-center align-items-center">

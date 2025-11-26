@@ -1,7 +1,8 @@
 <?php include("../../assets/shared/connect.php") ?>
+<?php session_start();?>
 <?php include("process/incomeandexpenseprocess.php"); ?>
 <?php include("process/viewincomeandexpenseprocess.php") ?>
-<?php include("process/updateexpense.php") ?>
+<?php include("process/editIncomeExpense.php") ?>
 
 
 
@@ -24,7 +25,7 @@
     <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top">
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
-                <a href="income&expenses.php">
+                <a href="income_expenses.php">
                     <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
                         style="height: 24px;" />
                 </a>
@@ -70,7 +71,7 @@
 
                         </div>
                         <div class="modal-body d-flex justify-content-center align-items-center">
-                            <a href="edit.php?type=expense&id=<?php echo $id?>"><button type="button"
+                            <a href="edit.php?type=<?php echo $type?>&id=<?php echo $id?>"><button type="button"
                                     class="btn btn-lg yesButton m-3"><b>Yes</b></button> </a>
                             <button type="button" class="btn btn-lg btn-secondary m-3"
                                 data-bs-dismiss="modal"><b>Cancel</b></button>

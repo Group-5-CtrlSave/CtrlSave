@@ -1,7 +1,14 @@
 <?php include('../../assets/shared/connect.php'); ?>
+<?php session_start();?>
 <?php include("process/incomeandexpenseprocess.php") ?>
 <?php include("process/viewincomeandexpenseprocess.php") ?>
-<?php include('process/updateexpense.php') ?>
+<?php include('process/editIncomeExpense.php') ?>
+
+<?php
+$getuserCategoriesQuery = "SELECT userCategoryID, categoryName, icon
+FROM `tbl_usercategories` WHERE userID = $userID AND type ='$type' AND isSelected = 1";
+$userCategoriesResult = executeQuery($getuserCategoriesQuery);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +38,7 @@
 
             <h2 class="m-0 text-center navigationBarTitle">Edit</h2>
 
-            <a data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <a data-bs-toggle="modal" data-bs-target="#deleteIncomeExpenseModal">
                 <img class="img-fluid" src="../../assets/img/shared/trashcan.png" alt="Delete" style="height: 24px;" />
             </a>
 
@@ -46,6 +53,37 @@
     <!-- Content -->
 
     <div class="container-fluid mainContainer">
+        
+        <!-- Modal -->
+
+        <div class="container-fluid">
+
+            <div class="modal fade" id="deleteIncomeExpenseModal" tabindex="-1" aria-labelledby="deleteIncomeExpenseLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addIncomeExpenseModalLabel">Do you want to delete this <?php echo $type?>?</h5>
+                           
+                        </div>
+                        <div class="modal-body d-flex justify-content-center align-items-center">
+                             <form method="POST">
+                             <button
+                              class="btn btn-success btn-lg  mx-3" type="submit" name="btnDelete"><b>Yes</b></button></a>
+                             <button type="button"
+                              class="btn btn-danger btn-lg  mx-3" data-bs-dismiss="modal" aria-label="Close"><b>No</b></button></a>
+                              </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
         <form method="POST">
 
 
@@ -54,17 +92,17 @@
                 <select id="iconSelect" class="selectpicker btn-lg selectForm" data-live-search="true"
                     title="Select a Category" name="userCategory">
 
-                    <?php if (mysqli_num_rows($expenseCategoriesResult) > 0) {
-                        while ($expenseCategory = mysqli_fetch_assoc($expenseCategoriesResult)) {
+                    <?php if (mysqli_num_rows($userCategoriesResult) > 0) {
+                        while ($userCategory = mysqli_fetch_assoc($userCategoriesResult)) {
 
-                            $icon = $expenseCategory['icon'];
-                            $categoryName = $expenseCategory['categoryName'];
+                            $icon = $userCategory['icon'];
+                            $categoryName = $userCategory['categoryName'];
                             ?>
                             <option
-                                data-content="<img src='../../assets/img/shared/categories/expense/<?php echo $icon ?>' width='40' height='40'> <?php echo $categoryName ?>"
-                                <?php echo ($expenseCategory['userCategoryID'] == $userCategoryID) ? 'selected' : '' ?>>
+                                data-content="<img src='../../assets/img/shared/categories/<?php echo $type?>/<?php echo $icon ?>' width='40' height='40'> <?php echo $categoryName?>"
+                                <?php echo ($userCategory['userCategoryID'] == $userCategoryID) ? 'selected' : '' ?>>
 
-                                <?php echo $expenseCategory['userCategoryID'] ?>
+                                <?php echo $userCategory['userCategoryID'] ?>
                             </option>
 
                             <?php
@@ -80,7 +118,7 @@
                 <div class="form-group">
                     <label for="formControlInput2" class="title"><b>Amount(PHP):</b></label>
                     <input type="text" class="form-control inputText" id="formControlInput2" value="<?php echo $amount?>"
-                      name="amount">
+                      name="amount" required>
                 </div>
             </div>
 
@@ -100,14 +138,15 @@
                 </div>
             </div>
 
+            <?php if ($type == 'expense'){?>
             <div class="container my-2">
                 <input class="checkBox" type="checkbox" id="recurringPayment" value="1" <?php echo ($isRecurring) ? 'checked' : '' ?> name="isRecurring">
                 <label class="label" for="recurringPayment">Recurring Payment</label>
             </div>
 
             <div class="container my-2">
-                <select class="form-select" id="frequencySelect" <?php echo ($isRecurring) ? '' : 'disabled'?> name="frequency">
-                    <option selected hidden disabled>Choose Frequency</option>
+                <select class="form-select" id="frequencySelect" <?php echo ($isRecurring) ? '' : 'disabled'?> name="frequency" required>
+                    <option value='' selected hidden disabled>Choose Frequency</option>
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
@@ -115,6 +154,7 @@
                 </select>
 
             </div>
+            <?php } ?>
 
             <div class="container fixed-bottom buttonContainer py-3">
                 <button type="submit" name="saveButton" class="btn btn-lg saveButton"><b>Save</b></button>

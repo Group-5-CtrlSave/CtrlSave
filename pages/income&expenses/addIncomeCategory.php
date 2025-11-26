@@ -1,4 +1,5 @@
 <?php include ('../../assets/shared/connect.php') ?>
+<?php session_start() ?>
 <?php include ('process/addincomecategoryprocess.php')?>
 
 <?php 
@@ -50,17 +51,19 @@ $incomeIconResult = executeQuery($getIncomeIconQuery);
         </div>
         <form method="POST">
 
+        <?php include ("process/successtag.php")?>
+
    
         <div class="container my-3 ">
             <label class="form-check-label" for="categoryName"><b>Enter Category Name:</b></label>
             <input type="text" class="form-control form-control-lg forms" id="categoryName" name="categoryName"
-                placeholder="e.g Investments">
+                placeholder="e.g Investments" required>
         </div>
         <!-- Category Icon -->
         <div class="container my-3">
             <label class="form-check-label" for="iconSelect"><b>Choose Category Icon:</b></label>
             <select id="iconSelect" class="selectpicker btn-lg selectForm" data-live-search="true"
-                title="Select an icon" name="icon">
+                title="Select an icon" name="icon" required>
                 <?php
                 if (mysqli_num_rows($incomeIconResult) >0) {
                     while ($icons = mysqli_fetch_assoc($incomeIconResult)){
@@ -101,6 +104,15 @@ $incomeIconResult = executeQuery($getIncomeIconQuery);
             $('.selectpicker').selectpicker();
         });
     </script>
+
+      <script>
+        setTimeout(function () {
+            var alertElement = document.getElementById('myAlert');
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }, 2000); 
+    </script>
+
 
 
 </body>

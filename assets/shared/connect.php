@@ -12,6 +12,8 @@
 		echo "can't connect to database";
 	}
 
+date_default_timezone_set('Asia/Manila');
+
   function executeQuery($query){
     $conn = $GLOBALS['conn'];
     return mysqli_query($conn, $query);

@@ -162,7 +162,7 @@ if (!empty($user['displayedBadges'])) {
       <?php
       $links = [
         ["Home", "home/home.php", "Home_SB.png"],
-        ["Income & Expenses", "income&expenses/income&expenses.php", "I&E_SB.png"],
+        ["Income & Expenses", "income&expenses/income_expenses.php", "I&E_SB.png"],
         ["Savings Goals", "savings/savingDetail.php", "Savings_SB.png"],
         ["Cointrol", "cointrol/cointrol.php", "Cointrol_SB.png"],
         ["Saving Strategies", "savingstrategies/savingstrat.php", "SavingStrat_SB.png"],
