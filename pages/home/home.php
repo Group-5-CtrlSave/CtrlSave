@@ -34,8 +34,18 @@ $expenseResult = executeQuery($expenseQuery);
 $expenseRow = mysqli_fetch_assoc($expenseResult);
 $todayExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
 
-// total balance
-$todayBalance = $todayIncome - $todayExpense;
+/* 🔥 TOTAL SAVINGS (deduct but NOT counted as expense) */
+$savingsQuery = "
+  SELECT SUM(currentAmount) AS totalSavings
+  FROM tbl_savinggoals
+  WHERE userID = '$userID'
+";
+$savingsResult = executeQuery($savingsQuery);
+$savingsRow = mysqli_fetch_assoc($savingsResult);
+$totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings'] : 0;
+
+/* 🧮 FINAL BALANCE: Income – Expense – Savings */
+$todayBalance = $todayIncome - $todayExpense - $totalSavings;
 ?>
 
 <!DOCTYPE html>
@@ -174,9 +184,7 @@ $todayBalance = $todayIncome - $todayExpense;
 
       <div class="container" style="margin-top: 120px; padding-bottom: 120px;">
 
-        <!-- Bg -->
-        <div
-          style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
         </div>
 
         <!-- Income|Expense|Balance -->
