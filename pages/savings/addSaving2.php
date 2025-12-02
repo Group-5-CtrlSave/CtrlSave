@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include("../../assets/shared/connect.php");
@@ -20,6 +19,26 @@ $goalIcon = $_SESSION['goalIcon'] ?? '';
 $iconFilename = basename($goalIcon);
 $displayIconRel = $iconFilename ? "../../assets/img/shared/categories/expense/" . $iconFilename : '';
 
+// Get user's available balance
+$incomeQuery = "SELECT SUM(amount) AS totalIncome FROM tbl_income WHERE userID = '$userID'";
+$incomeResult = mysqli_query($conn, $incomeQuery);
+$incomeRow = mysqli_fetch_assoc($incomeResult);
+$totalIncome = $incomeRow['totalIncome'] !== null ? $incomeRow['totalIncome'] : 0;
+
+$expenseQuery = "SELECT SUM(amount) AS totalExpense FROM tbl_expense WHERE userID = '$userID'";
+$expenseResult = mysqli_query($conn, $expenseQuery);
+$expenseRow = mysqli_fetch_assoc($expenseResult);
+$totalExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
+
+// Get total amount in ALL savings goals
+$savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID'";
+$savingsResult = mysqli_query($conn, $savingsQuery);
+$savingsRow = mysqli_fetch_assoc($savingsResult);
+$totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings'] : 0;
+
+// Available Balance = Income - Expenses - Total Savings
+$availableBalance = $totalIncome - $totalExpense - $totalSavings;
+
 if (isset($_POST['btnAddGoalConfirmed'])) {
     $goalName = mysqli_real_escape_string($conn, $_POST['goalName'] ?? $goalName);
     $goalIcon = basename(mysqli_real_escape_string($conn, $_POST['goalIcon'] ?? $iconFilename));
@@ -33,6 +52,12 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
 
     if ($currentAmount > $targetAmount) {
         echo "<script>alert('Current balance cannot exceed goal amount!'); window.history.back();</script>";
+        exit();
+    }
+
+    // Check if current amount exceeds available balance
+    if ($currentAmount > $availableBalance) {
+        echo "<script>alert('Insufficient balance! Your available balance is ₱" . number_format($availableBalance, 2) . "'); window.history.back();</script>";
         exit();
     }
 
@@ -105,6 +130,13 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     .icon-list::-webkit-scrollbar { width: 0px; background: transparent; }
     .icon-list { scrollbar-width: none; -ms-overflow-style: none; }
     .icon-list::-webkit-scrollbar-thumb { background: transparent; }
+
+    .balance-info {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body class="m-0 overflow-hidden" style="background-color: #44B87D; height: 100vh;">
@@ -130,6 +162,15 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
         </div>
       <?php endif; ?>
 
+      <!-- Available Balance Display -->
+      <div class="balance-info text-center mb-3">
+        <small class="text-white">Available Balance</small>
+        <h5 class="text-white fw-bold mb-0">₱<?php echo number_format($availableBalance, 2); ?></h5>
+      </div>
+
+      <input type="hidden" name="goalName" value="<?= htmlspecialchars($goalName) ?>">
+      <input type="hidden" name="goalIcon" value="<?= htmlspecialchars($iconFilename) ?>">
+
       <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Goal Amount</label>
       <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;" id="goalAmountWrapper">
         <input type="number" name="goalAmount" id="goalAmount" placeholder="Enter amount" step="0.01" 
@@ -140,10 +181,12 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
       <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Current Balance</label>
       <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-3" style="height: 50px;" id="currentBalanceWrapper">
         <input type="number" name="currentBalance" id="currentBalance" placeholder="Enter balance" step="0.01" 
+               max="<?php echo $availableBalance; ?>"
                class="border-0 bg-transparent fw-semibold flex-grow-1" style="outline: none; font-size: 15px;" required>
         <span class="text-warning fw-bold">PHP</span>
       </div>
       <div id="balanceError" class="error-message" style="display:none;">Current balance cannot exceed goal amount</div>
+      <div id="insufficientBalanceError" class="error-message" style="display:none;">Insufficient balance. Available: ₱<?php echo number_format($availableBalance, 2); ?></div>
 
       <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Target Date</label>
       <div class="d-flex align-items-center justify-content-between bg-white rounded-3 px-3 mb-4" style="height: 50px;">
@@ -195,28 +238,48 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
   const currentBalance = document.getElementById("currentBalance");
   const targetDate = document.getElementById("targetDate");
   const balanceError = document.getElementById("balanceError");
+  const insufficientBalanceError = document.getElementById("insufficientBalanceError");
   const currentBalanceWrapper = document.getElementById("currentBalanceWrapper");
   const goalForm = document.getElementById("goalForm");
+  const availableBalance = <?php echo $availableBalance; ?>;
 
   function validateBalance() {
     const goal = parseFloat(goalAmount.value) || 0;
     const current = parseFloat(currentBalance.value) || 0;
     
+    // Reset errors
+    balanceError.style.display = "none";
+    insufficientBalanceError.style.display = "none";
+    currentBalanceWrapper.classList.remove("error");
+    
+    if (currentBalance.value.trim() === "") {
+      return true; // Don't show error if field is empty
+    }
+    
+    // Check if current amount exceeds available balance
+    if (current > availableBalance) {
+      insufficientBalanceError.style.display = "block";
+      currentBalanceWrapper.classList.add("error");
+      return false;
+    }
+    
+    // Check if current balance exceeds goal amount
     if (current > goal && goal > 0) {
       balanceError.style.display = "block";
       currentBalanceWrapper.classList.add("error");
       return false;
-    } else {
-      balanceError.style.display = "none";
-      currentBalanceWrapper.classList.remove("error");
-      return true;
     }
+    
+    return true;
   }
 
   function checkFields(){
-    const allFilled = goalAmount.value.trim() !== "" && 
-                     currentBalance.value.trim() !== "" && 
-                     targetDate.value.trim() !== "";
+    // Check if fields have values - allow 0 for currentBalance
+    const goalFilled = goalAmount.value.trim() !== "";
+    const balanceFilled = currentBalance.value.trim() !== "";
+    const dateFilled = targetDate.value.trim() !== "";
+    
+    const allFilled = goalFilled && balanceFilled && dateFilled;
     const balanceValid = validateBalance();
     
     if (allFilled && balanceValid) {
@@ -231,12 +294,21 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
   targetDate.addEventListener("input", checkFields);
 
   goalForm.addEventListener("submit", function(e) {
+    const current = parseFloat(currentBalance.value) || 0;
+    
+    if (current > availableBalance) {
+      e.preventDefault();
+      alert("Insufficient balance! Your available balance is ₱" + availableBalance.toFixed(2));
+      return;
+    }
+    
     if (!validateBalance()) {
       e.preventDefault();
       alert("Current balance cannot exceed goal amount!");
     }
   });
 
+  // Initial check on page load
   checkFields();
 </script>
 </body>
