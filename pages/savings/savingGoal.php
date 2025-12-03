@@ -160,6 +160,10 @@ $result = mysqli_query($conn, $query);
             $progress = 0;
           }
           $progress = min(100, max(0, $progress));
+          
+          // Use floor to only show 100% when truly complete
+          $displayProgress = floor($progress);
+          
           $iconFile = trim($row['icon'] ?? '');
           $iconFileEsc = $iconFile !== '' ? htmlspecialchars($iconFile) : "Default.png";
           $icon = "../../assets/img/shared/categories/expense/" . $iconFileEsc;
@@ -188,7 +192,7 @@ $result = mysqli_query($conn, $query);
                 <?php if ($progress >= 100): ?>
                   <div class="ms-3 small fw-semibold text-success">Complete</div>
                 <?php else: ?>
-                  <div class="ms-3 small fw-medium" style="color: #44B87D;"><?= round($progress) ?>%</div>
+                  <div class="ms-3 small fw-medium" style="color: #44B87D;"><?= $displayProgress ?>%</div>
                 <?php endif; ?>
               </div>
             </div>

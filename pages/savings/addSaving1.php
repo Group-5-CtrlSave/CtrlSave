@@ -60,6 +60,35 @@ $icons = [
       pointer-events: auto;
       opacity: 1;
     }
+    
+    #continueBtn:focus,
+    #continueBtn:active,
+    #continueBtn:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+    
+    .btn:focus,
+    .btn:active,
+    .btn:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    
+    button:focus,
+    button:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    #continueBtn {
+      border: none !important;
+    }
   </style>
 </head>
 <body class="m-0 overflow-hidden" style="background-color: #44B87D; height: 100vh;">
@@ -98,7 +127,7 @@ $icons = [
     <div class="p-3">
       <button type="submit" id="continueBtn"
          class="btn w-100 fw-semibold d-flex justify-content-center align-items-center"
-         style="background-color: #F6D25B; border-radius: 999px; height: 50px; font-size: 16px;">
+         style="background-color: #F6D25B; border-radius: 999px; height: 50px; font-size: 16px; outline: none; box-shadow: none; border: none;">
         Continue
       </button>
     </div>
