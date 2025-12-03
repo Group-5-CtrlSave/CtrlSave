@@ -34,23 +34,14 @@ if (isset($_POST['btnLogin'])) {
 
             $userID = $row['userID'];
 
-            /* ---------------------------------------------------------
-               1) INSERT LOGIN HISTORY
-            --------------------------------------------------------- */
+            // INSERT LOGIN HISTORY
             $insertLogin = "
                 INSERT INTO tbl_loginhistory (userID, loginDate)
                 VALUES ($userID, NOW())
             ";
             $conn->query($insertLogin);
 
-
-            /* ---------------------------------------------------------
-               2) DAILY LOGIN CHALLENGE - AUTO COMPLETE
-               challengeID must match your "Login to CtrlSave" daily challenge
-               Example: challengeID = 1  (change if needed)
-            --------------------------------------------------------- */
-
-            $dailyLoginChallengeID = 1; // <-- update with your real challengeID
+            $dailyLoginChallengeID = 1; // update with your real challengeID
 
             // Check if assigned & in progress
             $checkDaily = "
@@ -78,14 +69,7 @@ if (isset($_POST['btnLogin'])) {
                 $conn->query($updateDaily);
             }
 
-
-            /* ---------------------------------------------------------
-               3) WEEKLY LOGIN CHALLENGE (5 days)
-               challengeID must match your "Login 5 days" weekly challenge
-               Example: challengeID = 6  (change if needed)
-            --------------------------------------------------------- */
-
-            $weeklyLoginChallengeID = 6;  // <-- update with your real challengeID
+            $weeklyLoginChallengeID = 6;  // update with your real challengeID
 
             // Count distinct login days this week
             $countLogin = "

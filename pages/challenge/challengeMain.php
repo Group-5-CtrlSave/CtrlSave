@@ -193,27 +193,27 @@ executeQuery($updateWeekly);
 
     <!-- READ CHALLENGES QUERY -->
     <?php
-    // Use intval to be safe if userID not numeric
+
     $userID = intval($userID);
 
     $dailyquery = "
-        SELECT c.challengeID, c.challengeName, c.exp, c.type,
-               u.userChallengeID, u.userID, u.assignedDate, u.status, u.claimedAt, u.completedAt
-        FROM tbl_challenges c
-        INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
-        WHERE u.userID = {$userID}
-          AND c.type = 'Daily'
-    ";
+    SELECT c.challengeID, c.challengeName, c.exp, c.type, c.quantity,
+           u.userChallengeID, u.userID, u.assignedDate, u.status, u.claimedAt, u.completedAt
+    FROM tbl_challenges c
+    INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
+    WHERE u.userID = {$userID}
+      AND c.type = 'Daily'
+";
     $dailyresult = executeQuery($dailyquery);
 
     $weeklyquery = "
-        SELECT c.challengeID, c.challengeName, c.exp, c.type,
-               u.userChallengeID, u.userID, u.assignedDate, u.status, u.claimedAt, u.completedAt
-        FROM tbl_challenges c
-        INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
-        WHERE u.userID = {$userID}
-          AND c.type = 'Weekly'
-    ";
+    SELECT c.challengeID, c.challengeName, c.exp, c.type, c.quantity,
+           u.userChallengeID, u.userID, u.assignedDate, u.status, u.claimedAt, u.completedAt
+    FROM tbl_challenges c
+    INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
+    WHERE u.userID = {$userID}
+      AND c.type = 'Weekly'
+";
     $weeklyresult = executeQuery($weeklyquery);
     ?>
 
