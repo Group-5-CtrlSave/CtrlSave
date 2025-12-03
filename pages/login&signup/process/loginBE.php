@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 include("../../assets/shared/connect.php");
 
 if (isset($_POST['btnLogin'])) {
@@ -12,7 +10,7 @@ if (isset($_POST['btnLogin'])) {
     // Escape inputs to avoid SQL injection
     $emailUsernameEsc = $conn->real_escape_string($emailUsername);
 
-    // Query without prepared statements
+    // Query user
     $sql = "
         SELECT userID, userName, email, password
         FROM tbl_users
@@ -29,12 +27,107 @@ if (isset($_POST['btnLogin'])) {
 
         if (password_verify($password, $row['password'])) {
 
+            // SESSION
             $_SESSION['userID']   = $row['userID'];
             $_SESSION['userName'] = $row['userName'];
             $_SESSION['email']    = $row['email'];
 
+            $userID = $row['userID'];
+
+            /* ---------------------------------------------------------
+               1) INSERT LOGIN HISTORY
+            --------------------------------------------------------- */
+            $insertLogin = "
+                INSERT INTO tbl_loginhistory (userID, loginDate)
+                VALUES ($userID, NOW())
+            ";
+            $conn->query($insertLogin);
+
+
+            /* ---------------------------------------------------------
+               2) DAILY LOGIN CHALLENGE - AUTO COMPLETE
+               challengeID must match your "Login to CtrlSave" daily challenge
+               Example: challengeID = 1  (change if needed)
+            --------------------------------------------------------- */
+
+            $dailyLoginChallengeID = 1; // <-- update with your real challengeID
+
+            // Check if assigned & in progress
+            $checkDaily = "
+                SELECT userChallengeID
+                FROM tbl_userchallenges
+                WHERE userID = $userID
+                AND challengeID = $dailyLoginChallengeID
+                AND status = 'in progress'
+                LIMIT 1
+            ";
+
+            $resultDaily = $conn->query($checkDaily);
+
+            if ($resultDaily && $resultDaily->num_rows > 0) {
+                $rowDaily = $resultDaily->fetch_assoc();
+                $ucID = $rowDaily['userChallengeID'];
+
+                // Mark as completed
+                $updateDaily = "
+                    UPDATE tbl_userchallenges
+                    SET status = 'completed',
+                        completedAt = NOW()
+                    WHERE userChallengeID = $ucID
+                ";
+                $conn->query($updateDaily);
+            }
+
+
+            /* ---------------------------------------------------------
+               3) WEEKLY LOGIN CHALLENGE (5 days)
+               challengeID must match your "Login 5 days" weekly challenge
+               Example: challengeID = 6  (change if needed)
+            --------------------------------------------------------- */
+
+            $weeklyLoginChallengeID = 6;  // <-- update with your real challengeID
+
+            // Count distinct login days this week
+            $countLogin = "
+                SELECT COUNT(DISTINCT DATE(loginDate)) AS daysLogged
+                FROM tbl_loginhistory
+                WHERE userID = $userID
+                AND YEARWEEK(loginDate) = YEARWEEK(NOW());
+            ";
+            $countResult = $conn->query($countLogin);
+            $countRow = $countResult->fetch_assoc();
+            $daysLogged = $countRow['daysLogged'];
+
+            if ($daysLogged >= 5) {
+
+                $checkWeekly = "
+                    SELECT userChallengeID
+                    FROM tbl_userchallenges
+                    WHERE userID = $userID
+                    AND challengeID = $weeklyLoginChallengeID
+                    AND status = 'in progress'
+                    LIMIT 1
+                ";
+                $resultWeekly = $conn->query($checkWeekly);
+
+                if ($resultWeekly && $resultWeekly->num_rows > 0) {
+                    $rowWeekly = $resultWeekly->fetch_assoc();
+                    $ucIDweek = $rowWeekly['userChallengeID'];
+
+                    $updateWeekly = "
+                        UPDATE tbl_userchallenges
+                        SET status = 'completed',
+                            completedAt = NOW()
+                        WHERE userChallengeID = $ucIDweek
+                    ";
+                    $conn->query($updateWeekly);
+                }
+            }
+
+            // Redirect to home
             header("Location: ../home/home.php");
             exit;
+
         } else {
             $error = "Incorrect Password";
         }

@@ -44,7 +44,7 @@ if (isset($_POST['signup'])) {
             $_SESSION['userID'] = $newUserID;
 
             // INITIALIZE USER CATEGORIES USING ONLY WHILE
-            
+
             $categoriesToInsert = [];
 
             // Income categories 
@@ -64,7 +64,7 @@ if (isset($_POST['signup'])) {
                     $row['defaultCategoryID'],
                     $row['defaultNecessityType'],
                     $row['defaultIsFlexible'],
-                    1 
+                    1
                 ];
             }
 
@@ -103,13 +103,13 @@ if (isset($_POST['signup'])) {
             // INSERT USER CATEGORIES USING QUERY
             foreach ($categoriesToInsert as $cat) {
 
-                $catName      = $conn->real_escape_string($cat[0]);
-                $catType      = $conn->real_escape_string($cat[1]);
-                $catIcon      = $conn->real_escape_string($cat[2]);
-                $catDefaultID = (int)$cat[3];
+                $catName = $conn->real_escape_string($cat[0]);
+                $catType = $conn->real_escape_string($cat[1]);
+                $catIcon = $conn->real_escape_string($cat[2]);
+                $catDefaultID = (int) $cat[3];
                 $catNecessity = $conn->real_escape_string($cat[4]);
-                $catFlexible  = (int)$cat[5];
-                $catSelected  = (int)$cat[6];
+                $catFlexible = (int) $cat[5];
+                $catSelected = (int) $cat[6];
 
                 $insertCatSql = "
                     INSERT INTO tbl_usercategories
@@ -139,6 +139,28 @@ if (isset($_POST['signup'])) {
 
             if (!$conn->query($insertBudgetSql)) {
                 throw new Exception("Budget version insertion failed.");
+            }
+
+
+            // --- NEW: Initialize user challenges ---
+            $challengeQuery = "SELECT challengeID FROM tbl_challenges";
+            $challengeResult = $conn->query($challengeQuery);
+
+            if ($challengeResult && $challengeResult->num_rows > 0) {
+                while ($row = $challengeResult->fetch_assoc()) {
+                    $challengeID = (int) $row['challengeID'];
+
+                    $insertUserChallenge = "
+            INSERT INTO tbl_userchallenges
+            (challengeID, userID, status, assignedDate, completedAt, claimedAt)
+            VALUES
+            ($challengeID, $newUserID, 'in progress', NOW(), NULL, NULL)
+        ";
+
+                    if (!$conn->query($insertUserChallenge)) {
+                        throw new Exception("Failed to insert user challenge ID $challengeID");
+                    }
+                }
             }
 
             // COMMIT
