@@ -222,7 +222,7 @@ if ($result && mysqli_num_rows($result) > 0) {
       style="width: 140px; height: 140px;">
       <img src="<?php echo $icon; ?>" alt="Goal Icon" style="width: 100px;">
       <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #000000ff;">
-        <?php echo $isComplete ? 'Complete' : round($progress) . '%'; ?>
+      <?php echo $isComplete ? 'Complete' : floor($progress) . '%'; ?>
       </div>
     </div>
 

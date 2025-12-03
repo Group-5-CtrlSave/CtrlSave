@@ -127,6 +127,35 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
       opacity: 1;
     }
 
+    .save-btn:focus,
+    .save-btn:active,
+    .save-btn:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    .btn:focus,
+    .btn:active,
+    .btn:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    button:focus,
+    button:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .save-btn {
+      border: none !important;
+    }
+
     .icon-list::-webkit-scrollbar { width: 0px; background: transparent; }
     .icon-list { scrollbar-width: none; -ms-overflow-style: none; }
     .icon-list::-webkit-scrollbar-thumb { background: transparent; }
@@ -225,7 +254,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
     <div class="progress-line"></div>
     <div class="p-3">
       <button type="submit" name="btnAddGoalConfirmed" class="btn w-100 fw-semibold d-flex justify-content-center align-items-center save-btn"
-              style="background-color: #F6D25B; border-radius: 999px; height: 50px; font-size: 16px;">
+              style="background-color: #F6D25B; border-radius: 999px; height: 50px; font-size: 16px; outline: none; box-shadow: none; border: none;">
         Save
       </button>
     </div>
