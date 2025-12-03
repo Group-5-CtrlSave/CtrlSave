@@ -133,7 +133,7 @@ if (isset($_POST['signup'])) {
 
             // CREATE BUDGET VERSION
             $insertBudgetSql = "
-                INSERT INTO tbl_userbudgetversion (userID, balance, isActive)
+                INSERT INTO tbl_userbudgetversion (userID, totalIncome, isActive)
                 VALUES ($newUserID, 0.00, 1)
             ";
 
@@ -142,7 +142,7 @@ if (isset($_POST['signup'])) {
             }
 
 
-            // --- NEW: Initialize user challenges ---
+            // Initialize user challenges 
             $challengeQuery = "SELECT challengeID FROM tbl_challenges";
             $challengeResult = $conn->query($challengeQuery);
 

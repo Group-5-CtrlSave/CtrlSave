@@ -42,7 +42,7 @@ function updateExpenseChallenges($userID, $conn) {
     $weeklyResult = mysqli_query($conn, $checkWeekly);
     $row = mysqli_fetch_assoc($weeklyResult);
 
-    if ($row['total'] >= 1) {
+    if ($row['total'] >= 3) {
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
             SET status = 'completed', completedAt = NOW()
@@ -63,22 +63,21 @@ function updateIncomeChallenges($userID, $conn) {
         SELECT COUNT(*) AS total
         FROM tbl_income
         WHERE userID = $userID
-          AND YEARWEEK(dateAdded, 1) = YEARWEEK(CURDATE(), 1)
+        AND YEARWEEK(dateReceived, 1) = YEARWEEK(CURDATE(), 1)
     ";
 
     $weeklyIncomeResult = mysqli_query($conn, $checkWeeklyIncome);
     $row = mysqli_fetch_assoc($weeklyIncomeResult);
 
-    // User must add 3 incomes in a week
-    if ($row['total'] >= 3) {
+    if ($row['total'] >= 1) {
 
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
             SET status = 'completed',
-                completedAt = NOW()
+            completedAt = NOW()
             WHERE userID = $userID
-              AND challengeID = $weeklyIncomeID
-              AND status = 'in progress'
+            AND challengeID = $weeklyIncomeID
+            AND status = 'in progress'
         ");
 
     }

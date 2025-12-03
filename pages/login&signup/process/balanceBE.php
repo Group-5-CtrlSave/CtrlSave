@@ -33,9 +33,7 @@ if (isset($_POST['submit'])) {
 
         $balance = floatval($clean);
 
-        // ======================================
-        // 1. Get Active Budget Version
-        // ======================================
+        // Get Active Budget Version
         $sqlBudget = "
             SELECT userBudgetversionID 
             FROM tbl_userbudgetversion 
@@ -52,9 +50,7 @@ if (isset($_POST['submit'])) {
             $budgetRow = $rBudget->fetch_assoc();
             $userBudgetversionID = (int)$budgetRow['userBudgetversionID'];
 
-            // ======================================
-            // 2. Get Allowance Category (defaultCategoryID = 1)
-            // ======================================
+            // Get Allowance Category 
             $sqlCategory = "
                 SELECT userCategoryID 
                 FROM tbl_usercategories 
@@ -70,22 +66,18 @@ if (isset($_POST['submit'])) {
                 $catRow = $rCategory->fetch_assoc();
                 $allowanceCategoryID = (int)$catRow['userCategoryID'];
 
-                // ======================================
-                // 3. Update budget version balance
-                // ======================================
+                // Update budget version balance
                 $balanceEsc = $conn->real_escape_string($balance);
 
                 $updateSql = "
                     UPDATE tbl_userbudgetversion 
-                    SET balance = $balanceEsc 
+                    SET totalIncome = $balanceEsc 
                     WHERE userBudgetversionID = $userBudgetversionID
                 ";
 
                 $updateSuccess = $conn->query($updateSql);
 
-                // ======================================
-                // 4. Insert income transaction
-                // ======================================
+                // Insert income transaction
                 $note = $conn->real_escape_string("Allowance");
 
                 $insertIncomeSql = "
@@ -102,9 +94,6 @@ if (isset($_POST['submit'])) {
 
                 $incomeSuccess = $conn->query($insertIncomeSql);
 
-                // ======================================
-                // 5. Final redirect
-                // ======================================
                 if ($updateSuccess && $incomeSuccess) {
                     header("Location: pickExpense.php");
                     exit();
