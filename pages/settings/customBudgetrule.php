@@ -14,51 +14,95 @@ $stmt->execute();
 $categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Fetch user allocations (expenses + savings)
-$stmt = $conn->prepare("SELECT * FROM tbl_userallocation WHERE userBudgetruleID = ?");
+// Get user's budget rule ID
+$stmt = $conn->prepare("SELECT userBudgetRuleID FROM tbl_userbudgetrule WHERE userID = ? AND isSelected = 1");
 $stmt->bind_param("i", $userID);
 $stmt->execute();
-$allocations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$ruleResult = $stmt->get_result()->fetch_assoc();
+$userBudgetRuleID = $ruleResult['userBudgetRuleID'] ?? null;
 $stmt->close();
 
-// Map allocations for easy access
+// Fetch user allocations (expenses + savings)
+$allocations = [];
 $allocMap = [];
-foreach ($allocations as $alloc) {
-    if ($alloc['userCategoryID']) {
-        $allocMap[$alloc['userCategoryID']] = [
-            'limitType' => $alloc['limitType'],
-            'value' => $alloc['value'],
-            'necessityType' => $alloc['necessityType']
-        ];
-    } else {
-        $allocMap['saving'] = $alloc['value'];
+if ($userBudgetRuleID) {
+    $stmt = $conn->prepare("SELECT * FROM tbl_userallocation WHERE userBudgetruleID = ?");
+    $stmt->bind_param("i", $userBudgetRuleID);
+    $stmt->execute();
+    $allocations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    // Map allocations for easy access
+    foreach ($allocations as $alloc) {
+        if ($alloc['userCategoryID']) {
+            $allocMap[$alloc['userCategoryID']] = [
+                'limitType' => $alloc['limitType'],
+                'value' => $alloc['value'],
+                'necessityType' => $alloc['necessityType']
+            ];
+        } else if ($alloc['necessityType'] === 'saving') {
+            $allocMap['saving'] = $alloc['value'];
+        }
     }
 }
 
 // ---------------- HANDLE FORM SUBMISSION ----------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Update savings
-    $savingValue = intval(str_replace(',', '', $_POST['savings_value'] ?? 0));
-    $stmt = $conn->prepare("UPDATE tbl_userallocation SET value = ? WHERE userBudgetruleID = ? AND necessityType = 'saving'");
-    $stmt->bind_param("ii", $savingValue, $userID);
-    $stmt->execute();
-    $stmt->close();
+    $conn->begin_transaction();
+    
+    try {
+        // Create or update user budget rule with custom name
+        $customRuleName = "Custom Budget Rule";
+        
+        if ($userBudgetRuleID) {
+            // Update existing rule
+            $stmt = $conn->prepare("UPDATE tbl_userbudgetrule SET ruleName = ?, isSelected = 1 WHERE userBudgetRuleID = ?");
+            $stmt->bind_param("si", $customRuleName, $userBudgetRuleID);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            // Create new rule
+            $stmt = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected) VALUES (?, ?, NOW(), 1)");
+            $stmt->bind_param("is", $userID, $customRuleName);
+            $stmt->execute();
+            $userBudgetRuleID = $conn->insert_id;
+            $stmt->close();
+        }
 
-    // Update each category
-    foreach ($categories as $cat) {
-        $id = $cat['userCategoryID'];
-        $mode = $_POST["category_{$id}_mode"] ?? 'track';
-        $value = intval(str_replace(',', '', $_POST["category_{$id}_value"] ?? 0));
-        $limitType = ($mode === 'limit') ? 1 : 0;
-
-        $stmt = $conn->prepare("UPDATE tbl_userallocation SET value = ?, limitType = ? WHERE userBudgetruleID = ? AND userCategoryID = ?");
-        $stmt->bind_param("iiii", $value, $limitType, $userID, $id);
+        // Delete existing allocations
+        $stmt = $conn->prepare("DELETE FROM tbl_userallocation WHERE userBudgetruleID = ?");
+        $stmt->bind_param("i", $userBudgetRuleID);
         $stmt->execute();
         $stmt->close();
-    }
 
-    header("Location: settings.php");
-    exit();
+        // Insert savings allocation
+        $savingValue = intval(str_replace(',', '', $_POST['savings_value'] ?? 0));
+        $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, 'saving', 0, ?)");
+        $stmt->bind_param("ii", $userBudgetRuleID, $savingValue);
+        $stmt->execute();
+        $stmt->close();
+
+        // Insert each category allocation
+        foreach ($categories as $cat) {
+            $id = $cat['userCategoryID'];
+            $mode = $_POST["category_{$id}_mode"] ?? 'track';
+            $value = intval(str_replace(',', '', $_POST["category_{$id}_value"] ?? 0));
+            $limitType = ($mode === 'limit') ? 1 : 0;
+            $necessityType = $cat['userNecessityType'] ?? 'need';
+
+            $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("iisii", $userBudgetRuleID, $id, $necessityType, $limitType, $value);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        $conn->commit();
+        header("Location: settings.php");
+        exit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        $error = "Error saving budget rule: " . $e->getMessage();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -66,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Update Budget Rule</title>
+<title>Custom Budget Rule</title>
 <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
 <link rel="stylesheet" href="../../assets/css/sideBar.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -88,6 +132,7 @@ input[type="checkbox"] { accent-color:#F6D25B; width:17px; height:17px; cursor:p
 .btn { background-color:#F6D25B; color:black; width:130px; font-weight:bold; border-radius:27px; margin-top:15px; }
 .btn:hover:not(:disabled) { box-shadow:0 12px 16px rgba(0,0,0,0.24);}
 .btn:disabled { opacity:0.6; cursor:not-allowed; }
+.error { color: #ff4444; background: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
 </style>
 </head>
 <body>
@@ -102,8 +147,12 @@ input[type="checkbox"] { accent-color:#F6D25B; width:17px; height:17px; cursor:p
 
 <div class="container-fluid mainContainer">
 <form method="POST" id="budgetRuleForm">
-    <div class="titleContainer"><h2>Update Your Budget Rule</h2></div>
+    <div class="titleContainer"><h2>Create Your Own Budget Rule</h2></div>
     <div class="descContainer"><p>Adjust your monthly spending limits</p></div>
+
+    <?php if($error): ?>
+    <div class="error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
     <div class="tableContainer">
         <div class="row categories">

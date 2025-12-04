@@ -9,6 +9,15 @@ if (!isset($_SESSION['userID'])) {
 }
 $userID = (int) $_SESSION['userID'];
 
+/* ---------------- FETCH USER'S CURRENT RULE ---------------- */
+$currentRuleQuery = "SELECT ruleName FROM tbl_userbudgetrule WHERE userID = ? AND isSelected = 1";
+$stmt = $conn->prepare($currentRuleQuery);
+$stmt->bind_param("i", $userID);
+$stmt->execute();
+$currentRuleResult = $stmt->get_result()->fetch_assoc();
+$currentRuleName = $currentRuleResult['ruleName'] ?? null;
+$stmt->close();
+
 /* ---------------- FETCH DEFAULT RULE + ALLOCATIONS ---------------- */
 $sql = "
     SELECT r.defaultBudgetruleID, r.ruleName, r.ruleDescription,
@@ -156,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Page Body -->
     <div class="container py-4">
-        <h2>Do you follow a budgeting rule?</h2>
+        <h2>Want to change suggested rule?</h2>
         <p class="desc mb-4">Here are some budgeting rules to help<br>you get started on your saving journey.</p>
 
         <div class="row" style="overflow:scroll; height: 290px;">
@@ -167,11 +176,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#rule<?= $r['id'] ?>" aria-expanded="false">
                                 <input class="form-check-input me-2 ruleCheck" type="checkbox" name="ruleOption"
-                                    value="<?= $r['id'] ?>"/>
+                                    value="<?= $r['id'] ?>" <?= ($currentRuleName === $r['ruleName']) ? 'checked' : '' ?>/>
                                 <?= htmlspecialchars($r['ruleName']) ?>
                             </button>
                         </h2>
-                        <div id="rule<?= $r['id'] ?>" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
+                        <div id="rule<?= $r['id'] ?>" class="accordion-collapse collapse <?= ($currentRuleName === $r['ruleName']) ? 'show' : '' ?>" data-bs-parent="#budgetingRulesAccordion">
                             <div class="accordion-body text-center">
                                 <canvas id="chart<?= $r['id'] ?>"></canvas>
                                 <p class="mt-3"><?= htmlspecialchars($r['ruleDescription']) ?></p>
@@ -190,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="text-center mt-4">
-            <button type="submit" id="saveBtn" class="btn btn-warning" disabled>Save Changes</button>
+            <button type="submit" id="saveBtn" class="btn btn-warning">Save Changes</button>
         </div>
     </div>
 </form>
@@ -199,6 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
     const ruleData = <?= json_encode(array_values($rules)) ?>;
     const chartInstances = {};
+    const currentRuleName = <?= json_encode($currentRuleName) ?>;
 
     function createPieChart(id, data) {
         if (chartInstances[id]) return;
@@ -243,6 +253,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (rule.allocations) createPieChart(id, rule.allocations);
         }
+    });
+
+    // Draw chart for currently selected rule on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        ruleData.forEach(rule => {
+            if (rule.ruleName === currentRuleName && rule.allocations) {
+                createPieChart(rule.id, rule.allocations);
+            }
+        });
+        updateSaveButton();
     });
 </script>
 </body>

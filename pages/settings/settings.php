@@ -18,6 +18,28 @@ $stmt->execute();
 $result = $stmt->get_result()->fetch_assoc();
 $currentCurrency = $result['currencyCode'] ?? 'PHP';
 
+// Check if user has a budget rule and determine its type
+$budgetRuleQuery = "SELECT ruleName FROM tbl_userbudgetrule WHERE userID = ? AND isSelected = 1";
+$stmt = $conn->prepare($budgetRuleQuery);
+$stmt->bind_param("i", $userID);
+$stmt->execute();
+$budgetRuleResult = $stmt->get_result()->fetch_assoc();
+$hasSuggestedRule = false;
+$hasCustomRule = false;
+
+if ($budgetRuleResult) {
+    // Check if the rule name matches any default budget rules (suggested rules)
+    $defaultRuleCheck = "SELECT COUNT(*) as count FROM tbl_defaultbudgetrule WHERE ruleName = ?";
+    $stmtCheck = $conn->prepare($defaultRuleCheck);
+    $stmtCheck->bind_param("s", $budgetRuleResult['ruleName']);
+    $stmtCheck->execute();
+    $checkResult = $stmtCheck->get_result()->fetch_assoc();
+    $hasSuggestedRule = ($checkResult['count'] > 0);
+    $hasCustomRule = !$hasSuggestedRule; // If not suggested, it's custom
+    $stmtCheck->close();
+}
+$stmt->close();
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -69,13 +91,13 @@ while ($row = $categoryResult->fetch_assoc()) {
 }
 $stmt->close();
 
-// Cards
+// Cards - disable based on which rule type is active
 $cards = [
     ["title" => "Currency", "desc" => "Select your preferred currency", "modal" => "currency"],
     ["title" => "Needs & Wants", "desc" => "Manage spending categories", "modal" => "needsWants"],
     ["title" => "Budget Rule", "desc" => "Change preferred budgeting method", "modal" => "budgetRule"],
-    ["title" => "Suggested Budget Rule", "desc" => "Recommended budgeting method for you", "link" => "suggestedBudgetrule.php"],
-    ["title" => "Custom Budget Rule", "desc" => "Create your own budgeting method", "link" => "customBudgetrule.php"]
+    ["title" => "Suggested Budget Rule", "desc" => "Recommended budgeting method for you", "link" => "suggestedBudgetrule.php", "disabled" => $hasCustomRule],
+    ["title" => "Custom Budget Rule", "desc" => "Create your own budgeting method", "link" => "customBudgetrule.php", "disabled" => $hasSuggestedRule]
 ];
 ?>
 <!DOCTYPE html>
@@ -91,6 +113,16 @@ $cards = [
 <link rel="stylesheet" href="../../assets/css/home.css">
 <link rel="stylesheet" href="../../assets/css/sideBar.css">
 <link rel="stylesheet" href="../../assets/css/settings.css">
+<style>
+.settings-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.settings-card.disabled .btn {
+    pointer-events: none;
+    opacity: 0.6;
+}
+</style>
 </head>
 <body>
 
@@ -108,15 +140,21 @@ $cards = [
         <div class="settings-container mt-4 mb-4 px-3">
             <div class="d-flex flex-column gap-3">
                 <?php foreach ($cards as $c): ?>
-                <div class="settings-card d-flex justify-content-between align-items-center px-4 py-3 rounded-3" style="background-color:#F0f1f6;">
+                <div class="settings-card d-flex justify-content-between align-items-center px-4 py-3 rounded-3 <?= isset($c['disabled']) && $c['disabled'] ? 'disabled' : '' ?>" style="background-color:#F0f1f6;">
                     <div style="flex: 1; padding-right: 15px;">
                         <div class="fw-bold text-dark mb-1"><?= htmlspecialchars($c["title"]) ?></div>
                         <div class="text-muted small"><?= htmlspecialchars($c["desc"]) ?></div>
                     </div>
                     <?php if (isset($c['link'])): ?>
-                        <a href="<?= $c['link'] ?>" class="btn btn-sm fw-semibold px-4 py-2 bg-yellow-custom" style="flex-shrink: 0; white-space: nowrap;">
-                            Edit
-                        </a>
+                        <?php if (isset($c['disabled']) && $c['disabled']): ?>
+                            <button class="btn btn-sm fw-semibold px-4 py-2 bg-yellow-custom" style="flex-shrink: 0; white-space: nowrap;" disabled>
+                                Edit
+                            </button>
+                        <?php else: ?>
+                            <a href="<?= $c['link'] ?>" class="btn btn-sm fw-semibold px-4 py-2 bg-yellow-custom" style="flex-shrink: 0; white-space: nowrap;">
+                                Edit
+                            </a>
+                        <?php endif; ?>
                     <?php else: ?>
                         <button class="btn btn-sm fw-semibold px-4 py-2 bg-yellow-custom" style="flex-shrink: 0; white-space: nowrap;" onclick="openModal('<?= $c['modal'] ?>')">
                             Edit
@@ -179,11 +217,11 @@ $cards = [
     <div class="modalBox" onclick="event.stopPropagation()">
         <h5 class="fw-bold text-white mb-3">Edit Budget Rule</h5>
         <div class="form-check mb-2 p-3 rounded" style="background-color:#F0F1F6;">
-            <input class="form-check-input" type="radio" name="ruleType" value="suggested" id="suggestedRule" checked onchange="redirectBudgetRule()">
-            <label class="form-check-label fw-semibold text-dark" for="suggestedRule">Use Suggested Rule (50/30/20)</label>
+            <input class="form-check-input" type="radio" name="ruleType" value="suggested" id="suggestedRule" <?= $hasSuggestedRule ? 'checked' : '' ?> onchange="redirectBudgetRule()">
+            <label class="form-check-label fw-semibold text-dark" for="suggestedRule">Use Suggested Rule</label>
         </div>
         <div class="form-check p-3 rounded" style="background-color:#F0F1F6;">
-            <input class="form-check-input" type="radio" name="ruleType" value="custom" id="customRule" onchange="redirectBudgetRule()">
+            <input class="form-check-input" type="radio" name="ruleType" value="custom" id="customRule" <?= $hasCustomRule ? 'checked' : '' ?> onchange="redirectBudgetRule()">
             <label class="form-check-label fw-semibold text-dark" for="customRule">Create My Own</label>
         </div>
         <button type="button" class="btn w-100 fw-semibold bg-yellow-custom mt-3" onclick="closeModal('budgetRule')">Close</button>
