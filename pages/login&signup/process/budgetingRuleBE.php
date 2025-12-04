@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $del->execute();
 
                 // Insert allocations from default into tbl_userallocation
-                $insertAlloc = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, ?, 0, ?)");
+                $insertAlloc = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, ?, 1, ?)");
                 foreach ($rules[$selectedRule]['allocations'] as $alloc) {
                     $necessity = $alloc['category'];  
                     $value = (int) $alloc['percentage'];

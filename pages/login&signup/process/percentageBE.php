@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             $allocation_data = [
                 'userCategoryID' => $id,
                 'necessityType' => $category['userNecessityType'],
-                'limitType' => ($mode == 'limit') ? 1 : 0, 
+                'limitType' => ($mode == 'limit') ? 2 : 0, 
                 'value' => 0.00 
             ];
 
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             $savings_allocation = [
                 'userCategoryID' => $savingsCategory['userCategoryID'],
                 'necessityType' => 'saving', 
-                'limitType' => 1, 
+                'limitType' => 2, 
                 'value' => (float)$cleaned_savings_value 
             ];
             $allocations[] = $savings_allocation;

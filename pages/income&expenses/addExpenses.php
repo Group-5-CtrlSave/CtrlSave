@@ -2,6 +2,8 @@
 <?php session_start() ?>
 <?php include ('process/addExpenseprocess.php')?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -80,7 +82,7 @@
                 <label class="form-check-label label" for="amount"><b>Amount</b></label>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text">₱</span>
-                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount" required>
+                    <input type="number" step="0.01" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount" required>
                 </div>
             </div>
 

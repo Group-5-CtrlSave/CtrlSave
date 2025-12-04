@@ -1,3 +1,4 @@
+<?php include ('../../assets/shared/scripts/dailyoverspendingfunction.php') ?>
 <?php
 // userID
 $userID = '';
@@ -5,6 +6,8 @@ if (isset($_SESSION['userID'])){
     $userID = $_SESSION['userID'];
    
 }
+
+
 ?>
 
 
@@ -66,11 +69,12 @@ if (isset($_POST['addExpense'])) {
 
 
     (!empty($dueDate)) ? $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`, `recurringID`,`userBudgetversionID`) 
-        VALUES ('$userID','$amount','$categoryID','','$dueDate','$isRecurring','$note', '$lastRecurringID', '1')" :  $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
+        VALUES ('$userID','$amount','$categoryID',NULL,'$dueDate','$isRecurring','$note', '$lastRecurringID', '1')" :  $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
         VALUES ('$userID','$amount','$categoryID',NULL,'$isRecurring','$note', '$lastRecurringID' , '1')" ;
     
    
     executeQuery($addExpensesQuery);
+    checkDailyOverspending($userID);
     $_SESSION["successtag"] = "Expense succefully added!";
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
