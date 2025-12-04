@@ -3,7 +3,7 @@
 // EXPENSE CHALLENGES
 function updateExpenseChallenges($userID, $conn) {
 
-    // DAILY EXPENSE CHALLENGE
+    // DAILY: Add 1 expense today
     $dailyID = 2;
 
     $checkDaily = "
@@ -16,7 +16,6 @@ function updateExpenseChallenges($userID, $conn) {
     $dailyResult = mysqli_query($conn, $checkDaily);
 
     if ($dailyResult && mysqli_num_rows($dailyResult) > 0) {
-
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
             SET status = 'completed', completedAt = NOW()
@@ -26,7 +25,7 @@ function updateExpenseChallenges($userID, $conn) {
         ");
     }
 
-    // WEEKLY EXPENSE CHALLENGE 
+    // WEEKLY: Add 3 expenses
     $weeklyID = 9;
 
     $checkWeekly = "
@@ -38,12 +37,11 @@ function updateExpenseChallenges($userID, $conn) {
     $weeklyResult = mysqli_query($conn, $checkWeekly);
     $row = mysqli_fetch_assoc($weeklyResult);
 
-
     if ($row['total'] >= 3) {
-
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
-            SET status = 'completed', completedAt = NOW()
+            SET status = 'completed',
+                completedAt = NOW()
             WHERE userID = $userID
               AND challengeID = $weeklyID
               AND status = 'in progress'
@@ -51,10 +49,12 @@ function updateExpenseChallenges($userID, $conn) {
     }
 }
 
+
+
 // INCOME CHALLENGES
 function updateIncomeChallenges($userID, $conn) {
 
-    // WEEKLY INCOME CHALLENGE 
+    // WEEKLY: Add 1 income
     $weeklyIncomeID = 10;
 
     $checkWeeklyIncome = "
@@ -63,12 +63,10 @@ function updateIncomeChallenges($userID, $conn) {
         WHERE userID = $userID
           AND YEARWEEK(dateReceived, 1) = YEARWEEK(CURDATE(), 1)
     ";
-
     $weeklyIncomeResult = mysqli_query($conn, $checkWeeklyIncome);
     $row = mysqli_fetch_assoc($weeklyIncomeResult);
 
     if ($row['total'] >= 1) {
-
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
             SET status = 'completed',
@@ -80,9 +78,10 @@ function updateIncomeChallenges($userID, $conn) {
     }
 }
 
-// SAVING STRATEGY
-function updateSavingVideoChallenge($userID, $conn) {
 
+
+// SAVING STRATEGY CHALLENGES
+function updateSavingVideoChallenge($userID, $conn) {
     $challengeID = 3;
 
     mysqli_query($conn, "
@@ -96,7 +95,6 @@ function updateSavingVideoChallenge($userID, $conn) {
 }
 
 function updateSavingArticleChallenge($userID, $conn) {
-
     $challengeID = 8;
 
     mysqli_query($conn, "
@@ -109,39 +107,41 @@ function updateSavingArticleChallenge($userID, $conn) {
     ");
 }
 
-// SAVING Goal
 
+
+// SAVING GOAL DAILY
 function updateSavingGoalDailyChallenge($userID, $conn) {
-    $challengeID = 4; // Daily: Add 1 saving goal
+    $challengeID = 4;
 
-    $sql = "
+    mysqli_query($conn, "
         UPDATE tbl_userchallenges
         SET status = 'completed',
             completedAt = NOW()
         WHERE userID = $userID
           AND challengeID = $challengeID
           AND status = 'in progress'
-    ";
-
-    mysqli_query($conn, $sql);
+    ");
 }
 
-// SAVING Challenge
+
+
+// DAILY SAVING CHALLENGE (Add at least 10 pesos today)
 function updateSavingDaily10Peso($userID, $conn) {
     $challengeID = 5;
 
+    // Sum amount saved today
     $sql = "
-        SELECT id 
+        SELECT SUM(amount) AS totalSaved
         FROM tbl_savingchallenge_progress
         WHERE userID = $userID
-          AND amount = 10
           AND DATE(dateAdded) = CURDATE()
-        LIMIT 1
     ";
 
     $res = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($res);
+    $savedToday = intval($row['totalSaved']);
 
-    if ($res && mysqli_num_rows($res) > 0) {
+    if ($savedToday >= 10) {
         mysqli_query($conn, "
             UPDATE tbl_userchallenges
             SET status = 'completed', completedAt = NOW()
@@ -154,36 +154,57 @@ function updateSavingDaily10Peso($userID, $conn) {
 
 
 
+// WEEKLY SAVING CHALLENGE — Complete ANY full row of 5 slots
 function updateSavingWeeklyRow($userID, $conn) {
     $challengeID = 7;
 
-    // Use itemIndex (0–9) NOT amount
-    $rows = [
-        [0, 1, 2, 3, 4], // Row 1
-        [5, 6, 7, 8, 9]  // Row 2
-    ];
+    // Load user challenge to access slotData
+    $q = mysqli_query($conn, "
+        SELECT slotData
+        FROM tbl_usersavingchallenge
+        WHERE userID = $userID AND status='active'
+        LIMIT 1
+    ");
+    if (!$q || mysqli_num_rows($q) === 0) return;
 
-    foreach ($rows as $row) {
-        $count = 0;
+    $data = mysqli_fetch_assoc($q);
+    $slots = json_decode($data['slotData'], true);
 
-        foreach ($row as $idx) {
-            $query = "
-                SELECT id
-                FROM tbl_savingchallenge_progress
-                WHERE userID = $userID
-                  AND itemIndex = $idx
-                  AND YEARWEEK(dateAdded,1) = YEARWEEK(CURDATE(),1)
-                LIMIT 1
-            ";
+    if (!$slots || count($slots) != 20) return;
 
-            $res = mysqli_query($conn, $query);
-            if ($res && mysqli_num_rows($res) > 0) {
-                $count++;
+    // Break into rows of 5
+    $rows = array_chunk($slots, 5);
+
+    // Get saved progress for this week
+    $savedIndexes = [];
+
+    $res = mysqli_query($conn, "
+        SELECT itemIndex
+        FROM tbl_savingchallenge_progress
+        WHERE userID = $userID
+          AND YEARWEEK(dateAdded,1) = YEARWEEK(CURDATE(),1)
+    ");
+
+    while ($row = mysqli_fetch_assoc($res)) {
+        $savedIndexes[] = intval($row['itemIndex']);
+    }
+
+    // Check each row for full completion
+    foreach ($rows as $rowIndex => $rowSlotValues) {
+
+        $completed = true;
+
+        for ($i = 0; $i < 5; $i++) {
+            $slotIndex = $rowIndex * 5 + $i;
+
+            if (!in_array($slotIndex, $savedIndexes)) {
+                $completed = false;
+                break;
             }
         }
 
-        // If full row (5 items) completed → complete the challenge
-        if ($count === 5) {
+        if ($completed) {
+            // Update challenge
             mysqli_query($conn, "
                 UPDATE tbl_userchallenges
                 SET status = 'completed', completedAt = NOW()
@@ -195,8 +216,5 @@ function updateSavingWeeklyRow($userID, $conn) {
         }
     }
 }
-
-
-
 
 ?>

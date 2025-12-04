@@ -2,18 +2,22 @@
 <html lang="en">
 
 <head>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CtrlSave</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Import Roboto and Poppins -->
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Your Custom CSS -->
     <link rel="stylesheet" href="../../assets/css/landingPage.css">
     <link rel="icon" href="../../assets/img/shared/ctrlsaveLogo.png">
-</head>
 
     <style>
+        /* Center Content */
         .content {
             position: relative;
             display: flex;
@@ -21,27 +25,49 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            text-align: left;
+            text-align: center;
             z-index: 1;
             padding: 0 20px;
+        }
+
+        /* Fade-out animation */
+        .fade-out {
+            animation: fadeOut 0.7s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
     </style>
 </head>
 
 <body>
+
     <div class="wave top"></div>
+
     <div class="content">
-        <div class="logo">
-        </div>
-        <img src="..\..\assets\img\shared\logoName_s.png" alt="CTRLSAVE Title">
+        <img src="../../assets/img/shared/logoName_s.png" alt="CTRLSAVE Title">
     </div>
+
     <div class="wave bottom"></div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Fade + Redirect -->
     <script>
-        document.body.addEventListener('click', function () {
-            window.location.href = '../login&signup/login.php';
-        });
+        // Keep splash visible for 1.5 seconds
+        setTimeout(() => {
+
+            // Add fade-out class
+            document.body.classList.add('fade-out');
+
+            // Redirect after fade is done
+            setTimeout(() => {
+                window.location.href = '../login&signup/login.php';
+            }, 1000); // same duration as CSS fade
+
+        }, 1000);
     </script>
+
 </body>
 
 </html>
