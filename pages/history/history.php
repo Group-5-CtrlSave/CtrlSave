@@ -10,78 +10,47 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'];
 
-// filters (intval = dbl check if legit number )
+// filters
 $daysFilter = isset($_GET['days']) ? intval($_GET['days']) : 30;
 $typeFilter = isset($_GET['type']) ? $_GET['type'] : 'all';
 
 // query for income, expenses, savings
 $query = "
-  SELECT 
-    'expenses' AS type,
-    uc.categoryName AS name,
-    e.amount AS amount,
-    e.dateSpent AS date,
-    uc.type AS categoryType,
-    uc.icon AS icon
+  SELECT 'expenses' AS type, uc.categoryName AS name, e.amount AS amount, e.dateAdded AS date, uc.type AS categoryType, uc.icon AS icon
   FROM tbl_expense e
   JOIN tbl_usercategories uc ON e.userCategoryID = uc.userCategoryID
   WHERE e.userID = '$userID'
 
   UNION ALL
 
-  SELECT 
-    'income' AS type,
-    uc.categoryName AS name,
-    i.amount AS amount,
-    i.dateReceived AS date,
-    uc.type AS categoryType,
-    uc.icon AS icon
+  SELECT 'income' AS type, uc.categoryName AS name, i.amount AS amount, i.dateReceived AS date, uc.type AS categoryType, uc.icon AS icon
   FROM tbl_income i
   JOIN tbl_usercategories uc ON i.userCategoryID = uc.userCategoryID
   WHERE i.userID = '$userID'
 
   UNION ALL
 
-SELECT 
-    'savings' AS type,
-    sg.goalName AS name,
-    gt.amount AS amount,
-    gt.date AS date,
-    'savings' AS categoryType,
-    sg.icon AS icon
-FROM tbl_goaltransactions gt
-JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
-WHERE sg.userID = '$userID'
+  SELECT 'savings' AS type, sg.goalName AS name, gt.amount AS amount, gt.date AS date, 'savings' AS categoryType, sg.icon AS icon
+  FROM tbl_goaltransactions gt
+  JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
+  WHERE sg.userID = '$userID'
 
-UNION ALL
+  UNION ALL
 
-SELECT
-    'savings' AS type,
-    sg.goalName AS name,
-    sg.currentAmount AS amount,
-    sg.createdAt AS date,
-    'savings' AS categoryType,
-    sg.icon AS icon
-FROM tbl_savinggoals sg
-LEFT JOIN tbl_goaltransactions gt ON sg.savingGoalID = gt.savingGoalID
-WHERE sg.userID = '$userID' AND gt.goalTransactionID IS NULL
-
-  ";
+  SELECT 'savings' AS type, sg.goalName AS name, sg.currentAmount AS amount, sg.createdAt AS date, 'savings' AS categoryType, sg.icon AS icon
+  FROM tbl_savinggoals sg
+  LEFT JOIN tbl_goaltransactions gt ON sg.savingGoalID = gt.savingGoalID
+  WHERE sg.userID = '$userID' AND gt.goalTransactionID IS NULL
+";
 
 $query = "SELECT * FROM ($query) AS all_data";
 
 // filters
 $filterParts = [];
-
-// Days 
-if (isset($_GET['days']) && intval($_GET['days']) > 0) {
-  $daysFilter = intval($_GET['days']);
+if ($daysFilter > 0) {
   $filterParts[] = "all_data.date >= DATE_SUB(NOW(), INTERVAL $daysFilter DAY)";
 }
-
-// Type 
-if (isset($_GET['type']) && $_GET['type'] !== 'all') {
-  $typeFilter = strtolower($_GET['type']);
+if ($typeFilter !== 'all') {
   $filterParts[] = "all_data.type = '$typeFilter'";
 }
 
@@ -90,36 +59,35 @@ if (!empty($filterParts)) {
 }
 
 // Desc order
-$query = $query . " ORDER BY all_data.date DESC";
-$result = executeQuery($query);
+$query .= " ORDER BY all_data.date DESC";
 
+// execute query using mysqli
+$result = mysqli_query($conn, $query);
+if (!$result) {
+  die("Query failed: " . mysqli_error($conn));
+}
+
+// function to format time ago
 function formatTimeAgo($datetime)
 {
   $givenTime = strtotime($datetime);
   $currentTime = time();
   $timeDifference = $currentTime - $givenTime;
-  // If less than 60 secs
-  if ($timeDifference < 60) {
+
+  if ($timeDifference < 60)
     return 'Just now';
-  }
-  // If less than 1 hour ago
   elseif ($timeDifference < 3600) {
     $minutes = floor($timeDifference / 60);
-    $label = $minutes > 1 ? 'mins' : 'min';
-    return $minutes . " $label ago";
-  }
-  // If less than 24 hours ago 
-  elseif ($timeDifference < 86400) {
+    return $minutes . " " . ($minutes > 1 ? 'mins' : 'min') . " ago";
+  } elseif ($timeDifference < 86400) {
     $hours = floor($timeDifference / 3600);
-    $label = $hours > 1 ? 'hours' : 'hour';
-    return $hours . " $label ago";
-  }
-  // If more than 1 day ago
-  else {
-    return date('F d, Y | H:i', $givenTime);
+    return $hours . " " . ($hours > 1 ? 'hours' : 'hour') . " ago";
+  } else {
+    return date('F d, Y', $givenTime);
   }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
