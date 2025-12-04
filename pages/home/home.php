@@ -82,7 +82,6 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
       flex-direction: column;
       justify-content: center;
       width: 93%;
-      max-width: none;
     }
 
     .vertical-divider {
@@ -184,7 +183,8 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 
       <div class="container" style="margin-top: 120px; padding-bottom: 120px;">
 
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
+        <div
+          style="position: fixed; top: 0; left: 0; width: 100%; height: 230px; background-color: #44B87D; z-index: 998;">
         </div>
 
         <!-- Income|Expense|Balance -->
@@ -229,36 +229,36 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
             <?php
             // SQL for income and expense limit by 3
             $recentQuery = "
-        (
-            SELECT 
-                i.incomeID AS id,
-                i.amount,
-                i.note,
-                uc.icon AS icon,
-                uc.categoryName AS categoryName,
-                'income' AS type,
-                i.dateReceived AS dateCreated
-            FROM tbl_income i
-            JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
-            WHERE i.userID = '$userID'
-        )
-        UNION ALL
-        (
-            SELECT 
-                e.expenseID AS id,
-                e.amount,
-                e.note,
-                uc.icon AS icon,
-                uc.categoryName AS categoryName,
-                'expense' AS type,
-                e.dateSpent AS dateCreated
-            FROM tbl_expense e
-            JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
-            WHERE e.userID = '$userID'
-        )
-        ORDER BY dateCreated DESC
-        LIMIT 3
-        ";
+      (
+          SELECT 
+              i.incomeID AS id,
+              i.amount,
+              i.note,
+              uc.icon AS icon,
+              uc.categoryName AS categoryName,
+              'income' AS type,
+              i.dateReceived AS dateCreated
+          FROM tbl_income i
+          JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
+          WHERE i.userID = '$userID'
+      )
+      UNION ALL
+      (
+          SELECT 
+              e.expenseID AS id,
+              e.amount,
+              e.note,
+              uc.icon AS icon,
+              uc.categoryName AS categoryName,
+              'expense' AS type,
+              e.dateSpent AS dateCreated
+          FROM tbl_expense e
+          JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
+          WHERE e.userID = '$userID'
+      )
+      ORDER BY dateCreated DESC
+      LIMIT 3
+    ";
 
             $recentResult = executeQuery($recentQuery);
 
@@ -299,20 +299,24 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
                 </div>
                 <?php
               }
+              ?>
+              <div class="text-end mt-1">
+                <a href="../income&expenses/income_expenses.php" class="btn btn-link text-white fw-semibold p-0"
+                  style="font-size: 16px;">See more...</a>
+              </div>
+              <?php
             } else {
               ?>
               <div class="col-12 text-center mt-3">
-                <p class="text-white fw-bold">No recent income or expenses found.</p>
+                <div class="empty-state-container">
+                  <p class="mb-4 empty-state-paragraph-14px" style="font-size: 14px; color: #fff;">
+                    Tap the <b>+</b> button below to add your first income or expense.
+                  </p>
+                </div>
               </div>
               <?php
             }
             ?>
-
-            <!-- See more -->
-            <div class="text-end mt-1">
-              <a href="../income&expenses/income_expenses.php" class="btn btn-link text-white fw-semibold p-0"
-                style="font-size: 16px;">See more...</a>
-            </div>
 
           </div>
         </div>
@@ -329,20 +333,22 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
         </div>
 
         <?php
-        $watchQuery = "
-    SELECT r.resourceID, r.title, r.resourceType, r.link, r.description
-    FROM tbl_resources r
-    LEFT JOIN tbl_user_resource_progress p 
-        ON r.resourceID = p.resourceID AND p.userID = $userID
-    WHERE p.isCompleted = 0 OR p.isCompleted IS NULL
-    ORDER BY r.resourceID ASC
-";
-        $watchResult = executeQuery($watchQuery);
-
-        // array
+        $types = ['video', 'article', 'book'];
         $watchItems = [];
-        if (mysqli_num_rows($watchResult) > 0) {
-          while ($row = mysqli_fetch_assoc($watchResult)) {
+
+        foreach ($types as $type) {
+          $query = "
+        SELECT r.resourceID, r.title, r.resourceType, r.link, r.description
+        FROM tbl_resources r
+        LEFT JOIN tbl_user_resource_progress p 
+            ON r.resourceID = p.resourceID AND p.userID = $userID
+        WHERE (p.isCompleted = 0 OR p.isCompleted IS NULL)
+          AND r.resourceType = '$type'
+        ORDER BY r.resourceID ASC
+        LIMIT 1
+    ";
+          $result = executeQuery($query);
+          if ($row = mysqli_fetch_assoc($result)) {
             $watchItems[] = $row;
           }
         }
@@ -371,7 +377,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
                 </a>
               </div>
 
-              <button class="btn bg-white border w-100 mb-3 text-start fw-semibold" style="border-radius: 20px;"
+              <button class="btn bg-white w-100 mb-3 text-start fw-semibold" style="border-radius: 20px;"
                 onclick="window.open('<?php echo $firstItem['link']; ?>', '_blank')">
                 <?php echo $firstItem['title']; ?>
               </button>
@@ -383,7 +389,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 
             <!-- other small items (mixed since it's just preview) -->
             <?php foreach ($otherItems as $item): ?>
-              <button class="btn bg-white border w-100 mb-2 text-start fw-semibold" style="border-radius: 20px;"
+              <button class="btn bg-white w-100 mb-2 text-start fw-semibold" style="border-radius: 20px;"
                 onclick="window.open('<?php echo $item['link']; ?>', '_blank')">
                 <?php echo $item['title']; ?>
               </button>
@@ -396,18 +402,33 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
             </div>
           </div>
 
-          <!-- HARDCODED PA -->
-          <!-- Daily Challenge -->
+          <?php
+          // Fetch 1st in-progress challenge only
+          $dailyChallengeQuery = "
+    SELECT c.challengeID, c.challengeName, u.userChallengeID, u.status
+    FROM tbl_challenges c
+    INNER JOIN tbl_userchallenges u 
+        ON c.challengeID = u.challengeID
+    WHERE u.userID = $userID 
+      AND LOWER(c.type) = 'daily'
+      AND u.status IN ('in progress', 'completed')
+    ORDER BY u.assignedDate ASC
+    LIMIT 1
+";
+          $dailyChallengeResult = executeQuery($dailyChallengeQuery);
+          $dailyChallenge = mysqli_fetch_assoc($dailyChallengeResult);
+          ?>
+
           <div class="challenge-card p-3">
             <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Daily Saving Challenge</h2>
 
-            <div
-              class="d-flex justify-content-between align-items-center bg-white px-3 py-2 rounded-pill shadow-sm mb-2"
-              style="height: 45px;">
-              <span class="fw-medium text-dark">Login to CtrlSave</span>
-              <button class="btn btn-sm fw-bold"
-                style="background-color: #F6D25B; border-radius: 20px; color: black;">Claim</button>
-            </div>
+            <?php if ($dailyChallenge): ?>
+              <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
+                <span class="fw-medium text-dark"><?php echo ($dailyChallenge['challengeName']); ?></span>
+              </div>
+            <?php else: ?>
+              <p class="text-center text-muted">No daily challenges available.</p>
+            <?php endif; ?>
 
             <div class="text-end mt-2">
               <a href="../challenge/challengeMain.php" class="text-success fw-semibold text-decoration-none">See
@@ -415,56 +436,85 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
             </div>
           </div>
 
-        </div>
+          <?php
+          // Fetch 1st in-progress challenge only
+          $weeklyChallengeQuery = "
+    SELECT c.challengeID, c.challengeName, u.userChallengeID, u.status
+    FROM tbl_challenges c
+    INNER JOIN tbl_userchallenges u 
+        ON c.challengeID = u.challengeID
+    WHERE u.userID = $userID 
+      AND LOWER(c.type) = 'weekly'
+      AND u.status IN ('in progress', 'completed')
+    ORDER BY u.assignedDate ASC
+    LIMIT 1
+";
+          $weeklyChallengeResult = executeQuery($weeklyChallengeQuery);
+          $weeklyChallenge = mysqli_fetch_assoc($weeklyChallengeResult);
+          ?>
 
-      </div>
-    </div>
-  </div>
+          <div class="challenge-card p-3">
+            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Weekly Saving Challenge</h2>
 
-  <!-- Bottom Nav Bar -->
-  <div class="tab-bar d-flex align-items-center">
-    <div class="tab-item">
-      <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
-        <img src="../../assets/img/home/cointrol_Icon.png" class="tab-icon">
-        <div class="tab-label">Cointrol</div>
-      </a>
-    </div>
+            <?php if ($weeklyChallenge): ?>
+              <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
+                <span class="fw-medium text-dark"><?php echo ($weeklyChallenge['challengeName']); ?></span>
+              </div>
+            <?php else: ?>
+              <p class="text-center text-muted">No weekly challenges available.</p>
+            <?php endif; ?>
 
-    <div class="tab-item">
-      <a href="../home/calculator.php" class="text-decoration-none text-dark d-block">
-        <img src="../../assets/img/home/calculator.png" class="tab-icon">
-        <div class="tab-label">Calculator</div>
-      </a>
-    </div>
-  </div>
+            <div class="text-end mt-2">
+              <a href="../challenge/challengeMain.php" class="text-success fw-semibold text-decoration-none">See
+                more...</a>
+            </div>
+          </div>
 
-  <!-- Plus btn -->
-  <button id="plusBtn" data-bs-toggle="modal" data-bs-target="#plusModal">
-    <img src="../../assets/img/shared/plus.png" style="width:24px;height:24px;">
-  </button>
+          <!-- Bottom Nav Bar -->
+          <div class="tab-bar d-flex align-items-center">
+            <div class="tab-item">
+              <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
+                <img src="../../assets/img/home/cointrol_Icon.png" class="tab-icon">
+                <div class="tab-label">Cointrol</div>
+              </a>
+            </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="plusModal" tabindex="-1" aria-labelledby="addIncomeExpenseModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addIncomeExpenseModalLabel">Add Income or Expense</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body d-flex justify-content-center align-items-center">
-          <a href="../income&expenses/addIncome.php">
-            <button type="button" class="btn custom-btn btn-lg addIncomebtn mx-3"><b>Add Income</b></button>
-          </a>
-          <a href="../income&expenses/addExpenses.php">
-            <button type="button" class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="tab-item">
+              <a href="../home/calculator.php" class="text-decoration-none text-dark d-block">
+                <img src="../../assets/img/home/calculator.png" class="tab-icon">
+                <div class="tab-label">Calculator</div>
+              </a>
+            </div>
+          </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+          <!-- Plus btn -->
+          <button id="plusBtn" data-bs-toggle="modal" data-bs-target="#plusModal">
+            <img src="../../assets/img/shared/plus.png" style="width:24px;height:24px;">
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="plusModal" tabindex="-1" aria-labelledby="addIncomeExpenseModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addIncomeExpenseModalLabel">Add Income or Expense</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex justify-content-center align-items-center">
+                  <a href="../income&expenses/addIncome.php">
+                    <button type="button" class="btn custom-btn btn-lg addIncomebtn mx-3"><b>Add Income</b></button>
+                  </a>
+                  <a href="../income&expenses/addExpenses.php">
+                    <button type="button" class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bootstrap JS -->
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
