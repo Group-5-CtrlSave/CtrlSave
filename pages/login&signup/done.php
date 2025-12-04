@@ -1,3 +1,107 @@
+<?php
+session_start();
+include("../../assets/shared/connect.php");
+
+// Make sure user is logged in
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+$userID = (int)$_SESSION['userID'];
+
+if (isset($_POST['btnDone'])) {
+
+    // INSERT LOGIN HISTORY
+    $today = date('Y-m-d');
+
+    $checkLogin = "
+        SELECT loginID
+        FROM tbl_loginhistory
+        WHERE userID = $userID
+          AND DATE(loginDate) = '$today'
+        LIMIT 1
+    ";
+    $resultLogin = $conn->query($checkLogin);
+
+    if ($resultLogin && $resultLogin->num_rows === 0) {
+        $insertLogin = "
+            INSERT INTO tbl_loginhistory (userID, loginDate)
+            VALUES ($userID, NOW())
+        ";
+        $conn->query($insertLogin);
+    }
+
+  
+    $dailyLoginChallengeID = 1; 
+
+    $checkDaily = "
+        SELECT userChallengeID
+        FROM tbl_userchallenges
+        WHERE userID = $userID
+          AND challengeID = $dailyLoginChallengeID
+          AND status = 'in progress'
+        LIMIT 1
+    ";
+    $resultDaily = $conn->query($checkDaily);
+
+    if ($resultDaily && $resultDaily->num_rows > 0) {
+        $rowDaily = $resultDaily->fetch_assoc();
+        $ucID = (int)$rowDaily['userChallengeID'];
+
+        $updateDaily = "
+            UPDATE tbl_userchallenges
+            SET status = 'completed',
+                completedAt = NOW()
+            WHERE userChallengeID = $ucID
+        ";
+        $conn->query($updateDaily);
+    }
+
+    $weeklyLoginChallengeID = 6;
+
+    $countLogin = "
+        SELECT COUNT(DISTINCT DATE(loginDate)) AS daysLogged
+        FROM tbl_loginhistory
+        WHERE userID = $userID
+          AND YEARWEEK(loginDate) = YEARWEEK(NOW())
+    ";
+    $countResult = $conn->query($countLogin);
+    if ($countResult) {
+        $countRow   = $countResult->fetch_assoc();
+        $daysLogged = (int)$countRow['daysLogged'];
+
+        if ($daysLogged >= 5) {
+            $checkWeekly = "
+                SELECT userChallengeID
+                FROM tbl_userchallenges
+                WHERE userID = $userID
+                  AND challengeID = $weeklyLoginChallengeID
+                  AND status = 'in progress'
+                LIMIT 1
+            ";
+            $resultWeekly = $conn->query($checkWeekly);
+
+            if ($resultWeekly && $resultWeekly->num_rows > 0) {
+                $rowWeekly = $resultWeekly->fetch_assoc();
+                $ucIDweek = (int)$rowWeekly['userChallengeID'];
+
+                $updateWeekly = "
+                    UPDATE tbl_userchallenges
+                    SET status = 'completed',
+                        completedAt = NOW()
+                    WHERE userChallengeID = $ucIDweek
+                ";
+                $conn->query($updateWeekly);
+            }
+        }
+    }
+
+    // Redirect to home after everything
+    header("Location: ../home/home.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -98,7 +202,9 @@
         <div class="description">You can now start your saving journey.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
-        <a href="../home/home.php"><button type="submit" class="btn btn-warning mb-3">Next</button></a>
+        <form method="POST">
+            <button type="submit" class="btn btn-warning mb-3" name="btnDone">Next</button>
+        </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
