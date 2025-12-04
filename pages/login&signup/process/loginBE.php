@@ -5,7 +5,7 @@ include("../../assets/shared/connect.php");
 if (isset($_POST['btnLogin'])) {
 
     $emailUsername = trim($_POST['emailUsername']);
-    $password      = trim($_POST['password']);
+    $password = trim($_POST['password']);
 
     // Escape inputs to avoid SQL injection
     $emailUsernameEsc = $conn->real_escape_string($emailUsername);
@@ -28,18 +28,29 @@ if (isset($_POST['btnLogin'])) {
         if (password_verify($password, $row['password'])) {
 
             // SESSION
-            $_SESSION['userID']   = $row['userID'];
+            $_SESSION['userID'] = $row['userID'];
             $_SESSION['userName'] = $row['userName'];
-            $_SESSION['email']    = $row['email'];
+            $_SESSION['email'] = $row['email'];
 
             $userID = $row['userID'];
 
-            // INSERT LOGIN HISTORY
-            $insertLogin = "
-                INSERT INTO tbl_loginhistory (userID, loginDate)
-                VALUES ($userID, NOW())
-            ";
-            $conn->query($insertLogin);
+            // INSERT LOGIN HISTORY (only once per day)
+            $today = date('Y-m-d');
+
+            $checkLogin = "SELECT loginID
+            FROM tbl_loginhistory
+            WHERE userID = $userID
+            AND DATE(loginDate) = '$today'
+            LIMIT 1";
+            
+            $resultLogin = $conn->query($checkLogin);
+
+            if ($resultLogin && $resultLogin->num_rows === 0) {
+                $insertLogin = "INSERT INTO tbl_loginhistory (userID, loginDate)
+                VALUES ($userID, NOW())";
+
+                $conn->query($insertLogin);
+            }
 
             $dailyLoginChallengeID = 1; // update with your real challengeID
 

@@ -31,10 +31,8 @@ if (isset($_POST['signup'])) {
         try {
 
             // INSERT USER
-            $insertUserSql = "
-                INSERT INTO tbl_users (userName, firstName, lastName, email, password)
-                VALUES ('$username', '$fname', '$lname', '$email', '$hashedPassword')
-            ";
+            $insertUserSql = "INSERT INTO tbl_users (userName, firstName, lastName, email, password)
+                VALUES ('$username', '$fname', '$lname', '$email', '$hashedPassword')";
 
             if (!$conn->query($insertUserSql)) {
                 throw new Exception("User insertion failed.");
@@ -48,12 +46,10 @@ if (isset($_POST['signup'])) {
             $categoriesToInsert = [];
 
             // Income categories 
-            $sqlIncome = "
-                SELECT categoryName, type, icon, defaultCategoryID, defaultNecessityType, defaultIsFlexible
+            $sqlIncome = "SELECT categoryName, type, icon, defaultCategoryID, defaultNecessityType, defaultIsFlexible
                 FROM tbl_defaultcategories
                 WHERE type = 'income'
-                ORDER BY defaultCategoryID ASC
-            ";
+                ORDER BY defaultCategoryID ASC";
             $resIncome = $conn->query($sqlIncome);
 
             while ($row = $resIncome->fetch_assoc()) {
@@ -69,12 +65,10 @@ if (isset($_POST['signup'])) {
             }
 
             // Savings category 
-            $sqlSavings = "
-                SELECT defaultCategoryID, icon, defaultnecessityType
+            $sqlSavings = "SELECT defaultCategoryID, icon, defaultnecessityType
                 FROM tbl_defaultcategories
                 WHERE categoryName = 'Savings' AND type = 'savings'
-                LIMIT 1
-            ";
+                LIMIT 1";
             $resSavings = $conn->query($sqlSavings);
 
             if ($row = $resSavings->fetch_assoc()) {
@@ -111,9 +105,8 @@ if (isset($_POST['signup'])) {
                 $catFlexible = (int) $cat[5];
                 $catSelected = (int) $cat[6];
 
-                $insertCatSql = "
-                    INSERT INTO tbl_usercategories
-                    (userID, categoryName, type, icon, userNecessityType, userisFlexible, defaultCategoryID, isSelected)
+                $insertCatSql = "INSERT INTO tbl_usercategories (userID, categoryName, 
+                    type, icon, userNecessityType, userisFlexible, defaultCategoryID, isSelected)
                     VALUES (
                         $newUserID,
                         '$catName',
@@ -132,10 +125,8 @@ if (isset($_POST['signup'])) {
             }
 
             // CREATE BUDGET VERSION
-            $insertBudgetSql = "
-                INSERT INTO tbl_userbudgetversion (userID, totalIncome, isActive)
-                VALUES ($newUserID, 0.00, 1)
-            ";
+            $insertBudgetSql = "INSERT INTO tbl_userbudgetversion (versionNumber, userID, userBudgetRuleID, totalIncome, isActive)
+            VALUES (1, $newUserID, 1, 0.00, 1)";
 
             if (!$conn->query($insertBudgetSql)) {
                 throw new Exception("Budget version insertion failed.");
@@ -150,12 +141,8 @@ if (isset($_POST['signup'])) {
                 while ($row = $challengeResult->fetch_assoc()) {
                     $challengeID = (int) $row['challengeID'];
 
-                    $insertUserChallenge = "
-            INSERT INTO tbl_userchallenges
-            (challengeID, userID, status, assignedDate, completedAt, claimedAt)
-            VALUES
-            ($challengeID, $newUserID, 'in progress', NOW(), NULL, NULL)
-        ";
+                    $insertUserChallenge = "INSERT INTO tbl_userchallenges (challengeID, userID, status, assignedDate, completedAt, claimedAt)
+                    VALUES ($challengeID, $newUserID, 'in progress', NOW(), NULL, NULL)";
 
                     if (!$conn->query($insertUserChallenge)) {
                         throw new Exception("Failed to insert user challenge ID $challengeID");

@@ -15,6 +15,8 @@ $incomeCategoriesResult = executeQuery($getIncomeCategoriesQuery);
 
 <?php
 
+include('../challenge/process/challengeController.php');
+
 if (isset($_POST['addIncome'])){
     $amount = $_POST['amount'];
     $note = $_POST['note'];
@@ -25,7 +27,12 @@ if (isset($_POST['addIncome'])){
     (!empty($date)) ? $addIncomeQuery = "INSERT INTO tbl_income( `userID`, `amount`, `dateReceived`, `note`, `userCategoryID`, `userBudgetversionID`) 
     VALUES ('$userID','$amount','$date','$note','$categoryID', '1')" : $addIncomeQuery = "INSERT INTO tbl_income( `userID`, `amount`, `dateReceived`, `note`, `userCategoryID`, `userBudgetversionID`) 
     VALUES ('$userID','$amount',DEFAULT,'$note','$categoryID', '1')";
+
     executeQuery($addIncomeQuery);
+
+    // AUTO UPDATE WEEKLY INCOME CHALLENGE
+    updateIncomeChallenges($userID, $conn);
+    
     $_SESSION['successtag'] = "Income added Successfully!";
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;

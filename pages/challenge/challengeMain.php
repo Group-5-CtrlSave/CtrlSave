@@ -1,34 +1,28 @@
 <?php
 session_start();
 include("../../assets/shared/connect.php");
+include("process/challengeProgress.php");
 
 // ensure we have a user id
 $userID = isset($_SESSION['userID']) ? intval($_SESSION['userID']) : 0;
-
-// EXPIRATION LOGIC FOR DAILY & WEEKLY CHALLENGES
-
-// DAILY = 24 hours
-$updateDaily = "
-    UPDATE tbl_userchallenges u
-    JOIN tbl_challenges c ON u.challengeID = c.challengeID
-    SET u.status = 'failed'
-    WHERE c.type = 'Daily'
-      AND u.status = 'in progress'
-      AND TIMESTAMPDIFF(HOUR, u.assignedDate, NOW()) >= 24
-";
-executeQuery($updateDaily);
-
-// WEEKLY = 168 hours (7 days)
-$updateWeekly = "
-    UPDATE tbl_userchallenges u
-    JOIN tbl_challenges c ON u.challengeID = c.challengeID
-    SET u.status = 'failed'
-    WHERE c.type = 'Weekly'
-      AND u.status = 'in progress'
-      AND TIMESTAMPDIFF(HOUR, u.assignedDate, NOW()) >= 168
-";
-executeQuery($updateWeekly);
 ?>
+
+<?php
+include("process/reassignChallenges.php");
+
+if ($userID) {
+    // Daily
+    expireDailyChallenges($conn, $userID);
+    reassignFailedDailyChallenges($conn, $userID);
+    resetDailyChallengeSetIfCompleted($conn, $userID);
+
+    // Weekly
+    expireWeeklyChallenges($conn, $userID);
+    reassignFailedWeeklyChallenges($conn, $userID);
+    resetWeeklyChallengeSetIfCompleted($conn, $userID);
+}
+?>
+
 
 
 <!DOCTYPE html>
@@ -203,6 +197,7 @@ executeQuery($updateWeekly);
     INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
     WHERE u.userID = {$userID}
       AND c.type = 'Daily'
+      AND u.status IN ('in progress', 'completed') 
 ";
     $dailyresult = executeQuery($dailyquery);
 
@@ -213,6 +208,7 @@ executeQuery($updateWeekly);
     INNER JOIN tbl_userchallenges u ON c.challengeID = u.challengeID
     WHERE u.userID = {$userID}
       AND c.type = 'Weekly'
+      AND u.status IN ('in progress', 'completed')
 ";
     $weeklyresult = executeQuery($weeklyquery);
     ?>
@@ -271,7 +267,9 @@ executeQuery($updateWeekly);
                             </div>
 
                             <?php
-                            if ($dailystatus === "completed") {
+                            if ($dailystatus === "claimed") {
+                                echo "<button class='in-progress' disabled>Claimed</button>";
+                            } elseif ($dailystatus === "completed") {
                                 echo "<button class='claim-btn' data-challengeid='{$dailyrows['userChallengeID']}'>Claim</button>";
                             } elseif ($dailystatus === "failed") {
                                 echo "<button class='failed-btn' disabled>Failed</button>";
@@ -317,40 +315,22 @@ executeQuery($updateWeekly);
                             }
                         }
 
-                        // prepare progress text for known multi-step weekly challenges
+                        $challengeId = intval($weeklyrows['challengeID']);
+                        $progress = getChallengeProgress($userID, $challengeId, $conn);
+
                         $progressText = "";
+                        if ($progress && $weeklystatus !== "claimed") {
+                            $current = $progress['current'];
+                            $total = $progress['total'];
 
-                        // expense weekly challenge (challengeID = 9) -> needs 3 expenses
-                        if (intval($weeklyrows['challengeID']) === 9) {
-                            $progressQuery = "
-                                SELECT COUNT(*) AS total
-                                FROM tbl_expense
-                                WHERE userID = {$userID}
-                                  AND YEARWEEK(dateAdded, 1) = YEARWEEK(CURDATE(), 1)
-                            ";
-                            $pRes = executeQuery($progressQuery);
-                            $progressRow = $pRes ? mysqli_fetch_assoc($pRes) : ['total' => 0];
-                            $progress = intval($progressRow['total']);
-                            if ($progress > 3)
-                                $progress = 3;
-                            $progressText = "Progress: {$progress}/3";
+                            if ($current > $total)
+                                $current = $total;
+
+                            $progressText = "Progress: {$current}/{$total}";
                         }
 
-                        // weekly login challenge (challengeID = 6) -> needs 5 logins
-                        if (intval($weeklyrows['challengeID']) === 6) {
-                            $loginQuery = "
-                                SELECT COUNT(*) AS total
-                                FROM tbl_loginhistory
-                                WHERE userID = {$userID}
-                                  AND YEARWEEK(loginDate, 1) = YEARWEEK(CURDATE(), 1)
-                            ";
-                            $lRes = executeQuery($loginQuery);
-                            $loginRow = $lRes ? mysqli_fetch_assoc($lRes) : ['total' => 0];
-                            $progressLogin = intval($loginRow['total']);
-                            if ($progressLogin > 5)
-                                $progressLogin = 5;
-                            $progressText = "Progress: {$progressLogin}/5";
-                        }
+
+
                         ?>
 
                         <div class="challenge-item">
@@ -364,7 +344,9 @@ executeQuery($updateWeekly);
                             </div>
 
                             <?php
-                            if ($weeklystatus === "completed") {
+                            if ($weeklystatus === "claimed") {
+                                echo "<button class='in-progress' disabled>Claimed</button>";
+                            } elseif ($weeklystatus === "completed") {
                                 echo "<button class='claim-btn' data-challengeid='{$weeklyrows['userChallengeID']}'>Claim</button>";
                             } elseif ($weeklystatus === "failed") {
                                 echo "<button class='failed-btn' disabled>Failed</button>";
@@ -383,21 +365,43 @@ executeQuery($updateWeekly);
     </section>
 
     <!-- Saving Challenge Section -->
+
+    <?php
+    $userID = intval($_SESSION['userID']);
+    $progress = [];
+
+    // Fetch saved progress from DB
+    $sql = "SELECT itemIndex, amount FROM tbl_savingchallenge_progress WHERE userID = $userID";
+    $res = mysqli_query($conn, $sql);
+
+    while ($row = mysqli_fetch_assoc($res)) {
+        $progress[intval($row['itemIndex'])] = intval($row['amount']);
+    }
+    ?>
+
     <section id="saving" class="tab-content">
         <div style="text-align:center; margin-bottom:20px;">
             <div style="position:relative; display:inline-block;">
                 <img src="../../assets/img/challenge/alkansya.png" alt="Alkansya" style="width:100px;">
                 <div id="totalSaved"
                     style="position:absolute; top:70%; left:48%; transform:translate(-50%,-50%); font-weight:bold; font-size:16px; color:#333;">
-                    ₱0/200
+                    ₱0/100
                 </div>
             </div>
             <div style="font-weight:bold; margin-top:10px; color:#fff;">Lvl. 1</div>
-            <p style="font-weight:bold; margin-top:10px; color:#fff;">Click the amount to mark</p>
+            <p style="font-weight:bold; margin-top:10px; color:#fff;">Add an amount to the saving jar</p>
         </div>
 
         <div id="savingGrid"
             style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; text-align:center; max-width:300px; margin:auto;">
+        </div>
+
+        <div style="text-align:center; margin-top:40px;">
+            <button id="addSelectedBtn" style="background:#FFC727; border:none; padding:10px 30px;
+           border-radius:20px; font-weight:bold; font-size:14px;
+           color:black; cursor:pointer;">
+                Add
+            </button>
         </div>
     </section>
 
@@ -460,15 +464,46 @@ executeQuery($updateWeekly);
             });
         });
 
-        // saving challenge UI (kept unchanged)
+    //    SAVING CHALLENGE SYSTEM (DATABASE BASED)
+
         const savingAmounts = [5, 10, 5, 10, 5, 20, 5, 10, 20, 10];
         const targetAmount = 100;
+
         let totalSaved = 0;
+        let selectedToAdd = [];
+
+        // Inject DB progress into JavaScript
+        let dbProgress = {};
+        <?php
+        foreach ($progress as $index => $amount) {
+            echo "dbProgress[$index] = $amount;";
+        }
+        ?>
+
+        // Convert DB data → UI state
+        let savedState = {
+            clicked: Array(savingAmounts.length).fill(false),
+            total: 0
+        };
+
+        // Mark coins that belong to this user
+        for (let idx in dbProgress) {
+            idx = parseInt(idx);
+            savedState.clicked[idx] = true;
+            savedState.total += savingAmounts[idx];
+        }
+
+        totalSaved = savedState.total;
+
         const grid = document.getElementById('savingGrid');
         const totalDisplay = document.getElementById('totalSaved');
-        let savedState = JSON.parse(localStorage.getItem('savingChallengeState')) || { clicked: Array(savingAmounts.length).fill(false), total: 0 };
-        totalSaved = savedState.total;
+        const addSelectedBtn = document.getElementById('addSelectedBtn');
+
+        // Update display
         totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
+        
+        // BUILD GRID BUTTONS
+
         savingAmounts.forEach((amount, index) => {
             const btn = document.createElement('button');
             btn.textContent = amount;
@@ -477,23 +512,60 @@ executeQuery($updateWeekly);
             btn.style.width = '50px';
             btn.style.height = '50px';
             btn.style.fontWeight = 'bold';
-            btn.dataset.amount = amount;
-            btn.dataset.index = index;
-            const isClicked = savedState.clicked[index];
-            if (isClicked) { btn.style.backgroundColor = '#FFC727'; btn.style.color = 'black'; } else { btn.style.backgroundColor = 'white'; btn.style.color = 'black'; }
-            btn.addEventListener('click', () => {
-                const clicked = savedState.clicked[index];
-                const amt = parseInt(amount);
-                if (clicked) {
-                    totalSaved -= amt; savedState.clicked[index] = false; btn.style.backgroundColor = 'white'; btn.style.color = 'black';
-                } else {
-                    totalSaved += amt; savedState.clicked[index] = true; btn.style.backgroundColor = '#FFC727'; btn.style.color = 'black';
-                }
-                savedState.total = totalSaved;
-                totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
-                localStorage.setItem('savingChallengeState', JSON.stringify(savedState));
-            });
+            btn.style.cursor = 'pointer';
+
+            if (savedState.clicked[index]) {
+                // Already saved in DB → lock
+                btn.style.backgroundColor = '#FFC727';
+                btn.style.color = 'black';
+                btn.disabled = true;
+            } else {
+                // Allow selection
+                btn.addEventListener('click', () => {
+                    if (selectedToAdd.includes(index)) {
+                        selectedToAdd = selectedToAdd.filter(i => i !== index);
+                        btn.style.backgroundColor = 'white';
+                    } else {
+                        selectedToAdd.push(index);
+                        btn.style.backgroundColor = '#FFE58A';
+                    }
+                });
+            }
+
             grid.appendChild(btn);
+        });
+
+        // PROCESS ADD BUTTON
+
+        addSelectedBtn.addEventListener('click', () => {
+            if (selectedToAdd.length === 0) {
+                alert("Please select at least one amount before clicking ADD.");
+                return;
+            }
+
+            selectedToAdd.forEach(idx => {
+                const amt = savingAmounts[idx];
+
+                savedState.clicked[idx] = true;
+                totalSaved += amt;
+
+                const btn = grid.children[idx];
+                btn.style.backgroundColor = '#FFC727';
+                btn.style.color = 'black';
+                btn.disabled = true;
+
+                // Save to DB
+                fetch("process/saveSavingProgress.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `index=${idx}&amount=${amt}`
+                });
+            });
+
+            selectedToAdd = [];
+            savedState.total = totalSaved;
+
+            totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
         });
     </script>
 

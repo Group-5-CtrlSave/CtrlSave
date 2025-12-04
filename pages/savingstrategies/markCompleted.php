@@ -11,14 +11,29 @@ if (!isset($_SESSION['userID']) || !isset($_POST['resourceID'])) {
 $userID = (int)$_SESSION['userID'];
 $resourceID = (int)$_POST['resourceID'];
 
-// ensure resource exists (optional)
-$chkRes = $conn->prepare("SELECT resourceID FROM tbl_resources WHERE resourceID = ?");
+// ensure resource exists (and get resourceType)
+$chkRes = $conn->prepare("SELECT resourceID, resourceType FROM tbl_resources WHERE resourceID = ?");
 $chkRes->bind_param("i", $resourceID);
 $chkRes->execute();
 $res = $chkRes->get_result();
+
 if ($res->num_rows === 0) {
     echo json_encode(['success' => false, 'message' => 'Resource not found']);
     exit();
+}
+
+$resource = $res->fetch_assoc();
+
+include_once "../challenge/process/challengeController.php";
+
+switch (strtolower($resource['resourceType'])) {
+    case 'video':
+        updateSavingVideoChallenge($userID, $conn);
+        break;
+
+    case 'article':
+        updateSavingArticleChallenge($userID, $conn);
+        break;
 }
 
 // check if already marked
@@ -28,7 +43,10 @@ $check->execute();
 $checkRes = $check->get_result();
 
 if ($checkRes->num_rows == 0) {
-    $insert = $conn->prepare("INSERT INTO tbl_user_resource_progress (userID, resourceID, isCompleted, dateCompleted) VALUES (?, ?, 1, NOW())");
+    $insert = $conn->prepare("
+        INSERT INTO tbl_user_resource_progress (userID, resourceID, isCompleted, dateCompleted)
+        VALUES (?, ?, 1, NOW())
+    ");
     $insert->bind_param("ii", $userID, $resourceID);
     $insert->execute();
 }
