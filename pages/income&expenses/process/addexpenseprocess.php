@@ -1,12 +1,15 @@
 <?php
 // userID
 $userID = '';
+
+include('../challenge/process/challengeController.php');
+
+
 if (isset($_SESSION['userID'])){
     $userID = $_SESSION['userID'];
    
 }
 ?>
-
 
 <?php
 $getExpensesCategoriesQuery = "SELECT userCategoryID, categoryName, icon FROM tbl_usercategories WHERE userID= $userID AND type = 'expense' AND isSelected = 1";
@@ -71,12 +74,15 @@ if (isset($_POST['addExpense'])) {
     
    
     executeQuery($addExpensesQuery);
+
+    updateExpenseChallenges($userID, $conn);
+
     $_SESSION["successtag"] = "Expense succefully added!";
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
     
 
-   
+
 
 
 }
