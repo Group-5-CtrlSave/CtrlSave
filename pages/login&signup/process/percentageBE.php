@@ -86,8 +86,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             $allocation_data = [
                 'userCategoryID' => $id,
                 'necessityType' => $category['userNecessityType'],
-                'limitType' => ($mode == 'limit') ? 1 : 0,
-                'value' => 0.00
+                'limitType' => ($mode == 'limit') ? 2 : 0, 
+                'value' => 0.00 
             ];
 
             if ($mode == 'limit') {
@@ -119,9 +119,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             // Savings is always a Limit
             $savings_allocation = [
                 'userCategoryID' => $savingsCategory['userCategoryID'],
-                'necessityType' => 'saving',
-                'limitType' => 1,
-                'value' => (float) $cleaned_savings_value
+                'necessityType' => 'saving', 
+                'limitType' => 2, 
+                'value' => (float)$cleaned_savings_value 
             ];
             $allocations[] = $savings_allocation;
             $total_limit_count++;

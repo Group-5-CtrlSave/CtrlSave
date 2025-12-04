@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../assets/shared/connect.php';
-
+include '../../assets/shared/scripts/dailyoversaving.php';
 if (!isset($_SESSION['userID'])) {
     header("Location: ../../pages/login&signup/login.php");
     exit;
@@ -64,6 +64,9 @@ if (isset($_POST['add_amount'])) {
       $insertQuery = "INSERT INTO tbl_goaltransactions (savingGoalID, amount, transaction, `date`)
                       VALUES ($savingGoalID, $amount, 'add', NOW())";
       mysqli_query($conn, $insertQuery);
+
+      checkDailyOversaving($userID);
+
 
       // Update goal amount
       $updateQuery = "UPDATE tbl_savinggoals 

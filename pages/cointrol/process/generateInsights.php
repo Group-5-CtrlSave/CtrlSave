@@ -14,9 +14,7 @@ if (isset($_SESSION['userID'])){
 <?php
 
 
-function generateHighestSpendingInsight($userID){
-
-}
+// Get Correlation Insights
 
 
 ?>

@@ -1,6 +1,12 @@
-<?php include("../../assets/shared/connect.php"); ?>
-<?php session_start() ?>
-<?php include("process/updateCharts.php") ?>
+<?php
+session_start();
+// userID
+$userID = '';
+if (isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+}
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -52,14 +58,15 @@
             </div>
             <!-- Reset Button -->
             <div class="container" id="resetButton" style="text-align: center; display: none">
-                <button class="btn btn-lg resetBtn" type="button"><b>RESET</b></button>
+                <button onclick="window.location.href='cointrol.php'" class="btn btn-lg resetBtn"
+                    type="button"><b>RESET</b></button>
             </div>
 
 
             <!-- Expenses Pie Chart -->
             <div class="container my-3 py-3 expensesChart">
                 <div class="container py-1 text-center">
-                    <h5 class="visualTitle m-0 p-0">Expenses Chart</h5>
+                    <h5 class="visualTitle m-0 p-0">Expenses Structure</h5>
                 </div>
                 <div>
                     <canvas id="expensesChart" height="200" width="200"></canvas>
@@ -74,7 +81,7 @@
 
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle mb-0">
+                    <table class="table table-bordered align-middle mb-0" id="monthlyTable">
                         <thead class="table-light">
                             <tr class="text-center">
                                 <th>Category</th>
@@ -83,19 +90,6 @@
                             </tr>
                         </thead>
                         <tbody class="text-center">
-                            <?php foreach ($expenseList as $expenseCategory) {
-                                $categoryAmount = $expenseCategory["amount"];
-                                $percentage = ($overallTotal > 0 ) ? $categoryAmount / $overallTotal * 100 : 0 ;
-                                $percentage = round($percentage, 2 )
-                                ?>
-                                <tr>
-                                    <td><strong><?php echo $expenseCategory['categoryName']?></strong></td>
-                                    <td><?php echo $categoryAmount ?></td>
-                                    <td><?php echo $percentage?>%</td>
-                                </tr>
-                                <?php
-
-                            } ?>
 
 
                         </tbody>
@@ -110,31 +104,38 @@
                 <div class="container p-0 text-center">
                     <h5 class="visualTitle m-0 p-0" id="analysisForecast">Analysis and Recommendations</h5>
 
+
                 </div>
-                <p>Based on the current financial report, you have spent a total of 10,000 pesos for the month of May.
-                </p>
+                <!-- Total Spent -->
+                <div class="container my-3" id="monthlyTotalSpent">
 
-                <p>Your top 3 spending categories are:</p>
-                <p> 1. Groceries – 35%<br>
-                    2. Dining Out – 20%<br>
-                    3. Electricity – 15%</p>
-
-                <p>You spent 20% on Dining Out, which is higher than your target limit of 15%. Because of this, you may
-                    have
-                    spent less on Groceries or saved less money.</p>
-
-                <p>To stay within your budget, try reducing your Dining Out expenses and use the extra money to buy more
-                    groceries or increase your savings.</p>
-
-                <div class="container p-0 text-center">
-                    <h5 class="visualTitle m-0 p-0">Additional Tips</h5>
                 </div>
 
-                <p>Try this additional tips based on your category:</p>
 
-                <p>1. <strong>Eat Out During Promos or Student Discount Hours</strong><br>
-                    2. <strong>Avoid including add-ons</strong><br>
-                    3. <strong>Try to bring your own drink/water</strong></p>
+                <!-- Top Spending Category -->
+
+                <div class="container my-3" id="topSpendingCateg">
+
+                </div>
+
+                <!-- Overspent Category -->
+                <div class="container my-3" id="overSpentCateg">
+
+                </div>
+
+                <!-- Overspent Category -->
+                <div class="container my-3" id="overSaveCateg">
+
+                </div>
+
+
+                <!-- Correlation of Categories -->
+                <div class="container my-3" id="correlationInsight">
+
+                </div>
+
+
+
             </div>
 
         </div>
@@ -150,6 +151,233 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- No Data for Charts -->
+    <script>
+        Chart.register({
+            id: 'noDataPlugin',
+            beforeDraw(chart) {
+                const data = chart.data.datasets[0].data;
+
+                if (!data || data.length === 0 || data.every(v => v === 0)) {
+                    const ctx = chart.ctx;
+                    const width = chart.width;
+                    const height = chart.height;
+
+                    chart.clear();
+
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = '18px Roboto';
+                    ctx.fillStyle = '#666';
+                    ctx.fillText('No data available', width / 2, height / 2);
+                    ctx.restore();
+                }
+            }
+        });
+
+    </script>
+
+
+
+    <!-- Bar Chart -->
+    <script>
+
+
+        const ctx = document.getElementById('monthlySpendingChart');
+
+        let monthlyBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Spending',
+                    data: Array(12).fill(0),
+                    backgroundColor: '#77D09A',
+                    borderRadius: 5,
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1000
+                        },
+                        grid: {
+                            color: '#c0c0c0',
+                            lineWidth: 2
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 0,
+                            color: '#000',
+                            font: {
+                                size: 14,
+                                family: 'Roboto, Arial, sans-serif'
+                            },
+                            padding: 5
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+
+    <!-- Pie Chart -->
+    <script>
+        const expensesCtx = document.getElementById('expensesChart');
+
+
+        let monthlyPieChart = new Chart(expensesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: '#000',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+
+                },
+                cutout: '60%',
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+
+    <!-- Generate Random Colors -->
+
+    <script>
+        function generateRandomColors(num) {
+            const colors = [];
+            const step = 360 / num;
+            for (let i = 0; i < num; i++) {
+                const hue = i * step;
+                colors.push(`hsl(${hue}, 40%, 60%)`);
+            }
+            return colors;
+        }
+    </script>
+
+
+    <!-- Fetch Month via AJAX -->
+    <script>
+        function fetchMonthYear(mnth, yr) {
+            let fetchMonth = mnth;
+            let fetchYear = yr;
+
+            fetch(`process/updateCharts.php?month=${fetchMonth}&year=${fetchYear}`)
+                .then(response => response.json())
+                .then(data => {
+
+
+                    // Update the Bar Chart
+                    monthlyBarChart.data.datasets[0].data = data.barChartData;
+                    monthlyBarChart.update();
+
+                    // Update the Pie Chart
+
+                    const catNum = data.pieChartLabels.length;
+                    monthlyPieChart.data.labels = data.pieChartLabels;
+                    monthlyPieChart.data.datasets[0].data = data.pieChartData;
+                    monthlyPieChart.data.datasets[0].backgroundColor = generateRandomColors(catNum);
+                    monthlyPieChart.update();
+
+                    // Update the Table
+
+                    const tbody = document.querySelector("#monthlyTable tbody");
+                    tbody.innerHTML = '';
+
+                    if (!data.tableData || data.tableData.length === 0) {
+                        tbody.innerHTML = `<tr class="text-center"><td colspan=3>No Data Available</td></tr>`;
+                    } else {
+                        data.tableData.forEach(expense => {
+                            const row = document.createElement('tr');
+                            row.classList.add('text-center');
+                            row.innerHTML = `
+                            <td><strong>${expense.categoryName}<strong></td> 
+                            <td>${expense.amount}</td> 
+                            <td>${expense.percentage}%</td> 
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+
+                    // Update the Total Spent
+                    let monthlyTotalSpent = document.getElementById("monthlyTotalSpent");
+                    monthlyTotalSpent.innerHTML = "";
+                    if (data.analysis && data.analysis.length > 0) {
+                        monthlyTotalSpent.innerHTML = "<p>" + data.analysis + "</p>"
+                    }
+
+                    // Update the Top Spending Categories
+                    let topCategories = document.getElementById("topSpendingCateg");
+                    topCategories.innerHTML = "";
+                    if (data.topCategories && data.topCategories.length > 0) {
+                        topCategories.innerHTML = "<b>Your Top Spending Categories for this month:</b><p>" + data.topCategories.join("<br>") + "</p>";
+                    }
+
+                    // Update Correlation Insight 
+                    let correlationInsight = document.getElementById("correlationInsight");
+                    correlationInsight.innerHTML = "";
+                    if (data.correlationInsight && data.correlationInsight.length > 0) {
+                        correlationInsight.innerHTML = "<p>" + data.correlationInsight + "</p>"
+                    }
+
+                    // Update Overspending Insight
+                    let overSpentCateg = document.getElementById("overSpentCateg");
+                    overSpentCateg.innerHTML = "";
+
+                    if (data.overspendingInsight && data.overspendingInsight.length > 0) {
+                        overSpentCateg.innerHTML += `<b>Your Overspending Categories:</b>`;
+                        data.overspendingInsight.forEach(element => {
+                            overSpentCateg.innerHTML += `<p>${element}</p>`;
+                        });
+                    }
+
+                    // Update Oversaving Insight
+                    let overSaveCateg = document.getElementById("overSaveCateg")
+                    overSaveCateg.innerHTML = "";
+                    if (data.oversavingInsight && data.oversavingInsight.length > 0) {
+                        overSaveCateg.innerHTML = "<p>" + data.oversavingInsight + "</p>"
+                    }
+
+
+
+                })
+                .catch(error => console.error('Error', error))
+        }
+    </script>
+
+
+    <!-- Change Month -->
     <script>
         // Global Variables
         let count = 0;
@@ -161,6 +389,7 @@
         let analysisForecast = document.getElementById("analysisForecast")
 
         function changeMonth(num) {
+
             // Get the presentDate
             let presentDate = new Date()
             // Pass the present Date in a newDate
@@ -188,6 +417,8 @@
             // Get the New Month and New Year
             let newMonth = newDate.getMonth() + 1;
             let newYear = newDate.getFullYear();
+
+            fetchMonthYear(newMonth, newYear);
 
             // Check if not in the Present Date
 
@@ -228,22 +459,11 @@
 
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
     </script>
 
+
+    <!-- Get Present Month -->
     <script>
         function getMonth() {
             let presentDate = new Date()
@@ -258,103 +478,11 @@
             spendingReport.innerHTML = "Monthly Spending Report"
             expensesTable.innerHTML = months[presentMonth - 1] + " " + presentYear + " " + "Expenses"
 
+            fetchMonthYear(presentMonth, presentYear);
+
         }
 
         getMonth();
-    </script>
-
-    <!-- Bar Chart -->
-
-    <script>
-        const monthlySpending = <?php echo $monthlyDataJSON; ?>;
-
-        const ctx = document.getElementById('monthlySpendingChart');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Monthly Spending',
-                    data: monthlySpending,
-                    backgroundColor: '#77D09A',
-                    borderRadius: 5,
-                    barPercentage: 0.8,
-                    categoryPercentage: 0.7
-                }]
-            },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-        y: {
-            beginAtZero: true,
-            ticks: {
-                stepSize: 1000
-            },
-            grid: {
-                color: '#c0c0c0',
-                lineWidth: 2
-            }
-        },
-        x: {
-            grid: {
-                display: false
-            },
-            ticks: {
-                autoSkip: false,      
-                maxRotation: 45,      
-                minRotation: 0,
-                color: '#000',
-                font: {
-                    size: 14,        
-                    family: 'Roboto, Arial, sans-serif'
-                },
-                padding: 5        
-            }
-        }
-    }
-}
-        });
-    </script>
-
-
-    <!-- Pie Chart -->
-
-    <script>
-        const expensesCtx = document.getElementById('expensesChart');
-        const expenseCategories = <?php echo $categoriesJSON; ?>;
-        const dataCategories = <?php echo $dataJSON; ?>;
-
-        new Chart(expensesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: expenseCategories,
-                datasets: [{
-                    data: dataCategories,
-                    backgroundColor: ['#2a9d8f', '#f4a261', '#2ecc71', '#45a29e', '#208b8d'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'right',
-                        labels: {
-                            color: '#000',
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-
-                },
-                cutout: '60%',
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
     </script>
 
 

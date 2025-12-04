@@ -2,6 +2,8 @@
 <?php session_start() ?>
 <?php include ('process/addExpenseprocess.php')?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -80,7 +82,7 @@
                 <label class="form-check-label label" for="amount"><b>Amount</b></label>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text">₱</span>
-                    <input type="text" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount" required>
+                    <input type="number" step="0.01" class="form-control form-control-lg" id="amount" placeholder="Enter amount" name="amount" required>
                 </div>
             </div>
 
@@ -90,8 +92,8 @@
             </div>
 
             <div class="container py-1">
-                <label class="form-check-label label" for="date"><b>Due Date</b></label>
-                <input type="date" class="form-control form-control-lg" id="date" name="dueDate">
+                <label class="form-check-label label" for="date"><b>Date</b></label>
+                <input type="date" class="form-control form-control-lg" id="date" name="date">
             </div>
             <div class="container py-2">
                 <input class="checkBox" type="checkbox" id="recurringPayment" value="1" name="recurringPayment">
