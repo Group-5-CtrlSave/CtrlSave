@@ -46,7 +46,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                  JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
                                  WHERE sg.userID = $userID
                                  AND DATE(gt.date) BETWEEN '$startDate' AND '$endDate'
-                                 AND gt.transaction = 'add'"; // Only count "add" transactions
+                                 AND gt.transaction = 'add'";
                 $savingsResult = executeQuery($savingsQuery);
                 $savingsRow = mysqli_fetch_assoc($savingsResult);
                 $totalSaved = floatval($savingsRow['totalSaved'] ?? 0);
@@ -60,7 +60,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                "% of your allocated savings budget of ₱" . number_format($budgetLimit,2) . 
                                ". Consider redirecting excess savings to needs or wants if necessary.";
 
-                    // Avoid duplicate entry
+                    // Avoid duplicate entry (INSIGHTS)
                     $checkInsight = "SELECT 1 FROM tbl_spendinginsights 
                                      WHERE userID = $userID 
                                      AND insightType = 'oversaving'
@@ -74,6 +74,31 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                           VALUES ($userID, NULL, 'oversaving', '$message', NOW())";
                         executeQuery($insertInsight);
                     }
+
+                    /* ===========================================================
+                       ✅ NEW: MONTHLY OVERSAVING NOTIFICATION (NO DUPLICATES)
+                    ============================================================ */
+
+                    $notifMessage = "You oversaved ₱" . number_format(($totalSaved - $budgetLimit),2) .
+                                    " from $startDate to $endDate.";
+
+                    // Check duplicate notification
+                    $checkNotif = "SELECT 1 FROM tbl_notifications
+                                   WHERE userID = $userID
+                                   AND message = '$notifMessage'
+                                   AND type = 'monthly_oversaving'
+                                   AND DATE_FORMAT(createdAt,'%Y-%m') = '" . date('Y-m') . "'
+                                   LIMIT 1";
+
+                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
+                        $insertNotif = "INSERT INTO tbl_notifications
+                                        (notificationTitle, message, icon, userID, createdAt, type)
+                                        VALUES 
+                                        ('Monthly Oversaving Alert', '$notifMessage', 'savings.png',
+                                         $userID, NOW(), 'monthly_oversaving')";
+                        executeQuery($insertNotif);
+                    }
+
                 }
             }
         }

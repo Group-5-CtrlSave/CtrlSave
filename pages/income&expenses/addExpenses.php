@@ -92,8 +92,8 @@
             </div>
 
             <div class="container py-1">
-                <label class="form-check-label label" for="date"><b>Due Date</b></label>
-                <input type="date" class="form-control form-control-lg" id="date" name="dueDate">
+                <label class="form-check-label label" for="date"><b>Date</b></label>
+                <input type="date" class="form-control form-control-lg" id="date" name="date">
             </div>
             <div class="container py-2">
                 <input class="checkBox" type="checkbox" id="recurringPayment" value="1" name="recurringPayment">

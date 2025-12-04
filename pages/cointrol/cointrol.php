@@ -103,28 +103,37 @@ if (isset($_SESSION['userID'])) {
             <div class="container analysisRecommendations my-3 py-3">
                 <div class="container p-0 text-center">
                     <h5 class="visualTitle m-0 p-0" id="analysisForecast">Analysis and Recommendations</h5>
-                    <div class="container" id="testFetch"></div>
+
 
                 </div>
-                <p>Based on the current financial report, you have spent a total of 10,000 pesos for the month of May.
-                </p>
+                <!-- Total Spent -->
+                <div class="container my-3" id="monthlyTotalSpent">
+
+                </div>
+
 
                 <!-- Top Spending Category -->
 
-                <div class="container" id="topSpendingCateg">
+                <div class="container my-3" id="topSpendingCateg">
+
+                </div>
+
+                <!-- Overspent Category -->
+                <div class="container my-3" id="overSpentCateg">
+
+                </div>
+
+                <!-- Overspent Category -->
+                <div class="container my-3" id="overSaveCateg">
 
                 </div>
 
 
-
-
                 <!-- Correlation of Categories -->
+                <div class="container my-3" id="correlationInsight">
 
-                <p class="correlation">You spent 20% on Dining Out, which is higher than your target limit of 15%.
-                    Because of this, you may
-                    have spent less on Groceries or saved less money. To stay within your budget,
-                    try reducing your Dining Out expenses and use the extra money to buy more
-                    groceries or increase your savings.</p>
+                </div>
+
 
 
             </div>
@@ -290,7 +299,6 @@ if (isset($_SESSION['userID'])) {
 
 
                     // Update the Bar Chart
-                    document.getElementById('testFetch').innerHTML = data.pieChartLabels;
                     monthlyBarChart.data.datasets[0].data = data.barChartData;
                     monthlyBarChart.update();
 
@@ -322,11 +330,43 @@ if (isset($_SESSION['userID'])) {
                         });
                     }
 
+                    // Update the Total Spent
+                    let monthlyTotalSpent = document.getElementById("monthlyTotalSpent");
+                    monthlyTotalSpent.innerHTML = "";
+                    if (data.analysis && data.analysis.length > 0) {
+                        monthlyTotalSpent.innerHTML = "<p>" + data.analysis + "</p>"
+                    }
+
                     // Update the Top Spending Categories
                     let topCategories = document.getElementById("topSpendingCateg");
-                     topCategories.innerHTML = "";
+                    topCategories.innerHTML = "";
                     if (data.topCategories && data.topCategories.length > 0) {
-                         topCategories.innerHTML = "<p>Your Top Spending Categories for this month:</p><p>" + data.topCategories.join("<br>") + "</p>";
+                        topCategories.innerHTML = "<b>Your Top Spending Categories for this month:</b><p>" + data.topCategories.join("<br>") + "</p>";
+                    }
+
+                    // Update Correlation Insight 
+                    let correlationInsight = document.getElementById("correlationInsight");
+                    correlationInsight.innerHTML = "";
+                    if (data.correlationInsight && data.correlationInsight.length > 0) {
+                        correlationInsight.innerHTML = "<p>" + data.correlationInsight + "</p>"
+                    }
+
+                    // Update Overspending Insight
+                    let overSpentCateg = document.getElementById("overSpentCateg");
+                    overSpentCateg.innerHTML = "";
+
+                    if (data.overspendingInsight && data.overspendingInsight.length > 0) {
+                        overSpentCateg.innerHTML += `<b>Your Overspending Categories:</b>`;
+                        data.overspendingInsight.forEach(element => {
+                            overSpentCateg.innerHTML += `<p>${element}</p>`;
+                        });
+                    }
+
+                    // Update Oversaving Insight
+                    let overSaveCateg = document.getElementById("overSaveCateg")
+                    overSaveCateg.innerHTML = "";
+                    if (data.oversavingInsight && data.oversavingInsight.length > 0) {
+                        overSaveCateg.innerHTML = "<p>" + data.oversavingInsight + "</p>"
                     }
 
 
