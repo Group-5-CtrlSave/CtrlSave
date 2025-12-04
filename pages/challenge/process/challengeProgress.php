@@ -16,28 +16,65 @@ function getChallengeProgress($userID, $challengeId, $conn)
             $r = mysqli_query($conn, $sql);
             return ["current" => intval(mysqli_fetch_assoc($r)['total']), "total" => 3];
 
-        case 7: // Saving row
-            $rows = [
-                [5,10,5,10,5],
-                [20,5,10,20,10]
-            ];
+        case 7: // Weekly: Complete ANY full row of saving challenge
 
-            $completed = 0;
-            foreach ($rows as $row) {
-                $count = 0;
-                foreach ($row as $amt) {
-                    $sql = "SELECT id FROM tbl_savingchallenge_progress
-                            WHERE userID=$userID AND amount=$amt
-                            AND YEARWEEK(dateAdded,1)=YEARWEEK(CURDATE(),1)";
-                    $r = mysqli_query($conn, $sql);
-                    if ($r && mysqli_num_rows($r) > 0) $count++;
-                }
-                if ($count === 5) { $completed = 5; break; }
+            // 1. Get active challenge (to read slotData)
+            $q = mysqli_query($conn,
+                "SELECT userSavingChallengeID, slotData 
+                 FROM tbl_usersavingchallenge 
+                 WHERE userID=$userID AND status='active' LIMIT 1"
+            );
+
+            if (!$q || mysqli_num_rows($q) == 0) {
+                return ["current" => 0, "total" => 5];
             }
 
-            return ["current" => $completed, "total" => 5];
+            $challenge = mysqli_fetch_assoc($q);
+
+            // 2. Decode slotData (20 slot values)
+            $slots = json_decode($challenge['slotData'], true);
+
+            if (!$slots || count($slots) != 20) {
+                return ["current" => 0, "total" => 5];
+            }
+
+            // 3. Break into rows of 5
+            $rows = array_chunk($slots, 5);
+
+            // 4. Get saved progress indexes
+            $saved = [];
+            $res = mysqli_query($conn,
+                "SELECT itemIndex FROM tbl_savingchallenge_progress
+                 WHERE userID=$userID"
+            );
+
+            while ($r = mysqli_fetch_assoc($res)) {
+                $saved[] = intval($r['itemIndex']);
+            }
+
+            // 5. Check each row → all 5 clicked?
+            foreach ($rows as $rowIndex => $rowSlots) {
+
+                $rowComplete = true;
+
+                for ($i = 0; $i < 5; $i++) {
+                    $slotIndex = $rowIndex * 5 + $i;
+                    if (!in_array($slotIndex, $saved)) {
+                        $rowComplete = false;
+                        break;
+                    }
+                }
+
+                if ($rowComplete) {
+                    return ["current" => 5, "total" => 5];
+                }
+            }
+
+            // Nothing complete yet
+            return ["current" => 0, "total" => 5];
 
         default:
             return null;
     }
 }
+?>

@@ -18,7 +18,6 @@ if ($userID) {
 
     // Weekly
     expireWeeklyChallenges($conn, $userID);
-    reassignFailedWeeklyChallenges($conn, $userID);
     resetWeeklyChallengeSetIfCompleted($conn, $userID);
 }
 ?>
@@ -156,6 +155,87 @@ if ($userID) {
             opacity: 0.8;
         }
 
+        /* --- POLISHED ROUND-BOTTOM FLASK DESIGN --- */
+
+        .xp-flask-wrapper {
+            display: inline-block;
+            animation: pulse 1.3s infinite ease-in-out;
+        }
+
+        .xp-flask {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Flask Neck */
+        .xp-flask-neck {
+            width: 38px;
+            height: 55px;
+            background: #e8ecf1;
+            border-radius: 12px;
+            border: 3px solid rgba(0, 0, 0, 0.05);
+            border-bottom: none;
+            box-shadow: inset 0 -4px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Flask Body - ROUND BOTTOM */
+        .xp-flask-body {
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle at 50% 30%, #ffffff, #e6e6e6 60%);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                inset 0 0 20px rgba(0, 0, 0, 0.15),
+                0 10px 18px rgba(0, 0, 0, 0.18),
+                0 0 0 5px rgba(255, 255, 255, 0.6);
+            margin-top: -8px;
+        }
+
+        /* Flask liquid inside */
+        .xp-flask-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            /* changes dynamically with JS */
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.15);
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1),0.4s ease;
+        }
+
+        /* XP label */
+        .xp-flask-label {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: rgba(0, 0, 0, 0.65);
+            text-shadow:
+                0 2px 4px rgba(255, 255, 255, 0.7),
+                0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gloss highlight on flask glass */
+        .xp-flask-body::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 22px;
+            width: 40%;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 50%;
+            filter: blur(8px);
+            transform: rotate(-20deg);
+        }
+
         @keyframes fadeInOut {
             0% {
                 opacity: 0;
@@ -174,6 +254,32 @@ if ($userID) {
             100% {
                 opacity: 0;
                 transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
             }
         }
     </style>
@@ -364,45 +470,44 @@ if ($userID) {
         </div>
     </section>
 
-    <!-- Saving Challenge Section -->
+    <!-- SAVING CHALLENGE SECTION (DYNAMIC, DB-DRIVEN) -->
 
-    <?php
-    $userID = intval($_SESSION['userID']);
-    $progress = [];
-
-    // Fetch saved progress from DB
-    $sql = "SELECT itemIndex, amount FROM tbl_savingchallenge_progress WHERE userID = $userID";
-    $res = mysqli_query($conn, $sql);
-
-    while ($row = mysqli_fetch_assoc($res)) {
-        $progress[intval($row['itemIndex'])] = intval($row['amount']);
-    }
-    ?>
+    <?php include("process/savingChallengeLoader.php"); ?>
 
     <section id="saving" class="tab-content">
+
         <div style="text-align:center; margin-bottom:20px;">
             <div style="position:relative; display:inline-block;">
                 <img src="../../assets/img/challenge/alkansya.png" alt="Alkansya" style="width:100px;">
-                <div id="totalSaved"
-                    style="position:absolute; top:70%; left:48%; transform:translate(-50%,-50%); font-weight:bold; font-size:16px; color:#333;">
-                    ₱0/100
+
+                <!-- Dynamic total -->
+                <div id="totalSaved" style="position:absolute; top:70%; left:48%; transform:translate(-50%,-50%);
+                       font-weight:bold; font-size:16px; color:#333;">
+                    ₱<?= $currentAmount ?>/<?= $targetAmount ?>
                 </div>
             </div>
-            <div style="font-weight:bold; margin-top:10px; color:#fff;">Lvl. 1</div>
+
+            <!-- Dynamic Level -->
+            <div id="savingLevelDisplay" style="font-weight:bold; margin-top:10px; color:#fff;">
+                Lvl. <?= $userLevel ?>
+            </div>
+
             <p style="font-weight:bold; margin-top:10px; color:#fff;">Add an amount to the saving jar</p>
         </div>
 
-        <div id="savingGrid"
-            style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; text-align:center; max-width:300px; margin:auto;">
+        <!-- GRID -->
+        <div id="savingGrid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
+                text-align:center; max-width:300px; margin:auto;">
         </div>
 
-        <div style="text-align:center; margin-top:40px;">
+        <div style="text-align:center; margin-top:20px;">
             <button id="addSelectedBtn" style="background:#FFC727; border:none; padding:10px 30px;
-           border-radius:20px; font-weight:bold; font-size:14px;
-           color:black; cursor:pointer;">
+               border-radius:20px; font-weight:bold; font-size:14px;
+               color:black; cursor:pointer;">
                 Add
             </button>
         </div>
+
     </section>
 
     <!-- Reward modals (kept intact) -->
@@ -426,6 +531,40 @@ if ($userID) {
         </div>
     </div>
 
+    <!-- UNIVERSAL XP REWARD MODAL -->
+    <div class="modal fade" id="xpRewardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4"
+                style="background-color:#44B87D; border-radius:20px; position:relative; overflow:hidden;">
+
+                <h5 id="xpModalTitle" class="fw-bold" style="color:#fff; font-size:28px;">Reward</h5>
+
+                <!-- CSS XP Bottle (no images) -->
+                <div class="xp-flask-wrapper my-3">
+                    <div id="xpFlask" class="xp-flask">
+                        <div class="xp-flask-neck"></div>
+                        <div class="xp-flask-body">
+                            <div class="xp-flask-liquid" id="xpFlaskLiquid"></div>
+                            <div class="xp-flask-label">XP</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <h3 id="xpAmountText" style="color:white; font-weight:bold; font-size:32px; margin-top:10px;">
+                    +0 XP
+                </h3>
+
+                <h6 id="xpLevelUpText" style="color:#FFC727; font-weight:bold; margin-top:5px; display:none;">
+                    LEVEL UP! 🎉
+                </h6>
+
+            </div>
+        </div>
+    </div>
+
+    <audio id="levelUpSound" src="../../assets/sounds/levelup.mp3" preload="auto"></audio>
+
     <script>
         const buttons = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
@@ -437,97 +576,98 @@ if ($userID) {
         }));
 
         const claimButtons = document.querySelectorAll('.claim-btn');
+
         claimButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const challengeItem = button.closest('.challenge-item');
+
                 const challengeID = button.dataset.challengeid;
+
                 fetch("process/claimChallengeBE.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: `challengeID=${challengeID}`
                 })
-                    .then(res => res.text())
-                    .then(response => {
-                        if (response === "success") {
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (data.status === "success") {
+
+                            // Update UI
                             button.classList.remove("claim-btn");
                             button.classList.add("in-progress");
                             button.textContent = "Claimed";
-                            const parentCard = button.closest('.challenge-card');
-                            const title = parentCard.querySelector("h3").textContent;
-                            const isDaily = title.toLowerCase().includes("daily");
-                            const modalId = isDaily ? "dailyRewardModal" : "weeklyRewardModal";
-                            new bootstrap.Modal(document.getElementById(modalId)).show();
-                        } else {
-                            alert("Error claiming challenge.");
+
+                            // Determine reward label (backend sends: 'daily' or 'weekly')
+                            let typeLabel =
+                                data.type === "daily" ? "Daily Reward" :
+                                    data.type === "weekly" ? "Weekly Reward" :
+                                        "Reward";
+
+                            // Show XP modal
+                            showXPModal(data.exp, typeLabel, data.leveledUp);
+
+                        }
+                        else {
+                            alert("Error: " + data.message);
                         }
                     });
             });
         });
 
-    //    SAVING CHALLENGE SYSTEM (DATABASE BASED)
 
-        const savingAmounts = [5, 10, 5, 10, 5, 20, 5, 10, 20, 10];
-        const targetAmount = 100;
+    </script>
 
-        let totalSaved = 0;
+    <!-- SAVING CHALLENGE — FULLY FIXED, DB-DRIVEN -->
+    <script>
+
+
+        let savingAmounts = <?= json_encode($savingAmounts) ?>;   // 20 slot values
+        let savingProgress = <?= json_encode($savingProgress) ?>;  // clicked index → saved amount
+        let targetAmount = <?= intval($targetAmount) ?>;
+        let totalSaved = <?= intval($currentAmount) ?>;
+        let userLevel = <?= intval($userLevel) ?>;
         let selectedToAdd = [];
 
-        // Inject DB progress into JavaScript
-        let dbProgress = {};
-        <?php
-        foreach ($progress as $index => $amount) {
-            echo "dbProgress[$index] = $amount;";
-        }
-        ?>
+        // DOM elements
+        const grid = document.getElementById("savingGrid");
+        const totalDisplay = document.getElementById("totalSaved");
+        const addBtn = document.getElementById("addSelectedBtn");
 
-        // Convert DB data → UI state
-        let savedState = {
-            clicked: Array(savingAmounts.length).fill(false),
-            total: 0
-        };
-
-        // Mark coins that belong to this user
-        for (let idx in dbProgress) {
-            idx = parseInt(idx);
-            savedState.clicked[idx] = true;
-            savedState.total += savingAmounts[idx];
-        }
-
-        totalSaved = savedState.total;
-
-        const grid = document.getElementById('savingGrid');
-        const totalDisplay = document.getElementById('totalSaved');
-        const addSelectedBtn = document.getElementById('addSelectedBtn');
-
-        // Update display
+        // Update Display
         totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
-        
-        // BUILD GRID BUTTONS
+
+        // =============================
+        // Build Slot UI
+        // =============================
+        grid.innerHTML = "";
 
         savingAmounts.forEach((amount, index) => {
-            const btn = document.createElement('button');
-            btn.textContent = amount;
-            btn.style.border = '2px solid #FFC727';
-            btn.style.borderRadius = '50%';
-            btn.style.width = '50px';
-            btn.style.height = '50px';
-            btn.style.fontWeight = 'bold';
-            btn.style.cursor = 'pointer';
 
-            if (savedState.clicked[index]) {
-                // Already saved in DB → lock
-                btn.style.backgroundColor = '#FFC727';
-                btn.style.color = 'black';
+            const btn = document.createElement("button");
+            btn.textContent = amount;
+            btn.style.border = "2px solid #FFC727";
+            btn.style.borderRadius = "50%";
+            btn.style.width = "50px";
+            btn.style.height = "50px";
+            btn.style.fontWeight = "bold";
+            btn.style.cursor = "pointer";
+
+            // Slot already saved
+            if (savingProgress[index] !== undefined) {
+                btn.style.backgroundColor = "#FFC727";
+                btn.style.color = "black";
                 btn.disabled = true;
-            } else {
-                // Allow selection
-                btn.addEventListener('click', () => {
+            }
+            else {
+                // Select/unselect
+                btn.addEventListener("click", () => {
+
                     if (selectedToAdd.includes(index)) {
                         selectedToAdd = selectedToAdd.filter(i => i !== index);
-                        btn.style.backgroundColor = 'white';
+                        btn.style.backgroundColor = "white";
                     } else {
                         selectedToAdd.push(index);
-                        btn.style.backgroundColor = '#FFE58A';
+                        btn.style.backgroundColor = "#FFE58A";
                     }
                 });
             }
@@ -535,40 +675,52 @@ if ($userID) {
             grid.appendChild(btn);
         });
 
-        // PROCESS ADD BUTTON
+        // =============================
+        // Handle ADD Button
+        // =============================
+        addBtn.addEventListener("click", () => {
 
-        addSelectedBtn.addEventListener('click', () => {
             if (selectedToAdd.length === 0) {
                 alert("Please select at least one amount before clicking ADD.");
                 return;
             }
 
-            selectedToAdd.forEach(idx => {
-                const amt = savingAmounts[idx];
+            selectedToAdd.forEach(index => {
+                const amount = savingAmounts[index];
 
-                savedState.clicked[idx] = true;
-                totalSaved += amt;
+                // Apply visually
+                totalSaved += amount;
 
-                const btn = grid.children[idx];
-                btn.style.backgroundColor = '#FFC727';
-                btn.style.color = 'black';
+                const btn = grid.children[index];
+                btn.style.backgroundColor = "#FFC727";
+                btn.style.color = "black";
                 btn.disabled = true;
 
-                // Save to DB
+                // Send to backend
                 fetch("process/saveSavingProgress.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: `index=${idx}&amount=${amt}`
-                });
+                    body: `index=${index}&amount=${amount}`
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === "completed") {
+                            alert(`🎉 Saving Challenge Completed! +${data.expAwarded} XP`);
+                            location.reload();
+                        }
+                    });
             });
 
+            // Reset selections
             selectedToAdd = [];
-            savedState.total = totalSaved;
 
+            // Update total display
             totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
         });
+
     </script>
 
+    <!-- Confetti Modal -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
         function launchConfetti() {
@@ -585,6 +737,73 @@ if ($userID) {
         if (dailyModal) dailyModal.addEventListener('shown.bs.modal', launchConfetti);
         if (weeklyModal) weeklyModal.addEventListener('shown.bs.modal', launchConfetti);
     </script>
+
+    <script>
+        function showXPModal(exp, type = "Reward", leveledUp = false) {
+            // Title text
+            document.getElementById("xpModalTitle").textContent = type;
+
+            // XP amount text animation
+            const xpText = document.getElementById("xpAmountText");
+            xpText.textContent = `+${exp} XP`;
+
+            xpText.style.animation = "none";
+            void xpText.offsetWidth;
+            xpText.style.animation = "slideIn 0.4s ease";
+
+            // Flask liquid
+            const liquid = document.getElementById("xpFlaskLiquid");
+
+            // Set color based on challenge type
+            if (type.includes("Daily")) {
+                liquid.style.background = "linear-gradient(135deg, #4CAF50, #81C784)";
+            } else if (type.includes("Weekly")) {
+                liquid.style.background = "linear-gradient(135deg, #FFC107, #FFD54F)";
+            } else if (type.includes("Saving")) {
+                liquid.style.background = "linear-gradient(135deg, #7E57C2, #B39DDB)";
+            } else {
+                liquid.style.background = "linear-gradient(135deg, #03A9F4, #81D4FA)";
+            }
+
+            // Liquid height (visual feedback)
+            if (type.includes("Daily")) {
+                liquid.style.height = "30%";
+            } else if (type.includes("Weekly")) {
+                liquid.style.height = "50%";
+            } else if (type.includes("Saving")) {
+                liquid.style.height = "100%";
+            } else {
+                liquid.style.height = "40%";
+            }
+
+            // Level-up text
+            const lvlText = document.getElementById("xpLevelUpText");
+            lvlText.style.display = leveledUp ? "block" : "none";
+
+            // Play sound ONLY when leveled up
+            if (leveledUp) {
+                const sfx = document.getElementById("levelUpSound");
+                if (sfx) {
+                    sfx.currentTime = 0;
+                    sfx.play().catch(() => { });
+                }
+            }
+
+            // Open XP modal
+            const modalEl = document.getElementById("xpRewardModal");
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            // Reload UI after modal closes
+            modalEl.addEventListener("hidden.bs.modal", () => {
+                location.reload();
+            }, { once: true });
+
+            // Confetti celebration
+            launchConfetti();
+        }
+    </script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
