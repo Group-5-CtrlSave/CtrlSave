@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include("../../assets/shared/connect.php");
@@ -26,10 +25,14 @@ $user = mysqli_fetch_assoc($userResult) ?? [
 
 $fullName = trim($user['firstName'] . ' ' . $user['lastName']);
 
-// Fetch level and XP info
-$levelQuery = "SELECT exp, lvl FROM tbl_userLvl WHERE userID = '$userID' LIMIT 1";
+// Insert user level if not exists
+$levelQuery = "SELECT exp, lvl FROM tbl_userlvl WHERE userID = '$userID' LIMIT 1";
 $levelResult = mysqli_query($conn, $levelQuery);
-$level = mysqli_fetch_assoc($levelResult) ?? ['exp' => 0, 'lvl' => 1];
+$level = mysqli_fetch_assoc($levelResult) ?? null;
+if (!$level) {
+    mysqli_query($conn, "INSERT INTO tbl_userlvl (userID, exp, lvl) VALUES ('$userID', 0, 1)");
+    $level = ['exp' => 0, 'lvl' => 1];
+}
 
 $currentXP = $level['exp'];
 $currentLevel = $level['lvl'];
@@ -39,7 +42,7 @@ $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 // Fetch all claimed achievements for map and auto-select
 $achievementsQuery = "
   SELECT a.icon, a.achievementName, a.type, ua.date
-  FROM tbl_userAchievements ua
+  FROM tbl_userachievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
   WHERE ua.userID = '$userID' AND ua.isClaimed = 1
   ORDER BY ua.date ASC
@@ -72,6 +75,49 @@ if (empty($displayedBadgesArray) && !empty($achievements)) {
 
 $hasAchievements = !empty($displayedBadgesArray);
 
+// Fetch income count
+$incomeCountQuery = "SELECT COUNT(*) AS total FROM tbl_income WHERE userID = '$userID'";
+$incomeCountResult = mysqli_query($conn, $incomeCountQuery);
+$incomeCount = mysqli_fetch_assoc($incomeCountResult)['total'] ?? 0;
+
+// Fetch completed savings
+$savingCountQuery = "SELECT COUNT(*) AS total FROM tbl_savinggoals WHERE userID = '$userID' AND status = 'completed'";
+$savingCountResult = mysqli_query($conn, $savingCountQuery);
+$savingCompleted = mysqli_fetch_assoc($savingCountResult)['total'] ?? 0;
+
+// Insert user achievements if not exists
+$allAchievements = mysqli_query($conn, "SELECT achievementID FROM tbl_achievements");
+while ($ach = mysqli_fetch_assoc($allAchievements)) {
+  $check = mysqli_query($conn, "SELECT * FROM tbl_userachievements WHERE achievementID = '{$ach['achievementID']}' AND userID = '$userID'");
+  if (mysqli_num_rows($check) == 0) {
+    mysqli_query($conn, "INSERT INTO tbl_userachievements(achievementID, userID, isClaimed, date) VALUES('{$ach['achievementID']}', '$userID', 0, NULL)");
+  }
+}
+
+// Fetch unclaimed achievements count (only claimable ones)
+$unclaimedQuery = "
+  SELECT a.achievementID, a.type, a.lvl
+  FROM tbl_userachievements ua
+  JOIN tbl_achievements a ON ua.achievementID = a.achievementID
+  WHERE ua.userID = '$userID' AND ua.isClaimed = 0
+";
+$unclaimedResult = mysqli_query($conn, $unclaimedQuery);
+$unclaimedCount = 0;
+if ($unclaimedResult) {
+  while ($row = mysqli_fetch_assoc($unclaimedResult)) {
+    if ($row['type'] == 'title') {
+      if ($currentLevel >= intval($row['lvl'])) $unclaimedCount++;
+    } else if ($row['type'] == 'badge') {
+      switch ($row['achievementID']) {
+        case 5: $unclaimedCount++; break;
+        case 6: if ($incomeCount >= 20) $unclaimedCount++; break;
+        case 7: if ($savingCompleted >= 1) $unclaimedCount++; break;
+        default: break;
+      }
+    }
+  }
+}
+
 // Determine profile picture src with cache busting
 $profilePic = $user['profilePicture'];
 if (!empty($profilePic)) {
@@ -103,6 +149,7 @@ if (file_exists($imageServerPath)) {
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <style>
   #sidebar, #sidebar * {
@@ -121,10 +168,13 @@ if (file_exists($imageServerPath)) {
   <div class="profile-container d-flex justify-content-center align-items-center w-100 flex-column">
     
 <button 
-  class="btn rounded-pill mb-3 align-self-end me-2"
+  class="btn rounded-pill mb-3 align-self-end me-2 position-relative"
   style="background-color:#F6D25B; border-color:#F6D25B; color:#000;"
   onclick="window.location.href='achievements.php'">
     <i class="bi bi-trophy"></i> Claim Achievements
+    <?php if ($unclaimedCount > 0): ?>
+      <i class="fa-solid fa-circle text-danger" style="font-size: 10px; position: absolute; top: 1px; left: 0px;"></i>
+    <?php endif; ?>
 </button>
     
     <div class="profile-card text-center">
