@@ -193,8 +193,7 @@
 
     </script>
 
-
-
+    <!-- Prevent Future Date for Income -->
     <script>
         const today = new Date().toISOString().split('T')[0];
         let date = document.getElementById('date')

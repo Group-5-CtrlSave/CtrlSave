@@ -117,7 +117,7 @@ $userCategoriesResult = executeQuery($getuserCategoriesQuery);
             <div class="container editContainer my-2 p-3">
                 <div class="form-group">
                     <label for="formControlInput2" class="title"><b>Amount(PHP):</b></label>
-                    <input type="text" class="form-control inputText" id="formControlInput2" value="<?php echo $amount?>"
+                    <input type="number" class="form-control inputText" id="formControlInput2" value="<?php echo $amount?>"
                       name="amount" required>
                 </div>
             </div>
@@ -147,9 +147,9 @@ $userCategoriesResult = executeQuery($getuserCategoriesQuery);
             <div class="container my-2">
                 <select class="form-select" id="frequencySelect" <?php echo ($isRecurring) ? '' : 'disabled'?> name="frequency" required>
                     <option value='' selected hidden disabled>Choose Frequency</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="daily" <?php echo ($expenseFrequency === 'daily') ? 'selected' : ''?>>Daily</option>
+                    <option value="weekly" <?php echo ($expenseFrequency === 'weekly') ? 'selected' : ''?>>Weekly</option>
+                    <option value="monthly" <?php echo ($expenseFrequency === 'monthly') ? 'selected' : ''?>>Monthly</option>
 
                 </select>
 
@@ -207,6 +207,22 @@ $userCategoriesResult = executeQuery($getuserCategoriesQuery);
         })
 
     </script>
+
+    <?php 
+    if (isset($_GET['type']) && $_GET['type'] === 'income'){
+    ?>
+    
+    <script>
+        const today = new Date().toISOString().split('T')[0];
+        let date = document.getElementById('date')
+        date.setAttribute('max', today);
+    </script>
+
+        <?php
+    }
+   ?>
+  
+  
 
 
 
