@@ -1,11 +1,10 @@
 <?php
 session_start();
-
 include("../../assets/shared/connect.php");
 
 $error = "";
 
-// Make sure user is logged in
+// Ensure user is logged in
 if (!isset($_SESSION['userID'])) {
     header("Location: login.php");
     exit();
@@ -14,28 +13,26 @@ if (!isset($_SESSION['userID'])) {
 if (isset($_POST['setCurrency'])) {
 
     $currency = $_POST['currency'] ?? "";
-    $userID   = (int) $_SESSION['userID']; // type safety
+    $userID   = (int) $_SESSION['userID'];
 
-    // Validate selection
+    // Validate option
     if ($currency !== "PHP" && $currency !== "USD") {
         $error = "Please choose a valid currency.";
     } else {
 
-        // Escape currency for safety
-        $currencyEsc = $conn->real_escape_string($currency);
+        // Prepared statement for security
+        $stmt = $conn->prepare("
+            UPDATE tbl_users
+            SET currencyCode = ?
+            WHERE userID = ?
+        ");
+        $stmt->bind_param("si", $currency, $userID);
 
-        // Query version (no prepare)
-        $updateSql = "
-            UPDATE tbl_users 
-            SET currencyCode = '$currencyEsc' 
-            WHERE userID = $userID
-        ";
-
-        if ($conn->query($updateSql)) {
+        if ($stmt->execute()) {
             header("Location: balance.php");
             exit();
         } else {
-            $error = "Failed to save currency, try again.";
+            $error = "Failed to save currency. Try again.";
         }
     }
 }
