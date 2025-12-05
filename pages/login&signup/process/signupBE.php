@@ -129,13 +129,26 @@ if (isset($_POST['signup'])) {
                 }
             }
 
-            // CREATE BUDGET VERSION
-            $insertBudgetSql = "INSERT INTO tbl_userbudgetversion (versionNumber, userID, userBudgetRuleID, totalIncome, isActive)
-            VALUES (1, $newUserID, 1, 0.00, 1)";
+            // Create a default budget rule for the new user
+            $ruleName = "Default Budget Rule";
+            $stmt = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected)
+            VALUES (?, ?, NOW(), 1)");
+            $stmt->bind_param("is", $newUserID, $ruleName);
+            $stmt->execute();
+            $newBudgetRuleID = $conn->insert_id;
+            $stmt->close();
 
-            if (!$conn->query($insertBudgetSql)) {
+
+            // CREATE BUDGET VERSION (correct)
+            $stmt = $conn->prepare("INSERT INTO tbl_userbudgetversion (versionNumber, userID, userBudgetRuleID, totalIncome, isActive)
+            VALUES (1, ?, ?, 0.00, 1)");
+            $stmt->bind_param("ii", $newUserID, $newBudgetRuleID);
+
+            if (!$stmt->execute()) {
                 throw new Exception("Budget version insertion failed.");
             }
+
+            $stmt->close();
 
 
             // Initialize user challenges 
