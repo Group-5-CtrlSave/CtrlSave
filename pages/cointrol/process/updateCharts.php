@@ -62,7 +62,7 @@ if ($overallTotal) {
         . number_format($overallTotal, 2) . " pesos for the month of "
         . $monthName . ".";
 
-}else {
+} else {
     $analysisMessage = "Analyzing Data...";
 }
 
@@ -106,8 +106,10 @@ $overspendingInsight = []; // default
 $getOverspendingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'overspending' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $overspendingInsightResult = executeQuery($getOverspendingInsightsQuery);
 if (mysqli_num_rows($overspendingInsightResult) > 0) {
-    while($row = mysqli_fetch_assoc($overspendingInsightResult))
-    $overspendingInsight[] = $row['message'];
+    while ($row = mysqli_fetch_assoc($overspendingInsightResult)) {
+        $overspendingInsight[] = $row['message'];
+    }
+
 }
 
 // ===== Get Spending Oversaving Insights =====

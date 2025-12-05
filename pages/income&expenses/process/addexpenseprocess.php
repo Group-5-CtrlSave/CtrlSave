@@ -1,16 +1,30 @@
 <?php include('../../assets/shared/scripts/dailyoverspendingfunction.php') ?>
+
+
 <?php
-// userID
-$userID = '';
 
 include('../challenge/process/challengeController.php');
 
-
+// userID
+$userID = 0;
 if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
+    
 
 }
 
+
+?>
+
+<?php
+$userBudgetVersionID = 0;
+$selectUserBudgetVersionQuery = "SELECT `userBudgetVersionID`, `versionNumber`, `userBudgetRuleID`, `totalIncome` 
+    FROM `tbl_userbudgetversion` WHERE userID = $userID AND isActive = 1";
+    $userBudgetVersionResult = executeQuery($selectUserBudgetVersionQuery);
+    if (mysqli_num_rows($userBudgetVersionResult) > 0){
+        $row = mysqli_fetch_assoc($userBudgetVersionResult);
+        $userBudgetVersionID = $row['userBudgetVersionID'] ?? 0;
+    }
 
 ?>
 
@@ -69,8 +83,8 @@ if (isset($_POST['addExpense']) && $_POST['amount'] != 0) {
                 break;
         }
     }
-    ($isRecurring) ? $addRecurringTransactionQuery = "INSERT INTO `tbl_recurringtransactions`(`userID`, `type`, `userCategoryID`, `amount`, `note`, `frequency`, `nextDuedate`) 
-    VALUES ('$userID','expenses','$categoryID','$amount','$note','$frequency',$nextDueDate)" : '';
+    ($isRecurring) ? $addRecurringTransactionQuery = "INSERT INTO `tbl_recurringtransactions`(`userID`, `type`, `userCategoryID`, `amount`, `note`, `frequency`, `nextDuedate`, `userBudgetVersionID`) 
+    VALUES ('$userID','expenses','$categoryID','$amount','$note','$frequency',$nextDueDate, $userBudgetVersionID)" : '';
     ($isRecurring) ? executeQuery($addRecurringTransactionQuery) : '';
 
     $lastRecurringID = mysqli_insert_id($conn) ?? '';
@@ -80,18 +94,20 @@ if (isset($_POST['addExpense']) && $_POST['amount'] != 0) {
         $target = $date;
         if ($now > $target) {
              $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
-        VALUES ('$userID','$amount','$categoryID',CONCAT('$date', ' ', CURTIME()),NULL,'$isRecurring','$note', '$lastRecurringID' , '1')";
+        VALUES ('$userID','$amount','$categoryID',CONCAT('$date', ' ', CURTIME()),NULL,'$isRecurring','$note', '$lastRecurringID' , '$userBudgetVersionID ')";
             
-
         } else if ($now < $target) {
                 $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`, `recurringID`,`userBudgetversionID`) 
-        VALUES ('$userID','$amount','$categoryID',NULL,'$date','$isRecurring','$note', '$lastRecurringID', '1')";
+        VALUES ('$userID','$amount','$categoryID',NULL,'$date','$isRecurring','$note', '$lastRecurringID', '$userBudgetVersionID ')";
         
         } else if ($now == $target) {
             $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
-        VALUES ('$userID','$amount','$categoryID',DEFAULT,NULL,'$isRecurring','$note', '$lastRecurringID' , '1')";
+        VALUES ('$userID','$amount','$categoryID',DEFAULT,NULL,'$isRecurring','$note', '$lastRecurringID' , '$userBudgetVersionID ')";
 
         }
+    }else {
+         $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
+        VALUES ('$userID','$amount','$categoryID',DEFAULT,NULL,'$isRecurring','$note', '$lastRecurringID' , '$userBudgetVersionID ')";
     }
 
 
