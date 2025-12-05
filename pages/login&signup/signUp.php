@@ -11,7 +11,8 @@ include("../../pages/login&signup/process/signupBE.php");
     <title>CtrlSave | Signup</title>
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
@@ -429,7 +430,8 @@ include("../../pages/login&signup/process/signupBE.php");
                     <h5>Password</h5>
                     <div class="password-wrapper">
                         <input id="password" type="password" class="form-control" name="password" placeholder="Password"
-                            required>
+                            required pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
+                            title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
                         <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password"
                             title="Show password">
                             <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
@@ -449,6 +451,16 @@ include("../../pages/login&signup/process/signupBE.php");
                             </svg>
                         </button>
                     </div>
+
+                    <div id="passwordRequirements"
+                        style="font-size: 13px; margin-top: 6px; color: white; font-family: 'Poppins', sans-serif;">
+                        <p id="reqLength">❌ At least 8 characters</p>
+                        <p id="reqUpper">❌ One uppercase letter (A–Z)</p>
+                        <p id="reqLower">❌ One lowercase letter (a–z)</p>
+                        <p id="reqNumber">❌ One number (0–9)</p>
+                        <p id="reqSpecial">❌ One special character (@$!%*?&)</p>
+                    </div>
+
                 </div>
 
 
@@ -458,7 +470,7 @@ include("../../pages/login&signup/process/signupBE.php");
             <div class="row buttonRow">
                 <!-- Button -->
                 <div class="col-12 btnLogin d-flex justify-content-center align-items-center">
-                    <button type="submit" name="signup" class="btn btn-warning mb-3">Next</button></a>
+                    <button type="submit" name="signup" class="btn btn-warning mb-3" id="nextBtn" disabled>Next</button>
                 </div>
 
 
@@ -490,6 +502,53 @@ include("../../pages/login&signup/process/signupBE.php");
             }
         });
     </script>
+
+    <script>
+        const password = document.getElementById("password");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Requirement text elements
+        const reqLength = document.getElementById("reqLength");
+        const reqUpper = document.getElementById("reqUpper");
+        const reqLower = document.getElementById("reqLower");
+        const reqNumber = document.getElementById("reqNumber");
+        const reqSpecial = document.getElementById("reqSpecial");
+
+        // Validation Regex
+        function validatePassword(pwd) {
+            return {
+                length: pwd.length >= 8,
+                upper: /[A-Z]/.test(pwd),
+                lower: /[a-z]/.test(pwd),
+                number: /\d/.test(pwd),
+                special: /[@$!%*?&]/.test(pwd)
+            };
+        }
+
+        // Update UI on input
+        password.addEventListener("input", () => {
+            const val = password.value;
+            const check = validatePassword(val);
+
+            // Update icons only — ✔ white, ❌ black
+            reqLength.innerHTML = (check.length ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " At least 8 characters";
+            reqUpper.innerHTML = (check.upper ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One uppercase letter (A–Z)";
+            reqLower.innerHTML = (check.lower ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One lowercase letter (a–z)";
+            reqNumber.innerHTML = (check.number ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One number (0–9)";
+            reqSpecial.innerHTML = (check.special ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One special character (@$!%*?&)";
+
+            // Enable button only if all valid
+            if (check.length && check.upper && check.lower && check.number && check.special) {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = "1";
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = "0.6";
+            }
+        });
+    </script>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
