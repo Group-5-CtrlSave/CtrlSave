@@ -166,6 +166,10 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     #plusBtn:hover {
       background: #3aa76e;
     }
+
+    .iePriceContainer {
+      min-width: 120px !important;
+    }
   </style>
 
 </head>
@@ -251,7 +255,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
               uc.icon AS icon,
               uc.categoryName AS categoryName,
               'expense' AS type,
-              e.dateSpent AS dateCreated
+              e.dateAdded AS dateCreated
           FROM tbl_expense e
           JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
           WHERE e.userID = '$userID'
@@ -261,6 +265,31 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     ";
 
             $recentResult = executeQuery($recentQuery);
+
+            function formatDateTimeDisplay($dateCreated)
+            {
+              $now = new DateTime();
+              $created = new DateTime($dateCreated);
+
+              // If same day → show "x hours ago"
+              if ($created->format('Y-m-d') == $now->format('Y-m-d')) {
+                $diff = $now->getTimestamp() - $created->getTimestamp();
+
+                if ($diff < 60)
+                  return "Just now";
+
+                $minutes = floor($diff / 60);
+                if ($minutes < 60)
+                  return $minutes . "m ago";
+
+                $hours = floor($minutes / 60);
+                return $hours . "h ago";
+              }
+
+              // If NOT today → show MM/DD/YYYY
+              return $created->format("n/j/Y");
+            }
+
 
             if (mysqli_num_rows($recentResult) > 0) {
               while ($item = mysqli_fetch_assoc($recentResult)) {
@@ -287,12 +316,13 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
                     <!-- Price + Time -->
                     <div class="container iePriceContainer p-1">
                       <h5 class="price m-0">
-                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], 2); ?>
+                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], decimals: 2); ?>
                       </h5>
 
                       <p class="time m-0">
-                        <b><?php echo date("h:i A", strtotime($item['dateCreated'])); ?></b>
+                        <b><?php echo formatDateTimeDisplay($item['dateCreated']); ?></b>
                       </p>
+
                     </div>
 
                   </div>
