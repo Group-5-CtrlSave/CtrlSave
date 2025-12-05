@@ -202,7 +202,7 @@ if (!empty($displayedBadgesArray)) {
 
       <form method="post" action="../../pages/logout/logout.php">
         <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium"
-          style="font-family:'Poppins',sans-serif!important;font-size:14px!important;">
+          style="font-family:'Poppins',sans-serif!important;font-size:14px!important;border-radius:20px;">
           Logout
         </button>
       </form>
