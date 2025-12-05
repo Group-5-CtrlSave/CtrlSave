@@ -42,34 +42,80 @@ $xpNeeded = 100 + (($currentLevel - 1) * 20);
 // Prevent overflow display
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
-// --- Fetch only the equipped badges (max 3) ---
-$displayedBadges = [];
-if (!empty($user['displayedBadges'])) {
-  $badgeIcons = explode(',', $user['displayedBadges']);
-  $badgeIcons = array_filter(array_map('trim', $badgeIcons)); // Remove empty values
+// --- Fetch all claimed achievements for auto-equip logic ---
+$stmtAllAchievements = $conn->prepare("
+  SELECT a.icon, a.achievementName, a.type, ua.date
+  FROM tbl_userAchievements ua
+  JOIN tbl_achievements a ON ua.achievementID = a.achievementID
+  WHERE ua.userID = ? AND ua.isClaimed = 1
+  ORDER BY ua.date ASC
+");
+$stmtAllAchievements->bind_param("i", $userID);
+$stmtAllAchievements->execute();
+$allAchievementsResult = $stmtAllAchievements->get_result();
+$allAchievements = [];
+while ($row = $allAchievementsResult->fetch_assoc()) {
+  $allAchievements[] = $row;
+}
+$stmtAllAchievements->close();
 
-  if (!empty($badgeIcons)) {
-    // Create placeholders for IN clause
-    $placeholders = implode(',', array_fill(0, count($badgeIcons), '?'));
+// Get displayed badges array from database
+$displayedBadgesString = trim($user['displayedBadges'] ?? '');
+$displayedBadgesArray = [];
+if (!empty($displayedBadgesString)) {
+  $displayedBadgesArray = explode(',', $displayedBadgesString);
+  $displayedBadgesArray = array_filter(array_map('trim', $displayedBadgesArray));
+}
 
-    $stmtBadges = $conn->prepare("
-            SELECT achievementName, icon
-            FROM tbl_achievements
-            WHERE icon IN ($placeholders)
-            LIMIT 3
-        ");
-
-    // Bind parameters dynamically
-    $types = str_repeat('s', count($badgeIcons));
-    $stmtBadges->bind_param($types, ...$badgeIcons);
-    $stmtBadges->execute();
-    $badgesResult = $stmtBadges->get_result();
-
-    while ($badge = $badgesResult->fetch_assoc()) {
-      $displayedBadges[] = $badge;
-    }
-    $stmtBadges->close();
+if (empty($displayedBadgesArray) && !empty($allAchievements)) {
+  $titles = array_filter($allAchievements, function($a) { return $a['type'] === 'title'; });
+  $badges = array_filter($allAchievements, function($a) { return $a['type'] === 'badge'; });
+  $selected = [];
+  
+  if (!empty($titles)) {
+    $titlesArray = array_values($titles);
+    $selected[] = $titlesArray[0]['icon'];
   }
+
+  $badgesArray = array_values($badges);
+  for ($i = 0; $i < 2 && $i < count($badgesArray); $i++) {
+    $selected[] = $badgesArray[$i]['icon'];
+  }
+  
+  $displayedBadgesArray = $selected;
+  
+  if (!empty($selected)) {
+    $newDisplayedBadges = implode(',', $selected);
+    $stmtUpdate = $conn->prepare("UPDATE tbl_users SET displayedBadges = ? WHERE userID = ?");
+    $stmtUpdate->bind_param("si", $newDisplayedBadges, $userID);
+    $stmtUpdate->execute();
+    $stmtUpdate->close();
+  }
+}
+
+// --- Fetch only the equipped badges (max 3) for display ---
+$displayedBadges = [];
+if (!empty($displayedBadgesArray)) {
+  // Create placeholders for IN clause
+  $placeholders = implode(',', array_fill(0, count($displayedBadgesArray), '?'));
+
+  $stmtBadges = $conn->prepare("
+    SELECT achievementName, icon
+    FROM tbl_achievements
+    WHERE icon IN ($placeholders)
+    LIMIT 3
+  ");
+
+  // Bind parameters dynamically
+  $types = str_repeat('s', count($displayedBadgesArray));
+  $stmtBadges->bind_param($types, ...$displayedBadgesArray);
+  $stmtBadges->execute();
+  $badgesResult = $stmtBadges->get_result();
+
+  while ($badge = $badgesResult->fetch_assoc()) {
+    $displayedBadges[] = $badge;
+  }
+  $stmtBadges->close();
 }
 ?>
 <!-- Sidebar UI -->
@@ -156,7 +202,7 @@ if (!empty($user['displayedBadges'])) {
 
       <form method="post" action="../../pages/logout/logout.php">
         <button type="submit" class="w-100 btn btn-sm btn-danger fw-medium"
-          style="font-family:'Poppins',sans-serif!important;font-size:14px!important;">
+          style="font-family:'Poppins',sans-serif!important;font-size:14px!important;border-radius:20px;">
           Logout
         </button>
       </form>

@@ -13,6 +13,11 @@ if (isset($_POST['signup'])) {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
+    // Password Strength Validation
+    if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/', $password)) {
+        $error = "Password must be at least 8 characters with uppercase, lowercase, number, and special character.";
+    }
+
     // Check for existing email
     $checkSql = "SELECT email FROM tbl_users WHERE email = '$email' LIMIT 1";
     $checkResult = $conn->query($checkSql);

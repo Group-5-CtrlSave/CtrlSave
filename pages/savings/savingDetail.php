@@ -67,12 +67,21 @@ if (isset($_POST['add_amount'])) {
 
       checkDailyOversaving($userID);
 
-
       // Update goal amount
       $updateQuery = "UPDATE tbl_savinggoals 
                       SET currentAmount = currentAmount + $amount 
                       WHERE savingGoalID = $savingGoalID";
       mysqli_query($conn, $updateQuery);
+
+      // Check if goal is now complete and update status
+      $checkCompleteQuery = "SELECT currentAmount, targetAmount FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID";
+      $checkCompleteResult = mysqli_query($conn, $checkCompleteQuery);
+      $updatedGoal = mysqli_fetch_assoc($checkCompleteResult);
+      
+      if ($updatedGoal['currentAmount'] >= $updatedGoal['targetAmount']) {
+        $updateStatusQuery = "UPDATE tbl_savinggoals SET status = 'Completed' WHERE savingGoalID = $savingGoalID";
+        mysqli_query($conn, $updateStatusQuery);
+      }
 
       header("Location: savingDetail.php?id=$savingGoalID");
       exit();
@@ -85,8 +94,17 @@ if (isset($_POST['edit_goal'])) {
   $newGoalName = mysqli_real_escape_string($conn, $_POST['goal_name']);
   $newTargetAmount = (float)$_POST['target_amount'];
 
+  // Get current amount to check if goal is complete after edit
+  $currentGoalQuery = "SELECT currentAmount FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID";
+  $currentGoalResult = mysqli_query($conn, $currentGoalQuery);
+  $currentGoalData = mysqli_fetch_assoc($currentGoalResult);
+  $currentAmount = $currentGoalData['currentAmount'];
+
+  // Determine new status based on current amount vs new target
+  $newStatus = ($currentAmount >= $newTargetAmount) ? 'Completed' : 'In Progress';
+
   $updateGoalQuery = "UPDATE tbl_savinggoals 
-                      SET goalName = '$newGoalName', targetAmount = $newTargetAmount 
+                      SET goalName = '$newGoalName', targetAmount = $newTargetAmount, status = '$newStatus' 
                       WHERE savingGoalID = $savingGoalID";
   mysqli_query($conn, $updateGoalQuery);
   header("Location: savingDetail.php?id=$savingGoalID");
@@ -121,6 +139,12 @@ if ($result && mysqli_num_rows($result) > 0) {
   $iconFile = trim($goal['icon'] ?? '');
   $icon = "../../assets/img/shared/categories/expense/" . ($iconFile !== '' ? htmlspecialchars($iconFile) : "Default.png");
   $isComplete = $progress >= 100;
+
+  //completed status
+  if ($isComplete && $goal['status'] !== 'completed') {
+    $updateStatusQuery = "UPDATE tbl_savinggoals SET status = 'Completed' WHERE savingGoalID = $savingGoalID";
+    mysqli_query($conn, $updateStatusQuery);
+  }
 } else {
   header("Location: savingGoal.php");
   exit();
