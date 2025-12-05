@@ -19,10 +19,19 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
         $totalIncome = $budgetVersionRow['totalIncome'];
 
-        // Get Allocation
-        $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-                          FROM tbl_userAllocation 
-                          WHERE userBudgetRuleID = $userBudgetRuleID";
+        // FIXED: Join tbl_usercategories to get userisFlexible
+        $getAllocation = "
+            SELECT 
+                ua.userCategoryID,
+                ua.necessityType,
+                ua.limitType,
+                ua.value AS allocationValue,
+                uc.userisFlexible
+            FROM tbl_userAllocation ua
+            LEFT JOIN tbl_usercategories uc 
+                ON ua.userCategoryID = uc.userCategoryID
+            WHERE ua.userBudgetRuleID = $userBudgetRuleID
+        ";
         $allocationResult = executeQuery($getAllocation);
 
         $userSpending = [];
@@ -33,6 +42,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 $necessityType = $allocationRow['necessityType'];
                 $limitType = $allocationRow['limitType'];
                 $value = $allocationRow['allocationValue'];
+                $userisFlexible = $allocationRow['userisFlexible'];
 
                 // Skip savings entirely
                 if ($userCategoryID == 0 && $necessityType === 'saving') continue;
@@ -92,13 +102,16 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                     'budgetLimit' => $budgetLimit,
                     'spentPercent' => $spentPercent,
                     'spentPercentOfIncome' => $spentPercentOfIncome,
-                    'categoryBreakdown' => $categoryBreakdown
+                    'categoryBreakdown' => $categoryBreakdown,
+                    'userisFlexible' => $userisFlexible
                 ];
             }
 
             // Find the most overspent allocation
             $mostOverspent = null;
             foreach ($userSpending as $sp) {
+                if ($sp['userisFlexible'] == 0 && $sp['categoryID'] != 0) continue;
+
                 if ($sp['spentPercent'] > 100) {
                     if (!$mostOverspent || $sp['spentPercent'] > $mostOverspent['spentPercent']) {
                         $mostOverspent = $sp;
@@ -107,7 +120,6 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
             }
 
             if ($mostOverspent) {
-                // Build list of other categories/necessities
                 $otherCategories = [];
                 foreach ($userSpending as $sp) {
                     if ($mostOverspent['categoryID'] == 0) {
@@ -126,7 +138,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 // Build category breakdown text
                 $breakdownText = '';
                 if (!empty($mostOverspent['categoryBreakdown'])) {
-                    arsort($mostOverspent['categoryBreakdown']); // sort descending
+                    arsort($mostOverspent['categoryBreakdown']);
                     $parts = [];
                     foreach ($mostOverspent['categoryBreakdown'] as $cat => $amt) {
                         $percentOfIncome = round(($amt / $totalIncome) * 100, 1);

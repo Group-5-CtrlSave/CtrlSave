@@ -1,12 +1,10 @@
 <!-- Include DB connection -->
 <?php
 include("../connect.php");
-
-
 ?>
+
 <!-- Set Range -->
 <?php
-
 $mode = 'monthly';
 
 if ($mode === 'monthly') {
@@ -16,19 +14,15 @@ if ($mode === 'monthly') {
     $startDate = date('Y-m-d', strtotime('last monday'));
     $endDate = date('Y-m-d', strtotime('next sunday'));
 }
-
 ?>
 
 <?php
-
 // Get Active Budget Version
-
 $getBudgetVersion = "SELECT userID, userBudgetRuleID, totalIncome 
 FROM tbl_userbudgetversion 
 WHERE isActive = 1;";
 
 $budgetVersionResult = executeQuery($getBudgetVersion);
-
 
 if (mysqli_num_rows($budgetVersionResult) > 0) {
     while ($budgetVersionRow = mysqli_fetch_assoc($budgetVersionResult)) {
@@ -37,13 +31,21 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
         $totalIncome = $budgetVersionRow['totalIncome'];
 
-        // Get Allocation for the Budget Version
-        $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-        FROM tbl_userAllocation 
-        WHERE userBudgetRuleID = $userBudgetRuleID";
+        // FIXED: JOIN tbl_usercategories to get userisFlexible
+        $getAllocation = "
+            SELECT 
+                ua.userCategoryID,
+                ua.necessityType,
+                ua.limitType,
+                ua.value AS allocationValue,
+                uc.userisFlexible
+            FROM tbl_userAllocation ua
+            LEFT JOIN tbl_usercategories uc 
+                ON ua.userCategoryID = uc.userCategoryID
+            WHERE ua.userBudgetRuleID = $userBudgetRuleID
+        ";
 
         $allocationResult = executeQuery($getAllocation);
-
 
         if (mysqli_num_rows($allocationResult) > 0) {
             while ($allocationRow = mysqli_fetch_assoc($allocationResult)) {
@@ -51,10 +53,12 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 $necessityType = $allocationRow['necessityType'];
                 $limitType = $allocationRow['limitType'];
                 $value = $allocationRow['allocationValue'];
+                $userisFlexible = $allocationRow['userisFlexible']; // now correct
 
+                // Skip tracked-only custom categories
+                if ($userCategoryID != 0 && $userisFlexible == 0) continue;
 
                 //  Fetch Expenses
-
                 if ($userCategoryID == 0) {
                     // For Default Allocation
                     $expenseQuery = "SELECT SUM(tbl_expense.amount) as totalSpent 
@@ -71,7 +75,6 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                     WHERE tbl_expense.userID = $userID
                     AND tbl_usercategories.userNecessityType = '$necessityType'
                     AND tbl_expense.dateSpent BETWEEN '$startDate' AND '$endDate'";
-
                 }
 
                 $expenseResult = executeQuery($expenseQuery);
@@ -138,22 +141,10 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                         VALUES ('Monthly Overspending Alert','$message','alert.png',$userID,NOW(), 'overspending')";
                         executeQuery($insertNotif);
                     }
-
-
                 }
-
-
-
-
-
             }
         }
-
-
     }
     echo "Overspending insights generated successfully!";
 }
-
-
-
 ?>

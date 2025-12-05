@@ -1,11 +1,10 @@
-<!-- Include DB connection -->
 <?php
+
 include("../connect.php");
 
 // Daily mode: only today
 $startDate = date('Y-m-d');
 $endDate = date('Y-m-d');
-
 
 // Get Active Budget Version
 $getBudgetVersion = "SELECT userID, userBudgetRuleID, totalIncome 
@@ -21,10 +20,19 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
         $totalIncome = $budgetVersionRow['totalIncome'];
 
-        // Get Allocation for the Budget Version
-        $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-        FROM tbl_userAllocation 
-        WHERE userBudgetRuleID = $userBudgetRuleID";
+        // FIXED: JOIN tbl_usercategories to get userisFlexible
+        $getAllocation = "
+            SELECT 
+                ua.userCategoryID,
+                ua.necessityType,
+                ua.limitType,
+                ua.value AS allocationValue,
+                uc.userisFlexible
+            FROM tbl_userAllocation ua
+            LEFT JOIN tbl_usercategories uc 
+                ON ua.userCategoryID = uc.userCategoryID
+            WHERE ua.userBudgetRuleID = $userBudgetRuleID
+        ";
 
         $allocationResult = executeQuery($getAllocation);
 
@@ -35,6 +43,10 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 $necessityType = $allocationRow['necessityType'];
                 $limitType = $allocationRow['limitType'];
                 $value = $allocationRow['allocationValue'];
+                $userisFlexible = $allocationRow['userisFlexible']; // now correct
+
+                // Skip tracked-only custom categories
+                if ($userCategoryID != 0 && $userisFlexible == 0) continue;
 
                 // Fetch Expenses
                 if ($userCategoryID == 0) {

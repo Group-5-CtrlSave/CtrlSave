@@ -13,41 +13,54 @@ function checkDailyOverspending($userID) {
 
     if (mysqli_num_rows($budgetVersionResult) > 0) {
         while ($budgetVersionRow = mysqli_fetch_assoc($budgetVersionResult)) {
+
             $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
             $totalIncome = $budgetVersionRow['totalIncome'];
 
-            // Get Allocation for the Budget Version
-            $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-                              FROM tbl_userAllocation 
-                              WHERE userBudgetRuleID = $userBudgetRuleID";
+            // FIXED: JOIN tbl_usercategories to get userIsFlexible
+            $getAllocation = "SELECT ua.userCategoryID, ua.necessityType, ua.limitType, 
+                                     ua.value AS allocationValue,
+                                     uc.userIsFlexible
+                              FROM tbl_userAllocation ua
+                              LEFT JOIN tbl_usercategories uc 
+                                     ON ua.userCategoryID = uc.userCategoryID
+                              WHERE ua.userBudgetRuleID = $userBudgetRuleID";
+
             $allocationResult = executeQuery($getAllocation);
 
             if (mysqli_num_rows($allocationResult) > 0) {
                 while ($allocationRow = mysqli_fetch_assoc($allocationResult)) {
+
                     $userCategoryID = $allocationRow['userCategoryID'];
                     $necessityType = $allocationRow['necessityType'];
                     $limitType = $allocationRow['limitType'];
                     $value = $allocationRow['allocationValue'];
+                    $userIsFlexible = $allocationRow['userIsFlexible']; // now correct
+
+                    // Skip tracked-only custom categories (flexible = 0)
+                    if ($userCategoryID != 0 && $userIsFlexible == 0) {
+                        continue;
+                    }
 
                     // Fetch Expenses
                     if ($userCategoryID == 0) {
-                        // Default Allocation
-                        $expenseQuery = "SELECT COALESCE(SUM(tbl_expense.amount),0) as totalSpent
-                                         FROM tbl_expense 
-                                         JOIN tbl_usercategories 
-                                         ON tbl_usercategories.userCategoryID = tbl_expense.userCategoryID
-                                         WHERE tbl_expense.userID = $userID 
-                                         AND tbl_usercategories.userNecessityType = '$necessityType'
-                                         AND DATE(tbl_expense.dateSpent) = '$startDate'";
+                        // Default Allocation (need/want/saving)
+                        $expenseQuery = "SELECT COALESCE(SUM(e.amount),0) AS totalSpent
+                                         FROM tbl_expense e
+                                         JOIN tbl_usercategories uc 
+                                          ON uc.userCategoryID = e.userCategoryID
+                                         WHERE e.userID = $userID 
+                                         AND uc.userNecessityType = '$necessityType'
+                                         AND DATE(e.dateSpent) = '$startDate'";
                     } else {
                         // User Allocation
-                        $expenseQuery = "SELECT COALESCE(SUM(tbl_expense.amount), 0) AS totalSpent 
-                                         FROM tbl_expense 
-                                         JOIN tbl_usercategories 
-                                         ON tbl_usercategories.userCategoryID = tbl_expense.userCategoryID 
-                                         WHERE tbl_expense.userID = $userID
-                                         AND tbl_usercategories.userNecessityType = '$necessityType'
-                                         AND DATE(tbl_expense.dateSpent) = '$startDate'";
+                        $expenseQuery = "SELECT COALESCE(SUM(e.amount),0) AS totalSpent
+                                         FROM tbl_expense e
+                                         JOIN tbl_usercategories uc 
+                                          ON uc.userCategoryID = e.userCategoryID
+                                         WHERE e.userID = $userID
+                                         AND uc.userCategoryID = $userCategoryID
+                                         AND DATE(e.dateSpent) = '$startDate'";
                     }
 
                     $expenseResult = executeQuery($expenseQuery);
@@ -62,23 +75,26 @@ function checkDailyOverspending($userID) {
                     }
 
                     if ($totalSpent > $budgetLimit) {
+
                         $overAmount = $totalSpent - $budgetLimit;
 
                         // Get the Category Label
                         if ($userCategoryID == 0) {
                             $categoryLabel = $necessityType;
                         } else {
-                            $catQuery = "SELECT categoryName FROM tbl_usercategories WHERE userCategoryID = $userCategoryID LIMIT 1";
+                            $catQuery = "SELECT categoryName 
+                                         FROM tbl_usercategories 
+                                         WHERE userCategoryID = $userCategoryID LIMIT 1";
                             $catResult = executeQuery($catQuery);
                             $catRow = mysqli_fetch_assoc($catResult);
                             $categoryLabel = $catRow['categoryName'] ?? "Unknown Category";
                         }
 
-                        // Build the message with current date and target limit
+                        // Build the message
                         $todayDate = date('Y-m-d');
                         $message = "You have overspent ₱$overAmount in $categoryLabel today ($todayDate). Your target limit was ₱$budgetLimit.";
 
-                        // Check if daily notification already exists
+                        // Check if daily notification exists
                         $checkNotif = "SELECT 1 FROM tbl_notifications 
                                        WHERE userID = $userID 
                                        AND message = '$message'
@@ -89,7 +105,7 @@ function checkDailyOverspending($userID) {
                             // Insert daily notification
                             $insertNotif = "INSERT INTO tbl_notifications 
                                             (notificationTitle, message, icon, userID, createdAt, type)
-                                            VALUES ('Daily Overspending Alert','$message','alert.png',$userID,NOW(), 'daily_overspending')";
+                                            VALUES ('Daily Overspending Alert','$message','alert.png',$userID,NOW(),'daily_overspending')";
                             executeQuery($insertNotif);
                         }
                     }
