@@ -2,7 +2,7 @@
 session_start();
 include("../../../assets/shared/connect.php");
 include("challengeController.php");
-include("savingChallengeFunctions.php"); // Required for new challenge creation
+include("savingChallengeFunctions.php");
 
 // ---------------------------
 // USER VALIDATION
@@ -26,7 +26,7 @@ $index = intval($_POST['index']);
 $amount = intval($_POST['amount']);
 
 // ---------------------------
-// 1. INSERT OR UPDATE SLOT PROGRESS
+// 1. SAVE SLOT PROGRESS
 // ---------------------------
 $stmt = $conn->prepare("
     INSERT INTO tbl_savingchallenge_progress (userID, itemIndex, amount, dateAdded)
@@ -37,7 +37,7 @@ $stmt->bind_param("iii", $userID, $index, $amount);
 $stmt->execute();
 
 // ---------------------------
-// ADD TO currentAmount IN ACTIVE CHALLENGE
+// 2. ADD TO CURRENT AMOUNT
 // ---------------------------
 $conn->query("
     UPDATE tbl_usersavingchallenge
@@ -46,7 +46,7 @@ $conn->query("
 ");
 
 // ---------------------------
-// FETCH ACTIVE CHALLENGE
+// 3. FETCH ACTIVE CHALLENGE
 // ---------------------------
 $challengeQuery = $conn->query("
     SELECT * FROM tbl_usersavingchallenge
@@ -60,75 +60,84 @@ if (!$challengeQuery || $challengeQuery->num_rows == 0) {
 }
 
 $challenge = $challengeQuery->fetch_assoc();
-
 $current = intval($challenge['currentAmount']);
 $target = intval($challenge['targetAmount']);
-$rewardEXP = intval($challenge['expReward']);
 
 // ---------------------------
-// COMPLETION CHECK
+// 4. COMPLETION CHECK
 // ---------------------------
 if ($current >= $target) {
 
-    // Mark current challenge completed
+    // Mark as completed
     $conn->query("
         UPDATE tbl_usersavingchallenge
         SET status = 'completed', completedAt = NOW()
         WHERE userSavingChallengeID = {$challenge['userSavingChallengeID']}
     ");
 
-    // Award EXP
+    // FIXED SAVING CHALLENGE REWARD → ALWAYS 50 XP
+    $rewardEXP = 50;
+
+    // Update EXP
     $conn->query("
         UPDATE tbl_userlvl
         SET exp = exp + $rewardEXP
         WHERE userID = $userID
     ");
 
-    // Re-fetch updated exp + level
+    // Fetch updated user level
     $row = $conn->query("
         SELECT lvl, exp FROM tbl_userlvl WHERE userID = $userID
     ")->fetch_assoc();
 
     $lvl = intval($row['lvl']);
     $exp = intval($row['exp']);
+    $leveledUp = false;
 
-    // LEVEL-UP LOOP
-    while ($exp >= $lvl * 100) {
-        $exp -= ($lvl * 100);
-        $lvl++;
+    // XP needed formula: Level 1=100, Level 2=120, Level 3=140...
+    function xpRequired($level)
+    {
+        return 100 + (($level - 1) * 20);
     }
 
-    // Update level + remaining exp
+    while ($exp >= xpRequired($lvl)) {
+        $exp -= xpRequired($lvl);
+        $lvl++;
+        $leveledUp = true;
+    }
+
+
+    // Save level state
     $conn->query("
         UPDATE tbl_userlvl
         SET lvl = $lvl, exp = $exp
         WHERE userID = $userID
     ");
 
-    // Clear old progress (the 20-slot grid)
+    // Clear used slot progress
     $conn->query("
         DELETE FROM tbl_savingchallenge_progress
         WHERE userID = $userID
     ");
 
-    // Create next challenge at new level
-    createSavingChallenge($conn, $userID, $lvl);         
+    // Create NEW saving challenge
+    createSavingChallenge($conn, $userID, $lvl);
 
-    echo json_encode([               
+    echo json_encode([
         "status" => "completed",
         "expAwarded" => $rewardEXP,
+        "leveledUp" => $leveledUp,
         "newLevel" => $lvl
     ]);
     exit();
 }
-                                              
+
 // ---------------------------
-// NOT COMPLETED → UPDATE DAILY/WEEKLY CHALLENGES
+// 5. NORMAL PROGRESS UPDATE
 // ---------------------------
 updateSavingDaily10Peso($userID, $conn);
 updateSavingWeeklyRow($userID, $conn);
 
-// Respond OK
 echo json_encode(["status" => "ok"]);
 exit();
 ?>

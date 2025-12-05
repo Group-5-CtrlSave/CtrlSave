@@ -17,14 +17,21 @@ $savingsCategory = null;
 $error = '';
 $show_tracking_prompt = false;
 
-
 function clean_currency_input($value)
 {
     $cleaned_value = preg_replace('/[,\s\x{20B1}\$]/u', '', $value);
     return trim($cleaned_value);
 }
 
-$sql_categories = "SELECT userCategoryID, categoryName, userisFlexible, userNecessityType FROM tbl_usercategories WHERE userID = ? AND type = 'expense' AND isSelected = 1 ORDER BY userNecessityType DESC, categoryName ASC";
+/* ----------------------------------------------------------
+   FETCH EXPENSE CATEGORIES
+----------------------------------------------------------- */
+$sql_categories = "SELECT userCategoryID, categoryName, userisFlexible, userNecessityType 
+                   FROM tbl_usercategories 
+                   WHERE userID = ? 
+                     AND type = 'expense' 
+                     AND isSelected = 1 
+                   ORDER BY userNecessityType DESC, categoryName ASC";
 $stmt_categories = $conn->prepare($sql_categories);
 if ($stmt_categories) {
     $stmt_categories->bind_param("i", $userID);
@@ -38,7 +45,14 @@ if ($stmt_categories) {
     $error = "Database error fetching expense categories: " . $conn->error;
 }
 
-$sql_savings_id = "SELECT userCategoryID, categoryName FROM tbl_usercategories WHERE userID = ? AND type = 'savings' AND categoryName = 'Savings'";
+/* ----------------------------------------------------------
+   FETCH SAVINGS CATEGORY
+----------------------------------------------------------- */
+$sql_savings_id = "SELECT userCategoryID, categoryName 
+                   FROM tbl_usercategories 
+                   WHERE userID = ? 
+                     AND type = 'savings' 
+                     AND categoryName = 'Savings'";
 $stmt_savings = $conn->prepare($sql_savings_id);
 if ($stmt_savings) {
     $stmt_savings->bind_param("i", $userID);
@@ -48,213 +62,215 @@ if ($stmt_savings) {
     $stmt_savings->close();
 
     if (!$savingsCategory) {
-        // Critical error: Savings category setup is missing for the user
         $error = "CRITICAL ERROR: 'Savings' category not found. Cannot proceed.";
     }
 } else {
     $error = "Database error fetching Savings category: " . $conn->error;
 }
 
+/* ----------------------------------------------------------
+   FETCH TOTAL INCOME FOR JS + VALIDATION (OUTSIDE POST!)
+----------------------------------------------------------- */
+$totalIncome = 0.00;
+$sql_income = "
+    SELECT totalIncome
+    FROM tbl_userbudgetversion
+    WHERE userID = ?
+      AND isActive = 1
+    ORDER BY userBudgetversionID DESC
+    LIMIT 1
+";
+$stmt_income = $conn->prepare($sql_income);
+if ($stmt_income) {
+    $stmt_income->bind_param("i", $userID);
+    $stmt_income->execute();
+    $res_income = $stmt_income->get_result();
+    if ($row = $res_income->fetch_assoc()) {
+        $totalIncome = (float)$row['totalIncome'];
+    }
+    $stmt_income->close();
+}
 
+// Make total income available to JavaScript (FOR LIVE BALANCE UI)
+echo "<script>window.userIncome = {$totalIncome};</script>";
+
+/* ----------------------------------------------------------
+   HANDLE POST REQUEST
+----------------------------------------------------------- */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
 
-    $all_tracking = true;
+    $all_tracking   = true;
     $valid_allocation = true;
-    $allocations = [];
-
+    $allocations    = [];
     $total_limit_count = 0;
 
-
+    /* -----------------------------
+       PROCESS EXPENSE CATEGORIES
+    ------------------------------ */
     if (!empty($categories)) {
         foreach ($categories as $category) {
+
             $id = $category['userCategoryID'];
             $name_base = "category_" . $id;
 
-            // Get mode and value from POST
-            $mode = $_POST[$name_base . "_mode"] ?? '';
+            $mode  = $_POST[$name_base . "_mode"] ?? '';
             $value = trim($_POST[$name_base . "_value"] ?? '');
+            $clean = clean_currency_input($value);
 
-            // Clean the input before validation
-            $cleaned_value = clean_currency_input($value);
-
-            if (empty($mode)) {
+            if (!$mode) {
                 $valid_allocation = false;
-                $error = "Internal error: Missing budget mode for an expense category.";
+                $error = "Internal Error: Missing mode for a category.";
                 break;
             }
 
-            $allocation_data = [
+            // limitType: 1 = percentage, 0 = amount
+            $allocation = [
                 'userCategoryID' => $id,
                 'necessityType' => $category['userNecessityType'],
-                'limitType' => ($mode == 'limit') ? 2 : 0, 
-                'value' => 0.00 
+                'limitType' => ($mode == 'limit') ? 1 : 0,
+                'value' => 0.00
             ];
 
             if ($mode == 'limit') {
                 $all_tracking = false;
                 $total_limit_count++;
 
-                // Validation for amount (must be a positive number after cleaning)
-                if (empty($value) || !is_numeric($cleaned_value) || (float) $cleaned_value <= 0) {
+                if (empty($value) || !is_numeric($clean) || (float)$clean <= 0) {
                     $valid_allocation = false;
-                    $error = "Limit value for " . htmlspecialchars($category['categoryName']) . " must be a positive monetary amount.";
+                    $error = "Limit for " . htmlspecialchars($category['categoryName']) . " must be a positive amount.";
                     break;
                 }
-                $allocation_data['value'] = (float) $cleaned_value;
+
+                $allocation['value'] = (float)$clean;
             }
 
-            $allocations[] = $allocation_data;
+            $allocations[] = $allocation;
         }
     }
 
-
+    /* -----------------------------
+        PROCESS SAVINGS
+    ------------------------------ */
     $savings_value = trim($_POST['savings_value'] ?? '');
-    $cleaned_savings_value = clean_currency_input($savings_value);
+    $clean_savings = clean_currency_input($savings_value);
 
-    if ($valid_allocation && $savingsCategory) {
-        if (empty($savings_value) || !is_numeric($cleaned_savings_value) || (float) $cleaned_savings_value <= 0) {
+    if ($valid_allocation) {
+        if (empty($savings_value) || !is_numeric($clean_savings) || (float)$clean_savings <= 0) {
             $valid_allocation = false;
-            $error = "Savings amount must be a positive monetary amount.";
+            $error = "Savings amount must be positive.";
         } else {
-            // Savings is always a Limit
-            $savings_allocation = [
+            $allocations[] = [
                 'userCategoryID' => $savingsCategory['userCategoryID'],
-                'necessityType' => 'saving', 
-                'limitType' => 2, 
-                'value' => (float)$cleaned_savings_value 
+                'necessityType' => 'saving',
+                'limitType' => 1, // ALWAYS percentage-based limit
+                'value' => (float)$clean_savings
             ];
-            $allocations[] = $savings_allocation;
             $total_limit_count++;
         }
     }
 
-
-    if ($valid_allocation) {
-        if ($all_tracking && $total_limit_count == 1) {
-            if (!isset($_POST['tracking_confirm'])) {
-                // Set flag to display the prompt on the FE
-                $show_tracking_prompt = true;
-                $valid_allocation = false; // Stop further processing until confirmed
-            }
+    /* -----------------------------
+        OPTIONAL TRACKING-ONLY PROMPT
+    ------------------------------ */
+    if ($valid_allocation && $all_tracking && $total_limit_count == 1) {
+        if (!isset($_POST['tracking_confirm'])) {
+            $show_tracking_prompt = true;
+            $valid_allocation = false;
         }
     }
 
-    // percentage-based validation using actual amounts
+    /* -----------------------------
+        VALIDATE AGAINST TOTAL INCOME
+    ------------------------------ */
     if ($valid_allocation && !$show_tracking_prompt) {
-
-        // Get user's active total income
-        $totalIncome = 0.00;
-        $sql_budget = "
-        SELECT totalIncome
-        FROM tbl_userbudgetversion
-        WHERE userID = ?
-          AND isActive = 1
-        ORDER BY userBudgetversionID DESC
-        LIMIT 1
-    ";
-        $stmt_budget = $conn->prepare($sql_budget);
-        if ($stmt_budget) {
-            $stmt_budget->bind_param("i", $userID);
-            $stmt_budget->execute();
-            $res_budget = $stmt_budget->get_result();
-            if ($rowBudget = $res_budget->fetch_assoc()) {
-                $totalIncome = (float) $rowBudget['totalIncome'];
-            }
-            $stmt_budget->close();
-        }
 
         if ($totalIncome <= 0) {
             $valid_allocation = false;
-            $error = "Cannot set budget limits because your total monthly income is missing or zero.";
+            $error = "You must set a valid monthly income before creating limits.";
         } else {
-            // Sum all LIMIT amounts (expenses + savings)
-            $totalLimitAmount = 0.0;
-            foreach ($allocations as $allocation) {
-                if ((int) $allocation['limitType'] === 1) { // only 'limit' mode
-                    $totalLimitAmount += (float) $allocation['value']; // actual amount
+            $sumLimitAmounts = 0.00;
+
+            foreach ($allocations as $a) {
+                if ((int)$a['limitType'] === 1) {
+                    $sumLimitAmounts += (float)$a['value'];
                 }
             }
 
-            // Convert to percent of income
-            $usedPercent = ($totalLimitAmount / $totalIncome) * 100;
-
-            // Block if > 100%
-            if ($usedPercent > 100.0) {
+            if ($sumLimitAmounts > $totalIncome) {
+                $percent = ($sumLimitAmounts / $totalIncome) * 100;
                 $valid_allocation = false;
-
-                $error = "Your total budget limits exceed 100% of your monthly income (₱" . number_format($totalIncome, 2) . ")";
+                $error = "Your limits exceed 100% of your income.";
             }
         }
     }
 
-    // Only start transaction if still valid after all checks
+    /* -----------------------------
+        SAVE FINAL DATA INTO DATABASE
+    ------------------------------ */
     if ($valid_allocation && !$show_tracking_prompt) {
 
         $conn->begin_transaction();
+
         try {
+            // Unselect previous rules
+            $sql_un = "UPDATE tbl_userbudgetrule SET isSelected = 0 WHERE userID = ?";
+            $stmt_un = $conn->prepare($sql_un);
+            $stmt_un->bind_param("i", $userID);
+            $stmt_un->execute();
+            $stmt_un->close();
+
+            // Insert new rule
             $ruleName = "Custom-Rule";
-            $isSelected = 1;
+            $sql_new = "INSERT INTO tbl_userbudgetrule (userID, ruleName, isSelected) VALUES (?, ?, 1)";
+            $stmt_new = $conn->prepare($sql_new);
+            $stmt_new->bind_param("is", $userID, $ruleName);
+            $stmt_new->execute();
+            $ruleID = $conn->insert_id;
+            $stmt_new->close();
 
-            $sql_unselect = "UPDATE tbl_userbudgetrule SET isSelected = 0 WHERE userID = ?";
-            $stmt_unselect = $conn->prepare($sql_unselect);
-            $stmt_unselect->bind_param("i", $userID);
-            $stmt_unselect->execute();
-            $stmt_unselect->close();
+            // Insert allocations
+            $sql_alloc = "INSERT INTO tbl_userallocation 
+                          (userBudgetruleID, userCategoryID, necessityType, limitType, value)
+                          VALUES (?, ?, ?, ?, ?)";
+            $stmt_alloc = $conn->prepare($sql_alloc);
 
-            $sql_rule = "INSERT INTO tbl_userbudgetrule (userID, ruleName, isSelected) VALUES (?, ?, ?)";
-            $stmt_rule = $conn->prepare($sql_rule);
-            $stmt_rule->bind_param("isi", $userID, $ruleName, $isSelected);
-            $stmt_rule->execute();
-            $userBudgetRuleID = $conn->insert_id;
-            $stmt_rule->close();
-
-
-            $sql_delete_allocations = "DELETE FROM tbl_userallocation WHERE userBudgetruleID = (SELECT userBudgetruleID FROM tbl_userbudgetrule WHERE userID = ? AND ruleName = 'Custom-Rule' AND isSelected = 1)";
-
-
-            $sql_allocation = "INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, ?, ?, ?, ?)";
-            $stmt_allocation = $conn->prepare($sql_allocation);
-
-            foreach ($allocations as $allocation) {
-                $userCategoryID = $allocation['userCategoryID'];
-                $necessityType = $allocation['necessityType'];
-                $limitType = $allocation['limitType'];
-                $value = $allocation['value'];
-
-
-                $stmt_allocation->bind_param("iisid", $userBudgetRuleID, $userCategoryID, $necessityType, $limitType, $value);
-                $stmt_allocation->execute();
+            foreach ($allocations as $a) {
+                $stmt_alloc->bind_param(
+                    "iisid",
+                    $ruleID,
+                    $a['userCategoryID'],
+                    $a['necessityType'],
+                    $a['limitType'],
+                    $a['value']
+                );
+                $stmt_alloc->execute();
             }
 
-            $stmt_allocation->close();
+            $stmt_alloc->close();
 
-
-            $sql_update_flex = "UPDATE tbl_usercategories SET userisFlexible = ? WHERE userCategoryID = ? AND userID = ?";
-            $stmt_update_flex = $conn->prepare($sql_update_flex);
+            // Update category modes
+            $sql_upd = "UPDATE tbl_usercategories SET userisFlexible = ? WHERE userCategoryID = ? AND userID = ?";
+            $stmt_upd = $conn->prepare($sql_upd);
 
             foreach ($categories as $category) {
                 $id = $category['userCategoryID'];
-                $name_base = "category_" . $id;
-                $mode = $_POST[$name_base . "_mode"] ?? 'track';
+                $mode = $_POST["category_{$id}_mode"] ?? 'track';
+                $flex = ($mode === 'limit') ? 1 : 0;
 
-                $new_isFlexible = ($mode == 'limit') ? 1 : 0;
-
-                $stmt_update_flex->bind_param("iii", $new_isFlexible, $id, $userID);
-                $stmt_update_flex->execute();
+                $stmt_upd->bind_param("iii", $flex, $id, $userID);
+                $stmt_upd->execute();
             }
 
-            $stmt_update_flex->close();
-
+            $stmt_upd->close();
 
             $conn->commit();
-
-            // Successful completion, proceed to the next step
             header("Location: done.php");
             exit();
 
         } catch (Exception $e) {
             $conn->rollback();
-            $error = "Transaction failed: Please try again. System Error: " . $e->getMessage();
+            $error = "Transaction failed: " . $e->getMessage();
         }
     }
 }
+?>

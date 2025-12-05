@@ -204,7 +204,7 @@ if ($userID) {
             /* changes dynamically with JS */
             background: linear-gradient(135deg, #4CAF50, #81C784);
             box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.15);
-            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1),0.4s ease;
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1), 0.4s ease;
         }
 
         /* XP label */
@@ -334,14 +334,37 @@ if ($userID) {
         </div>
     </header>
 
+
+
     <!-- Daily & Weekly Section -->
     <section id="daily" class="tab-content active">
+
         <!-- Daily Saving Challenge Card -->
         <div class="challenge-card">
             <h3>Daily Challenges</h3>
             <div class="row" style="overflow-x: scroll; height: 160px;">
-                <?php
-                if ($dailyresult && mysqli_num_rows($dailyresult) > 0) {
+
+                <?php if (!$dailyresult || mysqli_num_rows($dailyresult) == 0): ?>
+
+                    <!-- EMPTY STATE -->
+                    <div style="
+                    width:100%;
+                    height:140px;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:center;
+                    align-items:center;
+                    opacity:0.75;
+                ">
+                        <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
+                        <p style="font-family:Poppins, sans-serif; font-weight:600; color:#44B87D; font-size:14px;">
+                            No challenges yet to show
+                        </p>
+                    </div>
+
+                <?php else: ?>
+
+                    <?php
                     while ($dailyrows = mysqli_fetch_assoc($dailyresult)) {
                         $dailyname = htmlspecialchars($dailyrows['challengeName']);
                         $dailystatus = $dailyrows['status'];
@@ -368,8 +391,8 @@ if ($userID) {
                         ?>
                         <div class="challenge-item">
                             <div>
-                                <div><?php echo $dailyname; ?></div>
-                                <small style="font-size:12px;color:#666;"><?php echo $timeLeft; ?></small>
+                                <div><?= $dailyname ?></div>
+                                <small style="font-size:12px;color:#666;"><?= $timeLeft ?></small>
                             </div>
 
                             <?php
@@ -384,10 +407,10 @@ if ($userID) {
                             }
                             ?>
                         </div>
-                        <?php
-                    }
-                }
-                ?>
+                    <?php } ?>
+
+                <?php endif; ?>
+
             </div>
         </div>
 
@@ -395,14 +418,34 @@ if ($userID) {
         <div class="challenge-card mt-4">
             <h3>Weekly Challenges</h3>
             <div class="row" style="overflow-x: scroll; height: 160px;">
-                <?php
-                if ($weeklyresult && mysqli_num_rows($weeklyresult) > 0) {
+
+                <?php if (!$weeklyresult || mysqli_num_rows($weeklyresult) == 0): ?>
+
+                    <!-- EMPTY STATE -->
+                    <div style="
+                    width:100%;
+                    height:140px;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:center;
+                    align-items:center;
+                    opacity:0.75;
+                ">
+                        <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
+                        <p style="font-family:Poppins, sans-serif; font-weight:600; color:#44B87D; font-size:14px;">
+                            No challenges yet to show
+                        </p>
+                    </div>
+
+                <?php else: ?>
+
+                    <?php
                     while ($weeklyrows = mysqli_fetch_assoc($weeklyresult)) {
                         $weeklyname = htmlspecialchars($weeklyrows['challengeName']);
                         $weeklystatus = $weeklyrows['status'];
                         $assigned = $weeklyrows['assignedDate'];
 
-                        // compute weekly time left safely
+                        // compute weekly time left
                         $timeLeft = "Expired";
                         if (!empty($assigned)) {
                             try {
@@ -428,24 +471,20 @@ if ($userID) {
                         if ($progress && $weeklystatus !== "claimed") {
                             $current = $progress['current'];
                             $total = $progress['total'];
-
                             if ($current > $total)
                                 $current = $total;
-
                             $progressText = "Progress: {$current}/{$total}";
                         }
-
-
-
                         ?>
 
                         <div class="challenge-item">
                             <div>
-                                <div><?php echo $weeklyname; ?></div>
-                                <small style="font-size:12px; color:#666;"><?php echo $timeLeft; ?></small>
+                                <div><?= $weeklyname ?></div>
+                                <small style="font-size:12px; color:#666;"><?= $timeLeft ?></small>
                                 <?php if ($progressText !== ""): ?>
-                                    <small
-                                        style="font-size:9px; color:#555; display:block; margin-top:1px;"><?php echo $progressText; ?></small>
+                                    <small style="font-size:9px; color:#555; display:block; margin-top:1px;">
+                                        <?= $progressText ?>
+                                    </small>
                                 <?php endif; ?>
                             </div>
 
@@ -462,13 +501,15 @@ if ($userID) {
                             ?>
                         </div>
 
-                        <?php
-                    }
-                }
-                ?>
+                    <?php } ?>
+
+                <?php endif; ?>
+
             </div>
         </div>
+
     </section>
+
 
     <!-- SAVING CHALLENGE SECTION (DYNAMIC, DB-DRIVEN) -->
 
@@ -705,10 +746,16 @@ if ($userID) {
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "completed") {
-                            alert(`🎉 Saving Challenge Completed! +${data.expAwarded} XP`);
-                            location.reload();
+
+                            showXPModal(
+                                data.expAwarded,
+                                "Saving Challenge Completed",
+                                data.leveledUp
+                            );
+
                         }
                     });
+
             });
 
             // Reset selections
@@ -803,6 +850,112 @@ if ($userID) {
             launchConfetti();
         }
     </script>
+
+    <script>
+        setInterval(() => {
+            fetch("process/fetchChallenges.php")
+                .then(res => res.json())
+                .then(data => {
+                    refreshChallengeSection("daily", data.daily);
+                    refreshChallengeSection("weekly", data.weekly);
+                });
+        }, 10000); // Refresh every 10 seconds
+
+
+        function refreshChallengeSection(type, list) {
+            let cards = document.querySelectorAll("#daily .challenge-card");
+            let container =
+                type === "daily"
+                    ? cards[0].querySelector(".row")
+                    : cards[1].querySelector(".row");
+
+            if (!container) return;
+
+            // EMPTY STATE
+            if (list.length === 0) {
+                container.innerHTML = `
+            <div style="
+                width:100%;
+                height:140px;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                align-items:center;
+                opacity:0.75;">
+                <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
+                <p style="font-family:Poppins, sans-serif; font-weight:600; color:; font-size:14px;">
+                    No challenges yet to show
+                </p>
+            </div>
+        `;
+                return;
+            }
+
+            // BUILD NEW LIST
+            container.innerHTML = "";
+            list.forEach(ch => {
+
+                let statusBtn = "";
+                if (ch.status === "claimed")
+                    statusBtn = `<button class='in-progress' disabled>Claimed</button>`;
+                else if (ch.status === "completed")
+                    statusBtn = `<button class='claim-btn' data-challengeid='${ch.userChallengeID}'>Claim</button>`;
+                else if (ch.status === "failed")
+                    statusBtn = `<button class='failed-btn' disabled>Failed</button>`;
+                else
+                    statusBtn = `<button class='in-progress'>In Progress</button>`;
+
+                container.innerHTML += `
+            <div class="challenge-item">
+                <div>
+                    <div>${ch.challengeName}</div>
+                    <small style="font-size:12px;color:#666;">⏳ Updating...</small>
+                </div>
+                ${statusBtn}
+            </div>
+        `;
+            });
+
+            // REATTACH CLAIM BUTTON EVENTS
+            setTimeout(() => attachClaimEvents(), 50);
+        }
+
+
+        // ===============================
+        // Reattach claim button events
+        // ===============================
+        function attachClaimEvents() {
+            document.querySelectorAll('.claim-btn').forEach(button => {
+                button.onclick = () => {
+                    const challengeID = button.dataset.challengeid;
+
+                    fetch("process/claimChallengeBE.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `challengeID=${challengeID}`
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+
+                            if (data.status === "success") {
+                                button.classList.remove("claim-btn");
+                                button.classList.add("in-progress");
+                                button.textContent = "Claimed";
+
+                                let typeLabel =
+                                    data.type === "daily" ? "Daily Reward" :
+                                        data.type === "weekly" ? "Weekly Reward" :
+                                            "Reward";
+
+                                showXPModal(data.exp, typeLabel, data.leveledUp);
+                            }
+                        });
+                };
+            });
+        }
+
+    </script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

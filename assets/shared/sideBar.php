@@ -29,9 +29,17 @@ $levelResult = $stmtLevel->get_result();
 $level = $levelResult->fetch_assoc() ?? ['exp' => 0, 'lvl' => 1];
 $stmtLevel->close();
 
-$currentXP = $level['exp'];
-$currentLevel = $level['lvl'];
-$xpNeeded = 100;
+$currentXP = intval($level['exp']);
+$currentLevel = intval($level['lvl']);
+
+if ($currentLevel < 1) { 
+    $currentLevel = 1; 
+}
+
+// XP needed 
+$xpNeeded = 100 + (($currentLevel - 1) * 20);
+
+// Prevent overflow display
 $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 
 // --- Fetch only the equipped badges (max 3) ---
