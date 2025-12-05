@@ -46,62 +46,107 @@ if ($userBudgetRuleID) {
     }
 }
 
+/* ----------------------------------------------------------
+   FETCH TOTAL INCOME FOR BALANCE + LIMIT CHECK (ADDED)
+----------------------------------------------------------- */
+$totalIncome = 0.00;
+$sql_income = "
+    SELECT totalIncome
+    FROM tbl_userbudgetversion
+    WHERE userID = ?
+      AND isActive = 1
+    ORDER BY userBudgetversionID DESC
+    LIMIT 1
+";
+$stmt_income = $conn->prepare($sql_income);
+$stmt_income->bind_param("i", $userID);
+$stmt_income->execute();
+$res_income = $stmt_income->get_result()->fetch_assoc();
+$totalIncome = $res_income['totalIncome'] ?? 0;
+$stmt_income->close();
+
+echo "<script>window.userIncome = {$totalIncome};</script>";
+
+
 // ---------------- HANDLE FORM SUBMISSION ----------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $conn->begin_transaction();
-    
-    try {
-        // Create or update user budget rule with custom name
-        $customRuleName = "Custom Budget Rule";
-        
-        if ($userBudgetRuleID) {
-            // Update existing rule
-            $stmt = $conn->prepare("UPDATE tbl_userbudgetrule SET ruleName = ?, isSelected = 1 WHERE userBudgetRuleID = ?");
-            $stmt->bind_param("si", $customRuleName, $userBudgetRuleID);
-            $stmt->execute();
-            $stmt->close();
-        } else {
-            // Create new rule
-            $stmt = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected) VALUES (?, ?, NOW(), 1)");
-            $stmt->bind_param("is", $userID, $customRuleName);
-            $stmt->execute();
-            $userBudgetRuleID = $conn->insert_id;
-            $stmt->close();
+
+    /* ----------------------------------------------------------
+       LIMIT VALIDATION (ADDED)
+    ----------------------------------------------------------- */
+    $sumLimits = intval(str_replace(',', '', $_POST['savings_value'] ?? 0));
+
+    foreach ($categories as $cat) {
+        $id = $cat['userCategoryID'];
+        $mode = $_POST["category_{$id}_mode"] ?? 'track';
+
+        if ($mode === 'limit') {
+            $val = intval(str_replace(',', '', $_POST["category_{$id}_value"] ?? 0));
+            $sumLimits += $val;
         }
+    }
 
-        // Delete existing allocations
-        $stmt = $conn->prepare("DELETE FROM tbl_userallocation WHERE userBudgetruleID = ?");
-        $stmt->bind_param("i", $userBudgetRuleID);
-        $stmt->execute();
-        $stmt->close();
+    if ($sumLimits > $totalIncome) {
+        $error = "Your limits exceed 100% of your income.";
+    }
 
-        // Insert savings allocation
-        $savingValue = intval(str_replace(',', '', $_POST['savings_value'] ?? 0));
-        $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, 'saving', 0, ?)");
-        $stmt->bind_param("ii", $userBudgetRuleID, $savingValue);
-        $stmt->execute();
-        $stmt->close();
+    if (empty($error)) {
 
-        // Insert each category allocation
-        foreach ($categories as $cat) {
-            $id = $cat['userCategoryID'];
-            $mode = $_POST["category_{$id}_mode"] ?? 'track';
-            $value = intval(str_replace(',', '', $_POST["category_{$id}_value"] ?? 0));
-            $limitType = ($mode === 'limit') ? 1 : 0;
-            $necessityType = $cat['userNecessityType'] ?? 'need';
+        $conn->begin_transaction();
+        try {
+            // Create or update user budget rule with custom name
+            $customRuleName = "Custom Budget Rule";
 
-            $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("iisii", $userBudgetRuleID, $id, $necessityType, $limitType, $value);
+            if ($userBudgetRuleID) {
+                // Update existing rule
+                $stmt = $conn->prepare("UPDATE tbl_userbudgetrule SET ruleName = ?, isSelected = 1 WHERE userBudgetRuleID = ?");
+                $stmt->bind_param("si", $customRuleName, $userBudgetRuleID);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                // Create new rule
+                $stmt = $conn->prepare("INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected) VALUES (?, ?, NOW(), 1)");
+                $stmt->bind_param("is", $userID, $customRuleName);
+                $stmt->execute();
+                $userBudgetRuleID = $conn->insert_id;
+                $stmt->close();
+            }
+
+            // Delete existing allocations
+            $stmt = $conn->prepare("DELETE FROM tbl_userallocation WHERE userBudgetruleID = ?");
+            $stmt->bind_param("i", $userBudgetRuleID);
             $stmt->execute();
             $stmt->close();
-        }
 
-        $conn->commit();
-        header("Location: settings.php");
-        exit();
-    } catch (Exception $e) {
-        $conn->rollback();
-        $error = "Error saving budget rule: " . $e->getMessage();
+            // Insert savings allocation
+            $savingValue = intval(str_replace(',', '', $_POST['savings_value'] ?? 0));
+            $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, NULL, 'saving', 0, ?)");
+            $stmt->bind_param("ii", $userBudgetRuleID, $savingValue);
+            $stmt->execute();
+            $stmt->close();
+
+            // Insert each category allocation
+            foreach ($categories as $cat) {
+                $id = $cat['userCategoryID'];
+                $mode = $_POST["category_{$id}_mode"] ?? 'track';
+                $value = intval(str_replace(',', '', $_POST["category_{$id}_value"] ?? 0));
+                $limitType = ($mode === 'limit') ? 1 : 0;
+                $necessityType = $cat['userNecessityType'] ?? 'need';
+
+                $stmt = $conn->prepare("INSERT INTO tbl_userallocation (userBudgetruleID, userCategoryID, necessityType, limitType, value) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("iisii", $userBudgetRuleID, $id, $necessityType, $limitType, $value);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $conn->commit();
+            header("Location: settings.php");
+            exit();
+
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error = "Error saving budget rule: " . $e->getMessage();
+        }
     }
 }
 ?>
@@ -149,6 +194,13 @@ input[type="checkbox"] { accent-color:#F6D25B; width:17px; height:17px; cursor:p
 <form method="POST" id="budgetRuleForm">
     <div class="titleContainer"><h2>Create Your Own Budget Rule</h2></div>
     <div class="descContainer"><p>Adjust your monthly spending limits</p></div>
+
+    <!-- CURRENT BALANCE (ADDED) -->
+    <div id="balanceBox"
+         style="padding:12px;margin-bottom:15px;border:2px solid #F6D25B;border-radius:12px;background:white;">
+        <strong>Current Balance:</strong>
+        <span id="currentBalance" style="color:green;">₱0</span>
+    </div>
 
     <?php if($error): ?>
     <div class="error"><?= htmlspecialchars($error) ?></div>
@@ -205,9 +257,51 @@ input[type="checkbox"] { accent-color:#F6D25B; width:17px; height:17px; cursor:p
 </div>
 
 <script>
+// formatting
 function formatNumber(n){ let clean = n.replace(/[^0-9]/g,''); return clean?parseInt(clean,10).toLocaleString():''; }
 function addFormattingListener(input){ input.addEventListener('input',()=>{ let start=input.selectionStart; let oldLen=input.value.length; input.value=formatNumber(input.value); input.selectionEnd=start+(input.value.length-oldLen); }); }
 document.querySelectorAll('.limit-input, .savingsForm').forEach(addFormattingListener);
+
+/* ----------------------------------------------------------
+   LIVE BALANCE CALCULATION (ADDED)
+----------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+    const income = window.userIncome ?? 0;
+    const balanceEl = document.getElementById("currentBalance");
+    const saveBtn = document.querySelector("button[type='submit']");
+
+    function recalcBalance() {
+        let remaining = income;
+
+        // savings
+        let saveVal = document.querySelector(".savingsForm").value.replace(/[^0-9]/g, "");
+        remaining -= parseFloat(saveVal) || 0;
+
+        // categories
+        document.querySelectorAll(".expensesTab").forEach(row => {
+            let id = row.dataset.id;
+            let mode = row.querySelector(`[name="category_${id}_mode"]`).value;
+            let input = row.querySelector(".limit-input");
+            if (mode === "limit") {
+                let val = input.value.replace(/[^0-9]/g, "");
+                remaining -= parseFloat(val) || 0;
+            }
+        });
+
+        balanceEl.textContent = "₱" + remaining.toLocaleString();
+        balanceEl.style.color = remaining < 0 ? "red" : "green";
+        saveBtn.disabled = remaining < 0;
+    }
+
+    document.querySelectorAll(".limit-input, .savingsForm").forEach(i => {
+        i.addEventListener("input", recalcBalance);
+    });
+
+    document.querySelectorAll("[name$='_mode_checkbox_track'], [name$='_mode_checkbox_limit']")
+        .forEach(i => i.addEventListener("change", recalcBalance));
+
+    recalcBalance();
+});
 
 // Toggle track/limit checkboxes
 document.querySelectorAll('.expensesTab').forEach(row=>{
@@ -227,6 +321,7 @@ document.querySelectorAll('.expensesTab').forEach(row=>{
     updateRow(limit.checked?limit:track);
 });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
