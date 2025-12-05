@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include_once '../../assets/shared/connect.php';
@@ -9,12 +10,51 @@ if (!isset($_SESSION['userID'])) {
 }
 $userID = $_SESSION['userID'] ?? 0;
 if (isset($_POST['deleteAccount'])) {
+    // Fetch profile picture before deletion
+    $profileQuery = "SELECT profilePicture FROM tbl_users WHERE userID = '$userID'";
+    $profileResult = mysqli_query($conn, $profileQuery);
+    $profileRow = mysqli_fetch_assoc($profileResult);
+    $profilePicture = $profileRow['profilePicture'] ?? '';
+
+    // Delete from all related tables
+    $deleteQueries = [
+        "DELETE FROM tbl_expense WHERE userID = '$userID'",
+        "DELETE FROM tbl_forecasts WHERE userID = '$userID'",
+        "DELETE FROM tbl_income WHERE userID = '$userID'",
+        "DELETE FROM tbl_loginhistory WHERE userID = '$userID'",
+        "DELETE FROM tbl_notifications WHERE userID = '$userID'",
+        "DELETE FROM tbl_recurringtransactions WHERE userID = '$userID'",
+        "DELETE FROM tbl_savingchallenge_progress WHERE userID = '$userID'",
+        "DELETE FROM tbl_spendinginsights WHERE userID = '$userID'",
+        "DELETE FROM tbl_userachievements WHERE userID = '$userID'",
+        "DELETE FROM tbl_userbudgetversion WHERE userID = '$userID'",
+        "DELETE FROM tbl_usercategories WHERE userID = '$userID'",
+        "DELETE FROM tbl_userchallenges WHERE userID = '$userID'",
+        "DELETE FROM tbl_userlvl WHERE userID = '$userID'",
+        "DELETE FROM tbl_user_resource_progress WHERE userID = '$userID'",
+        "DELETE FROM tbl_goaltransactions WHERE savingGoalID IN (SELECT savingGoalID FROM tbl_savinggoals WHERE userID = '$userID')",
+        "DELETE FROM tbl_savinggoals WHERE userID = '$userID'",
+        "DELETE FROM tbl_userallocation WHERE userBudgetruleID IN (SELECT userBudgetRuleID FROM tbl_userbudgetrule WHERE userID = '$userID')",
+        "DELETE FROM tbl_userbudgetrule WHERE userID = '$userID'"
+    ];
+
+    foreach ($deleteQueries as $query) {
+        mysqli_query($conn, $query);
+    }
+
     // Delete user from database
     $deleteQuery = "DELETE FROM tbl_users WHERE userID = '$userID'";
     mysqli_query($conn, $deleteQuery);
-    // Delete other related user data
-    $deleteAchievementsQuery = "DELETE FROM tbl_userachievements WHERE userID = '$userID'";
-    mysqli_query($conn, $deleteAchievementsQuery);
+
+    // Delete profile picture file if it's not a default one
+    $defaultProfiles = ['profile_Pic.png', 'profile1.png', 'profile2.png', 'profile3.png', 'profile4.png'];
+    if ($profilePicture && !in_array($profilePicture, $defaultProfiles)) {
+        $filePath = "../../assets/img/profile/" . $profilePicture;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
+
     // Destroy session and redirect to login
     session_unset();
     session_destroy();
