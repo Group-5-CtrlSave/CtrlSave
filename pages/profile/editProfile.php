@@ -32,6 +32,7 @@ if (isset($_POST['deleteAccount'])) {
         "DELETE FROM tbl_userchallenges WHERE userID = '$userID'",
         "DELETE FROM tbl_userlvl WHERE userID = '$userID'",
         "DELETE FROM tbl_user_resource_progress WHERE userID = '$userID'",
+        "DELETE FROM tbl_usersavingchallenge WHERE userID = '$userID'",
         "DELETE FROM tbl_goaltransactions WHERE savingGoalID IN (SELECT savingGoalID FROM tbl_savinggoals WHERE userID = '$userID')",
         "DELETE FROM tbl_savinggoals WHERE userID = '$userID'",
         "DELETE FROM tbl_userallocation WHERE userBudgetruleID IN (SELECT userBudgetRuleID FROM tbl_userbudgetrule WHERE userID = '$userID')",
