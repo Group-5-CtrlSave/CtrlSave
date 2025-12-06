@@ -9,6 +9,10 @@ if (!isset($_SESSION['userID'])) {
 }
 $userID = (int) $_SESSION['userID'];
 
+/* ---------------- CURRENCY (symbol only, no conversion here) ---------------- */
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+
 /* ---------------- FETCH USER'S CURRENT RULE ---------------- */
 $currentRuleQuery = "SELECT ruleName FROM tbl_userbudgetrule WHERE userID = ? AND isSelected = 1";
 $stmt = $conn->prepare($currentRuleQuery);
