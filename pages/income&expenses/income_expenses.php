@@ -9,6 +9,12 @@ if (isset($_GET['type'])) {
     $type = 'all';
 }
 ?>
+
+<?php
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+?>
+
 <?php include("process/incomeandexpenseprocess.php"); ?>
 
 
@@ -168,7 +174,7 @@ if (isset($_GET['type'])) {
                                     <div class="container iePriceContainer p-1">
                                         <h5 class="price m-0">
                                             <?php
-                                            echo ($entry['type'] == 'income' ? '+' : '-') . ' ₱' . $entry['amount'];
+                                            echo ($entry['type'] == 'income' ? '+ ' : '- ') . $currencySymbol . number_format($entry['amount'], 2);
                                             ?>  
                                         </h5>
                                         <?php if ($entry['type'] == 'expense' && $entry['dueDate'] != '') { ?>

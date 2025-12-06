@@ -5,6 +5,11 @@
 <?php include('process/editIncomeExpense.php') ?>
 
 <?php
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+?>
+
+<?php
 $getuserCategoriesQuery = "SELECT userCategoryID, categoryName, icon
 FROM `tbl_usercategories` WHERE userID = $userID AND type ='$type' AND isSelected = 1";
 $userCategoriesResult = executeQuery($getuserCategoriesQuery);
@@ -116,7 +121,8 @@ $userCategoriesResult = executeQuery($getuserCategoriesQuery);
 
             <div class="container editContainer my-2 p-3">
                 <div class="form-group">
-                    <label for="formControlInput2" class="title"><b>Amount(PHP):</b></label>
+                    <label for="formControlInput2" class="title">
+                        <b>Amount (<?php echo htmlspecialchars($currencyCode); ?>):</b></label>
                     <input type="number" class="form-control inputText" id="formControlInput2" value="<?php echo $amount?>"
                       name="amount" required>
                 </div>

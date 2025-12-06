@@ -10,6 +10,10 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'];
 
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+
+
 // filters
 $daysFilter = isset($_GET['days']) ? intval($_GET['days']) : 30;
 $typeFilter = isset($_GET['type']) ? $_GET['type'] : 'all';
@@ -149,7 +153,7 @@ function formatTimeAgo($datetime)
             </span>
             <span class="text"><?php echo ($row['name']); ?></span>
             <span class="amount" style="color: <?= $row['type'] == 'expenses' ? '#FF5C5C' : '#44B87D' ?>">
-              <?php echo ($row['type'] == 'expenses' ? '-' : '+') . '₱' . number_format($row['amount'], 2); ?>
+              <?php echo ($row['type'] == 'expenses' ? '-' : '+') . $currencySymbol . number_format($row['amount'], 2); ?>
             </span>
           </div>
         </div>
