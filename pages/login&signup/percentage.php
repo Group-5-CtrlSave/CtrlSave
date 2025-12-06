@@ -1,5 +1,7 @@
 <?php
 include("../../pages/login&signup/process/percentageBE.php");
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 ?>
 
 <!DOCTYPE html>
@@ -350,7 +352,7 @@ include("../../pages/login&signup/process/percentageBE.php");
             <div id="balanceBox"
                 style="padding:12px;margin-bottom:15px;border:2px solid #F6D25B;border-radius:12px;background:white;">
                 <strong>Current Balance:</strong>
-                <span id="currentBalance" style="color:green;">₱0</span>
+                <span id="currentBalance" style="color:green;"><?= $symbol ?>0</span>
             </div>
 
 
@@ -416,7 +418,7 @@ include("../../pages/login&signup/process/percentageBE.php");
 
                                 <div class="col-4 labelLimit">
                                     <input class="form-control form-control-sm amountForm limit-input" type="text"
-                                        name="<?= $name_base ?>_value" placeholder="Amount" data-limit-input
+                                        name="<?= $name_base ?>_value" placeholder="<?= $symbol ?>0" data-limit-input
                                         data-catid="<?= $id ?>" <?= $input_disabled ?>         <?= $input_opacity ?>>
                                 </div>
 
@@ -446,7 +448,7 @@ include("../../pages/login&signup/process/percentageBE.php");
 
                     <div class="col-6 savingsLimit">
                         <input class="form-control form-control-sm savingsForm" type="text" name="savings_value"
-                            placeholder="Amount" data-limit-input data-catid="savings" required>
+                            placeholder="<?= $symbol ?>0" data-limit-input data-catid="savings" required>
 
                     </div>
                 </div>
@@ -464,6 +466,7 @@ include("../../pages/login&signup/process/percentageBE.php");
     </div>
 
     <script>
+        const currencySymbol = "<?= $symbol ?>";
         document.addEventListener("DOMContentLoaded", () => {
 
             // Total income output by backend in percentageBE.php
@@ -489,13 +492,13 @@ include("../../pages/login&signup/process/percentageBE.php");
                     }
 
                     if (mode === "limit") {
-                        let clean = input.value.replace(/[^0-9.]/g, "");
+                        let clean = input.value.replace(currencySymbol, "").replace(/[^0-9.]/g, "");
                         let amount = parseFloat(clean) || 0;
                         remaining -= amount;
                     }
                 });
 
-                balanceEl.innerText = "₱" + remaining.toLocaleString();
+                balanceEl.innerText = currencySymbol + remaining.toLocaleString();
 
                 balanceEl.style.color = (remaining < 0) ? "red" : "green";
             }
@@ -544,7 +547,9 @@ include("../../pages/login&signup/process/percentageBE.php");
                 const end = this.selectionEnd;
                 const oldLength = this.value.length;
 
-                this.value = formatNumber(this.value);
+                let num = formatNumber(this.value);
+                this.value = currencySymbol + num;
+
 
                 const newLength = this.value.length;
                 const diff = newLength - oldLength;
