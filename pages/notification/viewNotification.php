@@ -3,20 +3,89 @@ session_start();
 include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
+
+$userID = 0;
 if (!isset($_SESSION['userID'])) {
     header("Location: ../../pages/login&signup/login.php");
     exit;
+} else {
+    $userID = $_SESSION['userID'];
 }
+
+
+$notificationID = intval($_GET['id']);
+
+
+if (isset($_POST['btnPaid'])) {
+
+    $recurringID = intval($_POST['recurringID']);
+
+    $getRecurringTransactionQuery = "SELECT `userCategoryID`, `amount`, `note`, `frequency`, `userBudgetVersionID` 
+    FROM `tbl_recurringtransactions` 
+    WHERE userID = $userID 
+    AND recurringID = $recurringID LIMIT 1";
+    $recurringTransactionResult = executeQuery($getRecurringTransactionQuery);
+
+    if (mysqli_num_rows($recurringTransactionResult) > 0) {
+        $recurringrow = mysqli_fetch_assoc($recurringTransactionResult);
+        $userCategoryID = intval($recurringrow['userCategoryID']);
+        $amount = floatval($recurringrow['amount']);
+        $note = $recurringrow['note'];
+        $frequency = $recurringrow['frequency'];
+        $userBudgetVersionID = $recurringrow['userBudgetVersionID'];
+
+        $nextDueDate = '';
+
+        switch ($frequency) {
+            case 'daily':
+                $nextDueDate = "NOW() + INTERVAL 1 DAY";
+                break;
+
+            case 'weekly':
+                $nextDueDate = "NOW() + INTERVAL 1 WEEK";
+                break;
+
+            case 'monthly':
+                $nextDueDate = "NOW() + INTERVAL 1 MONTH";
+                break;
+
+            default:
+                $nextDueDate = '';
+                break;
+        }
+
+
+        $insertExpenseQuery = "INSERT INTO `tbl_expense`(`userID`, `amount`, `userCategoryID`, `dateSpent`, `dueDate`, `dateAdded`, `isRecurring`, `note`, `recurringID`, `userBudgetversionID`) 
+    VALUES ($userID,$amount,'$userCategoryID',NOW(),NULL,NOW(),1,'$note','$recurringID','$userBudgetVersionID')";
+        executeQuery($insertExpenseQuery);
+
+        $updateRecurringTransactionQuery = "UPDATE `tbl_recurringtransactions` 
+    SET `nextDuedate`= $nextDueDate
+    WHERE recurringID = $recurringID";
+        executeQuery($updateRecurringTransactionQuery);
+        $updateNotificationQuery = "UPDATE `tbl_notifications` 
+    SET `isPaid`= 1 
+    WHERE recurringID = $recurringID 
+    AND notificationID = $notificationID";
+        executeQuery($updateNotificationQuery);
+
+        header("Location: viewNotification.php?id=" . $notificationID);
+        $_SESSION['successtag'] = "Expense Successfully Added!";
+        exit;
+    }
+
+}
+
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("<p style='color:white; text-align:center;'>Invalid notification.</p>");
 }
 
-$notificationID = intval($_GET['id']);
+
 
 //query for showing details in each notif
 $query = "
-    SELECT notificationTitle, message, icon, createdAt
+    SELECT notificationTitle, message, icon, createdAt, type, recurringID, isPaid
     FROM tbl_notifications
     WHERE notificationID = $notificationID
     LIMIT 1
@@ -59,7 +128,7 @@ foreach ($paths as $p) {
 
 //if not
 if (!file_exists($iconPath)) {
-    $iconPath = "../../assets/img/shared/logo_s.png";
+    $iconPath = "../../assets/img/shared/logo_M.png";
 }
 
 // if alert. it should be shade of red
@@ -151,6 +220,13 @@ $titleColor = $isAlert ? "#E63946" : "#44B87D";
         .navigationBarTitle {
             font-family: "Poppins", sans-serif;
         }
+
+        .paidButton {
+            border-radius: 20px !important;
+            background-color: #F6D25B !important;
+            min-width: 250px;
+
+        }
     </style>
 </head>
 
@@ -171,6 +247,8 @@ $titleColor = $isAlert ? "#E63946" : "#44B87D";
 
     </nav>
 
+    <?php include("../../assets/shared/successtag.php"); ?>
+
     <!-- contents (full after ...) -->
     <div class="scrollableContainer">
         <img src="<?= $iconPath ?>" alt="Icon" class="notifIcon">
@@ -183,10 +261,29 @@ $titleColor = $isAlert ? "#E63946" : "#44B87D";
             <?= nl2br($row['message']) ?>
         </p>
 
+        <?php if ($row['type'] === 'recurring' && $row['isPaid'] == 0) { ?>
+            <form method="POST">
+                <div class="container py-2 text-center">
+                    <button class="btn btn-lg paidButton" type="submit" name="btnPaid"><b>Paid</b></button>
+                    <input type="hidden" value="<?php echo $row['recurringID'] ?>" name="recurringID">
+                </div>
+            </form>
+        <?php } ?>
+
+
         <div class="notifTime"><?= $formattedTime ?></div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+        setTimeout(function () {
+            var alertElement = document.getElementById('myAlert');
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }, 2000); 
+    </script>
+
 </body>
 
 </html>

@@ -191,7 +191,7 @@ if (mysqli_num_rows($positiveSavingInsightResult) > 0) {
     $positiveSavingInsight = $row['message'];
 }
  $noSavingInsight= ""; // default
-$getnoSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$getnoSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'no_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $noSavingInsightResult = executeQuery($getnoSavingInsightsQuery);
 if (mysqli_num_rows($noSavingInsightResult) > 0) {
     $row = mysqli_fetch_assoc($noSavingInsightResult);
