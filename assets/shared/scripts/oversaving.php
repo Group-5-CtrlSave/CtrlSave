@@ -2,107 +2,199 @@
 include("../connect.php");
 
 // Monthly mode
-$startDate = date('Y-m-01');
-$endDate = date('Y-m-t');
-$currentMonth = date('F'); // Full month name
-$currentYear = date('Y');  // Current year
+$startDate   = date('Y-m-01');
+$endDate     = date('Y-m-t');
+$currentMonth = date('F');
+$currentYear  = date('Y');
 
-// Get Active Budget Versions
+// ===============================
+// GET ACTIVE BUDGET VERSIONS
+// ===============================
 $getBudgetVersion = "SELECT userID, userBudgetRuleID, totalIncome 
                      FROM tbl_userbudgetversion 
-                     WHERE isActive = 1;";
+                     WHERE isActive = 1";
+
 $budgetVersionResult = executeQuery($getBudgetVersion);
 
 if (mysqli_num_rows($budgetVersionResult) > 0) {
-    while ($budgetVersionRow = mysqli_fetch_assoc($budgetVersionResult)) {
-        $userID = $budgetVersionRow['userID'];
-        $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
-        $totalIncome = $budgetVersionRow['totalIncome'];
 
-        // Get Allocation
-        $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-                          FROM tbl_userAllocation 
-                          WHERE userBudgetRuleID = $userBudgetRuleID";
+    while ($budgetVersionRow = mysqli_fetch_assoc($budgetVersionResult)) {
+
+        $userID           = $budgetVersionRow['userID'];
+        $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
+        $totalIncome      = floatval($budgetVersionRow['totalIncome']);
+
+        // ===============================
+        // GET SAVING ALLOCATIONS
+        // ===============================
+        $getAllocation = "SELECT userCategoryID, necessityType, limitType, value AS allocationValue
+                          FROM tbl_userallocation
+                          WHERE userBudgetRuleID = $userBudgetRuleID
+                          AND necessityType = 'saving'";
+
         $allocationResult = executeQuery($getAllocation);
 
         if (mysqli_num_rows($allocationResult) > 0) {
+
             while ($allocationRow = mysqli_fetch_assoc($allocationResult)) {
+
                 $userCategoryID = $allocationRow['userCategoryID'];
-                $necessityType = $allocationRow['necessityType'];
-                $limitType = $allocationRow['limitType'];
-                $value = $allocationRow['allocationValue'];
+                $limitType      = $allocationRow['limitType'];
+                $value          = $allocationRow['allocationValue'];
 
-                // Only process savings
-                if ($userCategoryID != 0 || $necessityType !== 'saving') {
-                    continue;
-                }
+                // Default saving (userCategoryID = 0) → percentage-based
+                // Custom saving (userCategoryID != 0) → fixed amount
+                $budgetLimit = ($userCategoryID == 0 && $limitType == 1) 
+                    ? ($totalIncome * ($value / 100)) 
+                    : $value;
 
-                // Calculate allocated savings
-                $budgetLimit = ($limitType == 1) ? ($totalIncome * $value / 100) : $value;
-
-                // Fetch total savings this month from goaltransactions
-                $savingsQuery = "SELECT COALESCE(SUM(gt.amount),0) as totalSaved
+                $savingsQuery = "SELECT COALESCE(SUM(gt.amount), 0) AS totalSaved
                                  FROM tbl_goaltransactions gt
                                  JOIN tbl_savinggoals sg ON gt.savingGoalID = sg.savingGoalID
                                  WHERE sg.userID = $userID
-                                 AND DATE(gt.date) BETWEEN '$startDate' AND '$endDate'
-                                 AND gt.transaction = 'add'";
+                                 AND gt.transaction = 'add'
+                                 AND DATE(gt.date) BETWEEN '$startDate' AND '$endDate'";
+
+                // If custom saving allocation, filter by savingGoalID
+                if ($userCategoryID != 0) {
+                    $savingsQuery .= " AND gt.savingGoalID = $userCategoryID";
+                }
+
                 $savingsResult = executeQuery($savingsQuery);
                 $savingsRow = mysqli_fetch_assoc($savingsResult);
-                $totalSaved = floatval($savingsRow['totalSaved'] ?? 0);
+                $totalSaved = $savingsRow ? floatval($savingsRow['totalSaved']) : 0;
 
-                // Check oversaving
+                // ===============================
+                // OVERSAVING
+                // ===============================
                 if ($totalSaved > $budgetLimit) {
-                    $oversavePercent = ($totalSaved / $budgetLimit) * 100;
+                    $oversavePercent = round(($totalSaved / $budgetLimit) * 100, 1);
+                    $message = "You saved ₱" . number_format($totalSaved, 2) . 
+                               " in $currentMonth $currentYear, exceeding your budget of ₱" . number_format($budgetLimit, 2) . 
+                               " (" . $oversavePercent . "%). Consider balancing savings with other needs.";
 
-                    $message = "You saved ₱" . number_format($totalSaved,2) . 
-                               " in $currentMonth $currentYear, which is " . round($oversavePercent,1) . 
-                               "% of your allocated savings budget of ₱" . number_format($budgetLimit,2) . 
-                               ". Consider redirecting excess savings to needs or wants if necessary.";
-
-                    // Avoid duplicate entry (INSIGHTS)
-                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights 
-                                     WHERE userID = $userID 
+                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
+                                     WHERE userID = $userID
                                      AND insightType = 'oversaving'
-                                     AND categoryA IS NULL
-                                     AND DATE_FORMAT(date,'%Y-%m') = '" . date('Y-m') . "'
+                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
                                      LIMIT 1";
 
                     if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
-                        $insertInsight = "INSERT INTO tbl_spendinginsights 
+                        $insertInsight = "INSERT INTO tbl_spendinginsights
                                           (userID, categoryA, insightType, message, date)
-                                          VALUES ($userID, NULL, 'oversaving', '$message', NOW())";
+                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'oversaving', '$message', NOW())";
                         executeQuery($insertInsight);
                     }
 
-                    /* ===========================================================
-                       ✅ NEW: MONTHLY OVERSAVING NOTIFICATION (NO DUPLICATES)
-                    ============================================================ */
+                    $notifMessage = "You oversaved ₱" . number_format($totalSaved - $budgetLimit, 2) . " this month.";
 
-                    $notifMessage = "You oversaved ₱" . number_format(($totalSaved - $budgetLimit),2) .
-                                    " from $startDate to $endDate.";
-
-                    // Check duplicate notification
                     $checkNotif = "SELECT 1 FROM tbl_notifications
                                    WHERE userID = $userID
                                    AND message = '$notifMessage'
                                    AND type = 'monthly_oversaving'
-                                   AND DATE_FORMAT(createdAt,'%Y-%m') = '" . date('Y-m') . "'
+                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
                                    LIMIT 1";
 
                     if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
                         $insertNotif = "INSERT INTO tbl_notifications
                                         (notificationTitle, message, icon, userID, createdAt, type)
-                                        VALUES 
-                                        ('Monthly Oversaving Alert', '$notifMessage', 'savings.png',
-                                         $userID, NOW(), 'monthly_oversaving')";
+                                        VALUES ('Monthly Oversaving Alert',
+                                                '$notifMessage',
+                                                'savings.png',
+                                                $userID,
+                                                NOW(),
+                                                'monthly_oversaving')";
                         executeQuery($insertNotif);
                     }
 
+                } 
+                // POSITIVE SAVING
+                else if ($totalSaved > 0 && $totalSaved <= $budgetLimit) {
+                    $message = "Excellent Saver! You saved ₱" . number_format($totalSaved, 2) . 
+                               " in $currentMonth $currentYear. You are staying within your planned savings budget!";
+
+                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
+                                     WHERE userID = $userID
+                                     AND insightType = 'positive_saving'
+                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
+                                     LIMIT 1";
+
+                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
+                        $insertInsight = "INSERT INTO tbl_spendinginsights
+                                          (userID, categoryA, insightType, message, date)
+                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'positive_saving', '$message', NOW())";
+                        executeQuery($insertInsight);
+                    }
+
+                    $notifMessage = "Congrats! You saved ₱" . number_format($totalSaved, 2) . " this month.";
+
+                    $checkNotif = "SELECT 1 FROM tbl_notifications
+                                   WHERE userID = $userID
+                                   AND message = '$notifMessage'
+                                   AND type = 'monthly_saving_positive'
+                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
+                                   LIMIT 1";
+
+                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
+                        $insertNotif = "INSERT INTO tbl_notifications
+                                        (notificationTitle, message, icon, userID, createdAt, type)
+                                        VALUES ('Savings Success',
+                                                '$notifMessage',
+                                                'savings.png',
+                                                $userID,
+                                                NOW(),
+                                                'monthly_saving_positive')";
+                        executeQuery($insertNotif);
+                    }
+
+                } 
+                // NO SAVING
+                else if ($totalSaved == 0) {
+                    $message = "You have no recorded savings for $currentMonth $currentYear. Try setting aside even a small amount to build financial stability.";
+
+                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
+                                     WHERE userID = $userID
+                                     AND insightType = 'no_saving'
+                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
+                                     LIMIT 1";
+
+                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
+                        $insertInsight = "INSERT INTO tbl_spendinginsights
+                                          (userID, categoryA, insightType, message, date)
+                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'no_saving', '$message', NOW())";
+                        executeQuery($insertInsight);
+                    }
+
+                    $notifMessage = "You did not save anything this month.";
+
+                    $checkNotif = "SELECT 1 FROM tbl_notifications
+                                   WHERE userID = $userID
+                                   AND message = '$notifMessage'
+                                   AND type = 'monthly_no_saving'
+                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
+                                   LIMIT 1";
+
+                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
+                        $insertNotif = "INSERT INTO tbl_notifications
+                                        (notificationTitle, message, icon, userID, createdAt, type)
+                                        VALUES ('No Savings Recorded',
+                                                '$notifMessage',
+                                                'savings.png',
+                                                $userID,
+                                                NOW(),
+                                                'monthly_no_saving')";
+                        executeQuery($insertNotif);
+                    }
                 }
-            }
+
+            } // allocation loop
         }
-    }
-    echo "Monthly oversaving insights generated successfully!";
+
+    } // budget version loop
+
+    echo "Monthly savings insights generated successfully!";
 }
 ?>

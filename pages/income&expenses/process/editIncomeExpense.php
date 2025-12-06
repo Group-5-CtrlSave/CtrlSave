@@ -51,6 +51,17 @@ if (isset($_POST["btnDelete"])) {
             $deleteIncomeQuery = "DELETE FROM `tbl_income` WHERE incomeID = $id and userID = $userID";
             executeQuery($deleteIncomeQuery);
 
+             $totalUserIncome = 0;
+            $getTotalIncome = "SELECT SUM(`amount`) as income FROM `tbl_income` WHERE userID = $userID";
+            $totalIncomeResult = executeQuery($getTotalIncome);
+            if (mysqli_num_rows($totalIncomeResult)) {
+                $row = mysqli_fetch_assoc($totalIncomeResult);
+                $totalUserIncome = $row['income'];
+
+            }
+            $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalIncome`='$totalUserIncome' WHERE userID = $userID and isActive = 1";
+            executeQuery($updateBudgetVersionQuery);
+
 
             $_SESSION["successtag"] = "Income Successfully Deleted!";
             header("Location: income_expenses.php");

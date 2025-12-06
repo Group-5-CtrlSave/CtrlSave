@@ -1,150 +1,131 @@
-<!-- Include DB connection -->
 <?php
 include("../connect.php");
-?>
 
-<!-- Set Range -->
-<?php
-$mode = 'monthly';
+$startDate = date('Y-m-01');
+$endDate = date('Y-m-t');
 
-if ($mode === 'monthly') {
-    $startDate = date('Y-m-01');
-    $endDate = date('Y-m-t');
-} else {
-    $startDate = date('Y-m-d', strtotime('last monday'));
-    $endDate = date('Y-m-d', strtotime('next sunday'));
-}
-?>
-
-<?php
-// Get Active Budget Version
 $getBudgetVersion = "SELECT userID, userBudgetRuleID, totalIncome 
-FROM tbl_userbudgetversion 
-WHERE isActive = 1;";
-
+                     FROM tbl_userbudgetversion 
+                     WHERE isActive = 1;";
 $budgetVersionResult = executeQuery($getBudgetVersion);
 
 if (mysqli_num_rows($budgetVersionResult) > 0) {
     while ($budgetVersionRow = mysqli_fetch_assoc($budgetVersionResult)) {
-
         $userID = $budgetVersionRow['userID'];
         $userBudgetRuleID = $budgetVersionRow['userBudgetRuleID'];
         $totalIncome = $budgetVersionRow['totalIncome'];
 
-        // FIXED: JOIN tbl_usercategories to get userisFlexible
-        $getAllocation = "
-            SELECT 
-                ua.userCategoryID,
-                ua.necessityType,
-                ua.limitType,
-                ua.value AS allocationValue,
-                uc.userisFlexible
-            FROM tbl_userAllocation ua
-            LEFT JOIN tbl_usercategories uc 
-                ON ua.userCategoryID = uc.userCategoryID
-            WHERE ua.userBudgetRuleID = $userBudgetRuleID
-        ";
+        // ==============================
+        // DEFAULT ALLOCATION
+        // ==============================
+        $defaultAllocQuery = "SELECT necessityType, limitType, value 
+                              FROM tbl_userAllocation 
+                              WHERE userBudgetRuleID = $userBudgetRuleID
+                              AND userCategoryID = 0";
+        $defaultAllocRes = executeQuery($defaultAllocQuery);
 
-        $allocationResult = executeQuery($getAllocation);
+        while ($allocRow = mysqli_fetch_assoc($defaultAllocRes)) {
+            $necessityType = $allocRow['necessityType'];
+            $limitType = $allocRow['limitType'];
+            $value = $allocRow['value'];
 
-        if (mysqli_num_rows($allocationResult) > 0) {
-            while ($allocationRow = mysqli_fetch_assoc($allocationResult)) {
-                $userCategoryID = $allocationRow['userCategoryID'];
-                $necessityType = $allocationRow['necessityType'];
-                $limitType = $allocationRow['limitType'];
-                $value = $allocationRow['allocationValue'];
-                $userisFlexible = $allocationRow['userisFlexible']; // now correct
+            $budgetLimit = ($limitType == 1) ? ($totalIncome * $value / 100) : $value;
 
-                // Skip tracked-only custom categories
-                if ($userCategoryID != 0 && $userisFlexible == 0) continue;
+            $catQuery = "SELECT userCategoryID, categoryName 
+                         FROM tbl_usercategories 
+                         WHERE userNecessityType = '$necessityType'
+                         AND userisFlexible = 1";
+            $catRes = executeQuery($catQuery);
 
-                //  Fetch Expenses
-                if ($userCategoryID == 0) {
-                    // For Default Allocation
-                    $expenseQuery = "SELECT SUM(tbl_expense.amount) as totalSpent 
-                    FROM tbl_expense 
-                    JOIN tbl_usercategories ON tbl_usercategories.userCategoryID = tbl_expense.userCategoryID
-                    WHERE tbl_expense.userID = $userID 
-                    AND tbl_usercategories.userNecessityType = '$necessityType'
-                    AND tbl_expense.dateSpent BETWEEN '$startDate' AND '$endDate'";
-                } else {
-                    // For User Allocation
-                    $expenseQuery = "SELECT SUM(amount) AS totalSpent 
-                    FROM tbl_expense JOIN tbl_usercategories 
-                    ON tbl_usercategories.userCategoryID = tbl_expense.userCategoryID 
-                    WHERE tbl_expense.userID = $userID
-                    AND tbl_usercategories.userNecessityType = '$necessityType'
-                    AND tbl_expense.dateSpent BETWEEN '$startDate' AND '$endDate'";
+            $totalSpent = 0;
+            $categoryList = [];
+
+            while ($catRow = mysqli_fetch_assoc($catRes)) {
+                $userCategoryID = $catRow['userCategoryID'];
+                $categoryName = $catRow['categoryName'];
+
+                $expenseQuery = "SELECT SUM(amount) AS spent 
+                                 FROM tbl_expense
+                                 WHERE userID = $userID
+                                 AND userCategoryID = $userCategoryID
+                                 AND DATE(dateSpent) BETWEEN '$startDate' AND '$endDate'";
+                $expenseRow = mysqli_fetch_assoc(executeQuery($expenseQuery));
+                $spent = floatval($expenseRow['spent'] ?? 0);
+
+                if ($spent > 0) {
+                    $totalSpent += $spent;
+                    $categoryList[] = $categoryName;
                 }
+            }
 
-                $expenseResult = executeQuery($expenseQuery);
-                $expenseRow = mysqli_fetch_assoc($expenseResult);
-                $totalSpent = floatval($expenseRow['totalSpent'] ?? 0);
+            if ($totalSpent > $budgetLimit && !empty($categoryList)) {
+                $overPercent = round(($totalSpent / $budgetLimit) * 100, 2);
 
-                // Set the Limit
-                if ($limitType == 1) {
-                    $budgetLimit = ($totalIncome * $value) / 100;
-                }
-                if ($limitType == 2) {
-                    $budgetLimit = $value;
-                }
+                $message = "You have overspent {$overPercent}% in $necessityType (" . implode(", ", $categoryList) . ") from $startDate to $endDate.";
 
-                if ($totalSpent > $budgetLimit) {
-                    $overAmount = $totalSpent - $budgetLimit;
+                executeQuery("INSERT INTO tbl_spendinginsights
+                              (userID, categoryA, necessityType, insightType, message, date)
+                              VALUES ($userID, NULL, '$necessityType', 'overspending', '$message', NOW())");
 
-                    // Get the Category Label
-                    if ($userCategoryID == 0) {
-                        $categoryLabel = $necessityType;
-                        $categoryCondition = "categoryA IS NULL AND necessityType = '$necessityType'";
-                    } else {
-                        $catQuery = "SELECT categoryName FROM tbl_usercategories WHERE userCategoryID = $userCategoryID LIMIT 1";
-                        $catResult = executeQuery($catQuery);
-                        $catRow = mysqli_fetch_assoc($catResult);
-                        $categoryLabel = $catRow['categoryName'] ?? "Unknown Category";
-                        $categoryCondition = "categoryA = $userCategoryID";
-                    }
+                executeQuery("INSERT INTO tbl_notifications
+                              (notificationTitle, message, icon, userID, createdAt, type)
+                              VALUES ('Monthly Overspending Alert','$message','alert.png',$userID,NOW(), 'overspending')");
+            }
+        }
 
-                    // Build The Message
-                    $message = "You have overspent ₱$overAmount in $categoryLabel from $startDate to $endDate.";
+        // ==============================
+        // CUSTOM ALLOCATIONS
+        // ==============================
+        $customAllocQuery = "SELECT userCategoryID, necessityType, limitType, value
+                             FROM tbl_userAllocation 
+                             WHERE userBudgetRuleID = $userBudgetRuleID
+                             AND userCategoryID != 0";
+        $customAllocRes = executeQuery($customAllocQuery);
 
-                    // Determine necessityType value for the insight
-                    $insightNecessity = ($userCategoryID == 0) ? "'$necessityType'" : "NULL";
+        while ($allocRow = mysqli_fetch_assoc($customAllocRes)) {
+            $userCategoryID = $allocRow['userCategoryID'];
+            $necessityType = $allocRow['necessityType'];
+            $limitType = $allocRow['limitType'];
+            $value = $allocRow['value'];
 
-                    // Check if the insight already exists
-                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights 
-                    WHERE userID = $userID 
-                    AND insightType = 'overspending'
-                    AND " . ($userCategoryID == 0
-                        ? "necessityType = '$necessityType'"
-                        : "categoryA = $userCategoryID") . "
-                    AND DATE(date) BETWEEN '$startDate' AND '$endDate'
-                    LIMIT 1";
+            // Get actual category name
+            $catQuery = "SELECT categoryName, userisFlexible 
+                         FROM tbl_usercategories 
+                         WHERE userCategoryID = $userCategoryID LIMIT 1";
+            $catRow = mysqli_fetch_assoc(executeQuery($catQuery));
+            $categoryName = $catRow['categoryName'] ?? "Unknown Category";
+            $isFlexible = intval($catRow['userisFlexible']);
 
-                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
-                        // Insert insight
-                        $insertInsight = "INSERT INTO tbl_spendinginsights 
-                      (userID, categoryA, necessityType, insightType, message, date)
-                      VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", $insightNecessity, 'overspending', '$message', NOW())";
-                        executeQuery($insertInsight);
-                    }
+            // Skip rigid categories if you don’t want them monitored
+            if ($isFlexible == 0) continue;
 
-                    // Check if notification already exists
-                    $checkNotif = "SELECT 1 FROM tbl_notifications 
-                                   WHERE userID = $userID 
-                                   AND message = '$message'
-                                   AND DATE(createdAt) BETWEEN '$startDate' AND '$endDate'
-                                   LIMIT 1";
-                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
-                        // Insert notification
-                        $insertNotif = "INSERT INTO tbl_notifications 
-                                        (notificationTitle, message, icon, userID, createdAt, type)
-                                        VALUES ('Monthly Overspending Alert','$message','alert.png',$userID,NOW(), 'overspending')";
-                        executeQuery($insertNotif);
-                    }
-                }
+            // Calculate budget
+            $budgetLimit = ($limitType == 1) ? ($totalIncome * $value / 100) : $value;
+
+            // Get actual spending
+            $expenseQuery = "SELECT SUM(amount) AS spent 
+                             FROM tbl_expense 
+                             WHERE userID = $userID
+                             AND userCategoryID = $userCategoryID
+                             AND DATE(dateSpent) BETWEEN '$startDate' AND '$endDate'";
+            $expenseRow = mysqli_fetch_assoc(executeQuery($expenseQuery));
+            $spent = floatval($expenseRow['spent'] ?? 0);
+
+            if ($spent > $budgetLimit) {
+                $overAmount = $spent - $budgetLimit;
+                $message = "You have overspent ₱{$overAmount} in $categoryName from $startDate to $endDate.";
+
+                executeQuery("INSERT INTO tbl_spendinginsights
+                              (userID, categoryA, necessityType, insightType, message, date)
+                              VALUES ($userID, $userCategoryID, '$necessityType', 'overspending', '$message', NOW())");
+
+                executeQuery("INSERT INTO tbl_notifications
+                              (notificationTitle, message, icon, userID, createdAt, type)
+                              VALUES ('Monthly Overspending Alert','$message','alert.png',$userID,NOW(), 'overspending')");
             }
         }
     }
-    echo "Overspending insights generated successfully!";
+
+    echo "Overspending insights per necessity type and custom categories generated successfully!";
 }
 ?>
