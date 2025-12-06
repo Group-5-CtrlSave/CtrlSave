@@ -10,9 +10,28 @@ if (isset($_SESSION['userID'])) {
 }
 
 
+
+
 // Current month & year
 $currentMonth = isset($_GET['month']) ? $_GET['month'] : date("m");
 $currentYear = isset($_GET['year']) ? $_GET['year'] : date("Y");
+
+// Total Income
+$getBudgetVersion = "SELECT totalIncome 
+                     FROM tbl_userbudgetversion 
+                     WHERE isActive = 1 AND userID = $userID";
+
+$budgetVersionResult = executeQuery($getBudgetVersion);
+
+$totalIncome = 0;
+if (mysqli_num_rows($budgetVersionResult) > 0) {
+    $row = mysqli_fetch_assoc($budgetVersionResult);
+    $totalIncome = (float)$row['totalIncome']; 
+}
+
+
+
+
 
 // ===== BAR CHART =====
 $getTotalExpensesPerMonth = "SELECT MONTH(dateSpent) AS monthNum, SUM(amount) AS totalSpending 
@@ -56,11 +75,24 @@ if (mysqli_num_rows($expenseStructureResult) > 0) {
         $expenses[] = $expenseRow;
     }
 }
+// ===== ANALYSIS MESSAGE =====
 if ($overallTotal) {
+
     $monthName = date("F", mktime(0, 0, 0, $currentMonth, 1));
+
     $analysisMessage = "Based on the current financial report, you have spent a total of "
         . number_format($overallTotal, 2) . " pesos for the month of "
         . $monthName . ".";
+
+    // ⚠️ Debt detection: expenses greater than planned income
+    if ($totalIncome > 0 && $overallTotal > $totalIncome) {
+        $analysisMessage .= " You are under debt. Please review your current expenses.";
+    }
+
+    // Optional: If totalIncome in budget version is 0
+    if ($totalIncome == 0) {
+        $analysisMessage .= " No income set in your budget version.";
+    }
 
 } else {
     $analysisMessage = "Analyzing Data...";
@@ -91,12 +123,14 @@ if (!empty($expenses)) {
 
 // ===== Get Spending Correlation Insights =====
 
-$correlationInsight = ""; // default
+$correlationInsight = [] ; // default
 $getCorrelationInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'correlation' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $correlationInsightResult = executeQuery($getCorrelationInsightsQuery);
 if (mysqli_num_rows($correlationInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($correlationInsightResult);
-    $correlationInsight = $row['message'];
+    while ($row = mysqli_fetch_assoc($correlationInsightResult)){
+            $correlationInsight[] = $row['message'];
+    }
+
 }
 
 
@@ -121,6 +155,50 @@ if (mysqli_num_rows($oversavingInsightResult) > 0) {
     $oversavingInsight = $row['message'];
 }
 
+// ===== Get Spending Positive Insights =====
+$positiveInsight = ""; // default
+$getpositiveInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$positiveInsightResult = executeQuery($getpositiveInsightsQuery);
+if (mysqli_num_rows($positiveInsightResult) > 0) {
+    $row = mysqli_fetch_assoc($positiveInsightResult);
+    $positiveInsight = $row['message'];
+}
+
+// ===== Get Spending Tracking Insights =====
+$trackingInsight = ""; // default
+$gettrackingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'tracking' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$trackingInsightResult = executeQuery($gettrackingInsightsQuery);
+if (mysqli_num_rows($trackingInsightResult) > 0) {
+    $row = mysqli_fetch_assoc($trackingInsightResult);
+    $trackingInsight = $row['message'];
+}
+
+// ===== Get Spending Tracking Insights =====
+$recommendationInsight = ""; // default
+$getrecommendationInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'recommendation' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$recommendationInsightResult = executeQuery($getrecommendationInsightsQuery);
+if (mysqli_num_rows($recommendationInsightResult) > 0) {
+    $row = mysqli_fetch_assoc($recommendationInsightResult);
+    $recommendationInsight = $row['message'];
+}
+
+// ===== Get Spending Oversaving Insights =====
+   $positiveSavingInsight= ""; // default
+$getpositiveSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$positiveSavingInsightResult = executeQuery($getpositiveSavingInsightsQuery);
+if (mysqli_num_rows($positiveSavingInsightResult) > 0) {
+    $row = mysqli_fetch_assoc($positiveSavingInsightResult);
+    $positiveSavingInsight = $row['message'];
+}
+ $noSavingInsight= ""; // default
+$getnoSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$noSavingInsightResult = executeQuery($getnoSavingInsightsQuery);
+if (mysqli_num_rows($noSavingInsightResult) > 0) {
+    $row = mysqli_fetch_assoc($noSavingInsightResult);
+    $noSavingInsight = $row['message'];
+  
+}
+
 
 echo json_encode([
     "barChartData" => $monthlyData,
@@ -131,6 +209,11 @@ echo json_encode([
     "topCategories" => $topCategories,
     "overspendingInsight" => $overspendingInsight,
     "oversavingInsight" => $oversavingInsight,
+    "positiveInsight" => $positiveInsight,
+    "positiveSavingInsight" => $positiveSavingInsight,
+    "noSavingInsight" => $noSavingInsight,
+    "trackingInsight" => $trackingInsight,
+    "recommendationInsight" => $recommendationInsight,
     "correlationInsight" => $correlationInsight
 ]);
 ?>
