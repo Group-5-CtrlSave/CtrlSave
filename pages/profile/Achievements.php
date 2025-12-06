@@ -167,6 +167,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        /* Base styles - Full width layout */
         body {
             background-color: #44B87D;
             overflow-x: hidden;
@@ -174,8 +175,16 @@ while ($row = mysqli_fetch_assoc($result)) {
             font-family: "Roboto", sans-serif;
             margin: 0;
             padding: 0;
-            max-width: 480px;
-            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Force navbar to full width */
+        nav, .navbar, header, .navigation-bar, .nav-container {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
 
         header {
@@ -190,8 +199,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             top: 72px;
             left: 0;
             right: 0;
-            max-width: 480px;
-            margin: 0 auto;
             z-index: 50;
             background-color: #44B87D;
             padding: 20px 30px;
@@ -232,7 +239,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             background: #ffffff;
             padding: 15px;
             border-radius: 20px;
-            color: #44B87D;
+            color: #000000;
             min-height: 70px;
             font-family: "Roboto", sans-serif;
         }
@@ -244,7 +251,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         .achievement-title {
             font-weight: bold;
             font-size: 16px;
-            color: #44B87D;
+            color: #000000;
             margin-bottom: 3px;
         }
 
@@ -329,6 +336,165 @@ while ($row = mysqli_fetch_assoc($result)) {
         .achievement-container::-webkit-scrollbar-thumb {
             background: #FFC727;
             border-radius: 10px;
+        }
+
+        /* ========================================
+        RESPONSIVE STYLES FOR TABLET AND DESKTOP
+        ======================================== */
+
+        /* Tablet View (768px and above) */
+        @media (min-width: 768px) {
+            .page-title {
+                font-size: 32px;
+                padding: 25px 40px;
+            }
+
+            .achievement-card {
+                max-width: 900px;
+                margin: 15px auto;
+                padding: 30px;
+            }
+
+            .achievement-card h3 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .achievement-container {
+                max-height: 400px;
+            }
+
+            .achievement-item {
+                padding: 20px;
+                min-height: 80px;
+            }
+
+            .achievement-title {
+                font-size: 18px;
+            }
+
+            .achievement-description {
+                font-size: 14px;
+            }
+
+            .achievement-icon {
+                width: 50px;
+                height: 50px;
+                margin-right: 15px;
+            }
+
+            .level-badge {
+                width: 70px;
+            }
+
+            .achievement-item button {
+                padding: 10px 30px;
+                font-size: 15px;
+                min-width: 100px;
+            }
+        }
+
+        /* Desktop View (1024px and above) */
+        @media (min-width: 1024px) {
+            .page-title {
+                font-size: 36px;
+                padding: 30px 50px;
+            }
+
+            .achievement-card {
+                max-width: 1200px;
+                padding: 40px;
+                margin: 20px auto;
+            }
+
+            .achievement-card h3 {
+                font-size: 28px;
+                margin-bottom: 25px;
+            }
+
+            .achievement-container {
+                max-height: 500px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding-right: 10px;
+            }
+
+            .achievement-item {
+                padding: 20px;
+                margin-bottom: 0;
+            }
+
+            .achievement-title {
+                font-size: 18px;
+            }
+
+            .achievement-description {
+                font-size: 14px;
+            }
+
+            .achievement-icon {
+                width: 55px;
+                height: 55px;
+                margin-right: 15px;
+            }
+
+            .level-badge {
+                width: 75px;
+            }
+
+            .achievement-item button {
+                padding: 10px 35px;
+                font-size: 16px;
+                min-width: 110px;
+            }
+
+            .achievement-container::-webkit-scrollbar {
+                width: 8px;
+            }
+        }
+
+        /* Large Desktop View (1440px and above) */
+        @media (min-width: 1440px) {
+            .page-title {
+                font-size: 40px;
+            }
+
+            .achievement-card {
+                max-width: 1400px;
+                padding: 50px;
+            }
+
+            .achievement-card h3 {
+                font-size: 32px;
+            }
+
+            .achievement-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                max-height: 600px;
+            }
+
+            .achievement-item {
+                padding: 25px;
+            }
+
+            .achievement-title {
+                font-size: 20px;
+            }
+
+            .achievement-description {
+                font-size: 15px;
+            }
+
+            .achievement-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .level-badge {
+                width: 80px;
+            }
         }
     </style>
 

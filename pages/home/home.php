@@ -90,6 +90,24 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
       background-color: #44B87D;
     }
 
+    .time {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
+    .time b {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
+    .notes {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
     .today-text {
       color: #FFFFFF;
       font-size: 16px;
@@ -366,7 +384,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
         <!-- Recommendation Card -->
         <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
           <div class="recommendation-card p-3">
-            <h2 class="fw-semibold mb-2" style="color: #44B87D; font-size: 16px;">Recommendation</h2>
+            <h2 class="fw-semibold mb-2" style="color: #000; font-size: 16px;">Recommendation</h2>
             <div class="d-flex justify-content-center">
               <img src="../../assets/img/home/InsiteBg.png" class="recommendation-img">
             </div>
@@ -402,7 +420,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 
           <!-- Watch / Read / Apply Section -->
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">
               Watch. Read. Apply. Save Smart
             </h2>
 
@@ -461,7 +479,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
           ?>
 
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Daily Saving Challenge</h2>
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">Daily Saving Challenge</h2>
 
             <?php if ($dailyChallenge): ?>
               <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
@@ -470,7 +488,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
             <?php else: ?>
               <div style="text-align:center;">
                 <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
-                <p style="font-family:Roboto, sans-serif; font-weight:600; color:#44B87D; font-size:14px; margin:0;">
+                <p style="font-family:Roboto, sans-serif; font-weight:600; color:#000; font-size:14px; margin:0;">
                   No daily challenges yet to show
                 </p>
               </div>
@@ -501,7 +519,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
           ?>
 
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Weekly Saving Challenge</h2>
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">Weekly Saving Challenge</h2>
 
             <?php if ($weeklyChallenge): ?>
               <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
