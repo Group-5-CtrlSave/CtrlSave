@@ -81,7 +81,7 @@ $stmt_income->bind_param("i", $userID);
 $stmt_income->execute();
 $row = $stmt_income->get_result()->fetch_assoc();
 if ($row) {
-    $totalIncome = (float)$row['totalIncome'];
+    $totalIncome = (float) $row['totalIncome'];
 }
 $stmt_income->close();
 
@@ -115,46 +115,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             break;
         }
 
-        $allocation = [
-            'userCategoryID' => $id,
-            'necessityType' => $category['userNecessityType'],
-            'limitType' => ($mode === 'limit') ? 1 : 0,
-            'value' => 0.00
-        ];
+        /* TRACK ONLY = limitType 0 */
+        if ($mode === "track") {
+            $allocations[] = [
+                'userCategoryID' => $id,
+                'necessityType' => $category['userNecessityType'],
+                'limitType' => 0,
+                'value' => 0
+            ];
+            continue;
+        }
 
-        if ($mode === 'limit') {
-            $all_tracking = false;
-            $total_limit_count++;
+        /* CUSTOM AMOUNT LIMIT = limitType 2 */
+        if ($mode === "limit") {
 
-            if (empty($value) || !is_numeric($clean) || (float)$clean <= 0) {
+            if ($clean === "" || !is_numeric($clean) || (float) $clean <= 0) {
                 $valid_allocation = false;
-                $error = "Limit for {$category['categoryName']} must be positive.";
+                $error = "Limit for {$category['categoryName']} must be a positive amount.";
                 break;
             }
 
-            $allocation['value'] = (float)$clean;
-        }
+            $amount = (float) $clean;
 
-        $allocations[] = $allocation;
+            $allocations[] = [
+                'userCategoryID' => $id,
+                'necessityType' => $category['userNecessityType'],
+                'limitType' => 2,   // amount-based custom limit
+                'value' => $amount
+            ];
+
+            $all_tracking = false;
+            $total_limit_count++;
+            continue;
+        }
     }
 
     /* -----------------------------
-        PROCESS SAVINGS (ALWAYS REQUIRED)
+    PROCESS SAVINGS (AMOUNT FOR CUSTOM RULE)
     ------------------------------ */
     if ($valid_allocation) {
 
         $savings_value = trim($_POST['savings_value'] ?? '');
         $clean_savings = clean_currency_input($savings_value);
 
-        if (empty($savings_value) || !is_numeric($clean_savings) || (float)$clean_savings <= 0) {
+        if ($clean_savings === "" || !is_numeric($clean_savings) || (float) $clean_savings <= 0) {
             $valid_allocation = false;
-            $error = "Savings must be a positive percentage.";
+            $error = "Savings must be a positive amount.";
         } else {
             $allocations[] = [
                 'userCategoryID' => $savingsCategory['userCategoryID'],
                 'necessityType' => 'saving',
-                'limitType' => 1,
-                'value' => (float)$clean_savings
+                'limitType' => 2,   // AMOUNT for custom rule
+                'value' => (float) $clean_savings
             ];
             $total_limit_count++;
         }
@@ -171,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
     }
 
     /* -----------------------------
-        VALIDATE TOTAL LIMITS
+        VALIDATE CUSTOM AMOUNT TOTAL
     ------------------------------ */
     if ($valid_allocation && !$show_tracking_prompt) {
 
@@ -179,17 +191,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             $valid_allocation = false;
             $error = "Set your income before creating limits.";
         } else {
-            $sumLimits = 0.00;
+
+            $sumAmounts = 0.00;
 
             foreach ($allocations as $a) {
-                if ($a['limitType'] == 1) {
-                    $sumLimits += $a['value'];
+                if ($a['limitType'] == 2) { // amount-based limits
+                    $sumAmounts += (float) $a['value'];
                 }
             }
 
-            if ($sumLimits > $totalIncome) {
+            if ($sumAmounts > $totalIncome) {
                 $valid_allocation = false;
-                $error = "Your limit totals exceed 100% of your income.";
+                $error = "Your total custom limits exceed your income.";
             }
         }
     }
@@ -202,7 +215,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
         $conn->begin_transaction();
 
         try {
-
             // Unselect old rules
             $stmt = $conn->prepare("UPDATE tbl_userbudgetrule SET isSelected = 0 WHERE userID = ?");
             $stmt->bind_param("i", $userID);
@@ -220,10 +232,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)) {
             $ruleID = $stmt->insert_id;
             $stmt->close();
 
-            // -------------------------------
-            // ⭐ CRITICAL FIX:
-            // Attach custom rule to active budget version
-            // -------------------------------
+            // Attach rule to active budget version
             $stmt = $conn->prepare("
                 UPDATE tbl_userbudgetversion
                 SET userBudgetRuleID = ?

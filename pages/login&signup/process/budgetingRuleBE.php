@@ -11,13 +11,13 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = (int) $_SESSION['userID'];
 
-// Currency setup (just for display)
+// Currency setup (display only)
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 
 
 // ----------------------------------------------------------
-// FETCH DEFAULT RULES + THEIR ALLOCATIONS
+// FETCH DEFAULT RULES + ALLOCATIONS
 // ----------------------------------------------------------
 $sql = "
     SELECT r.defaultBudgetruleID, r.ruleName, r.ruleDescription,
@@ -57,53 +57,51 @@ while ($row = $res->fetch_assoc()) {
 // ----------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // (1) User picked CUSTOM rule
+    // USER PICKS CUSTOM RULE
     if (isset($_POST['preferMine'])) {
         header("Location: percentage.php");
         exit;
     }
 
-
-    // (2) User clicked NEXT (useDefault)
+    // USER PICKS DEFAULT RULE
     if (!isset($_POST['useDefault'])) {
-        $error = "Invalid submission. Please choose a budget rule properly.";
-    } 
-    else {
+        $error = "Invalid submission. Please select a budgeting rule.";
+    } else {
 
         if (empty($_POST['ruleOption'])) {
-            $error = "Please select a budget rule before proceeding.";
-        } 
-        else {
+            $error = "Please select a budget rule.";
+        } else {
+
             $selectedRule = (int)$_POST['ruleOption'];
 
             if (!isset($rules[$selectedRule])) {
                 $error = "Invalid rule selected.";
-            } 
-            else {
+            } else {
 
                 $selectedRuleName = $rules[$selectedRule]['ruleName'];
 
-                // START TRANSACTION
+                // -------------------------------------------------
+                // BEGIN TRANSACTION
+                // -------------------------------------------------
                 $conn->begin_transaction();
 
                 try {
 
                     // -------------------------------------------------
-                    // STEP 1 — Mark ALL user's rules unselected
+                    // STEP 1 — UNSELECT ALL CURRENT RULES FOR USER
                     // -------------------------------------------------
-                    $unselect = $conn->prepare("
+                    $un = $conn->prepare("
                         UPDATE tbl_userbudgetrule
                         SET isSelected = 0
                         WHERE userID = ?
                     ");
-                    $unselect->bind_param("i", $userID);
-                    $unselect->execute();
-                    $unselect->close();
-
+                    $un->bind_param("i", $userID);
+                    $un->execute();
+                    $un->close();
 
 
                     // -------------------------------------------------
-                    // STEP 2 — Determine whether to insert or update rule
+                    // STEP 2 — CHECK IF USER HAS ANY RULE (UPDATE/INSERT)
                     // -------------------------------------------------
                     $check = $conn->prepare("
                         SELECT userBudgetRuleID
@@ -117,91 +115,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $check->close();
 
                     if ($result->num_rows > 0) {
-                        // User ALREADY has a rule — update it
+
+                        // USER ALREADY HAS A RULE → UPDATE IT
                         $row = $result->fetch_assoc();
                         $userBudgetRuleID = (int)$row['userBudgetRuleID'];
 
-                        $update = $conn->prepare("
+                        $upd = $conn->prepare("
                             UPDATE tbl_userbudgetrule
                             SET ruleName = ?, isSelected = 1
                             WHERE userBudgetRuleID = ?
                         ");
-                        $update->bind_param("si", $selectedRuleName, $userBudgetRuleID);
-                        $update->execute();
-                        $update->close();
+                        $upd->bind_param("si", $selectedRuleName, $userBudgetRuleID);
+                        $upd->execute();
+                        $upd->close();
 
                     } else {
 
-                        // User has NO rule yet → INSERT ONE
-                        $insert = $conn->prepare("
+                        // USER HAS NO RULE → INSERT NEW RULE
+                        $ins = $conn->prepare("
                             INSERT INTO tbl_userbudgetrule (userID, ruleName, createdAt, isSelected)
                             VALUES (?, ?, NOW(), 1)
                         ");
-                        $insert->bind_param("is", $userID, $selectedRuleName);
-                        $insert->execute();
-                        $userBudgetRuleID = $insert->insert_id;
-                        $insert->close();
+                        $ins->bind_param("is", $userID, $selectedRuleName);
+                        $ins->execute();
+                        $userBudgetRuleID = $ins->insert_id;
+                        $ins->close();
                     }
 
 
                     // -------------------------------------------------
-                    // STEP 3 — Update existing version's rule IF NEEDED
-                    // userBudgetVersion was created in balanceBE.php
-                    // It had userBudgetRuleID = 0 as placeholder
+                    // STEP 3 — ATTACH RULE TO ACTIVE VERSION
                     // -------------------------------------------------
-                    $updateVersion = $conn->prepare("
+                    $stmt = $conn->prepare("
                         UPDATE tbl_userbudgetversion
                         SET userBudgetRuleID = ?
                         WHERE userID = ? AND isActive = 1
                     ");
-                    $updateVersion->bind_param("ii", $userBudgetRuleID, $userID);
-                    $updateVersion->execute();
-                    $updateVersion->close();
-
+                    $stmt->bind_param("ii", $userBudgetRuleID, $userID);
+                    $stmt->execute();
+                    $stmt->close();
 
 
                     // -------------------------------------------------
-                    // STEP 4 — Replace ALL existing user allocations
+                    // STEP 4 — REPLACE ALL USER ALLOCATIONS (DEFAULT RULE)
                     // -------------------------------------------------
-                    $delAlloc = $conn->prepare("
+                    $del = $conn->prepare("
                         DELETE FROM tbl_userallocation
                         WHERE userBudgetruleID = ?
                     ");
-                    $delAlloc->bind_param("i", $userBudgetRuleID);
-                    $delAlloc->execute();
-                    $delAlloc->close();
+                    $del->bind_param("i", $userBudgetRuleID);
+                    $del->execute();
+                    $del->close();
 
 
-                    // Insert fresh allocations
-                    $allocStmt = $conn->prepare("
+                    // INSERT PERCENTAGE ALLOCATIONS
+                    $insertAlloc = $conn->prepare("
                         INSERT INTO tbl_userallocation
-                                (userBudgetruleID, userCategoryID, necessityType, limitType, value)
-                        VALUES  (?, NULL, ?, 1, ?)
+                            (userBudgetruleID, userCategoryID, necessityType, limitType, value)
+                        VALUES (?, NULL, ?, 1, ?)
                     ");
 
                     foreach ($rules[$selectedRule]['allocations'] as $alloc) {
                         $necessity = $alloc['category'];
-                        $value = (int)$alloc['percentage'];
-                        $allocStmt->bind_param("isi", $userBudgetRuleID, $necessity, $value);
-                        $allocStmt->execute();
+                        $percent   = $alloc['percentage'];
+
+                        $insertAlloc->bind_param("isi", $userBudgetRuleID, $necessity, $percent);
+                        $insertAlloc->execute();
                     }
 
-                    $allocStmt->close();
+                    $insertAlloc->close();
 
 
                     // -------------------------------------------------
-                    // COMMIT ALL CHANGES
+                    // COMMIT TRANSACTION
                     // -------------------------------------------------
                     $conn->commit();
-
                     header("Location: done.php");
                     exit;
-
 
                 } catch (Exception $e) {
 
                     $conn->rollback();
-                    $error = "Failed to save your chosen budget rule.";
+                    $error = "Failed to save selected rule.";
                 }
             }
         }
