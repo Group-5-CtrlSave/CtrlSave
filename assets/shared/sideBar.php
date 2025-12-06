@@ -168,7 +168,7 @@ if (!empty($displayedBadgesArray)) {
                 <img src="../../assets/img/challenge/<?= htmlspecialchars($badge['icon']); ?>"
                   alt="<?= htmlspecialchars($badge['achievementName']); ?>"
                   title="<?= htmlspecialchars($badge['achievementName']); ?>"
-                  style="width:16px;height:16px;object-fit:contain;flex-shrink:0;">
+                  style="width:25px;height:25px;object-fit:contain;flex-shrink:0;">
               <?php endforeach; ?>
 
             <?php else: ?>

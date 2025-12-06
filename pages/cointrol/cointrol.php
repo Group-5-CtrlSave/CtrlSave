@@ -118,12 +118,44 @@ if (isset($_SESSION['userID'])) {
 
                 </div>
 
+                <!-- Positive Category -->
+
+                <div class="container my-3" id="positive">
+
+                </div>
+
+                
+             
+
+                   <!-- Tracking Category -->
+
+                <div class="container my-3" id="tracking">
+
+                </div>
+
+
+
+                   <!-- Positive Category -->
+
+                <div class="container my-3" id="positiveSaving">
+
+                </div>
+
+                    <!-- No Saving Category -->
+
+                <div class="container my-3" id="noSaving">
+
+                </div>
+
+
+
+
                 <!-- Overspent Category -->
                 <div class="container my-3" id="overSpentCateg">
 
                 </div>
 
-                <!-- Overspent Category -->
+                <!-- Oversave Category -->
                 <div class="container my-3" id="overSaveCateg">
 
                 </div>
@@ -131,6 +163,12 @@ if (isset($_SESSION['userID'])) {
 
                 <!-- Correlation of Categories -->
                 <div class="container my-3" id="correlationInsight">
+
+                </div>
+
+                
+                <!-- Correlation of Categories -->
+                <div class="container my-3" id="recommendation">
 
                 </div>
 
@@ -348,7 +386,10 @@ if (isset($_SESSION['userID'])) {
                     let correlationInsight = document.getElementById("correlationInsight");
                     correlationInsight.innerHTML = "";
                     if (data.correlationInsight && data.correlationInsight.length > 0) {
-                        correlationInsight.innerHTML = "<p>" + data.correlationInsight + "</p>"
+                        data.correlationInsight.forEach(element => {
+                            correlationInsight.innerHTML += `<p> ${element} </p>`
+                        });
+                        
                     }
 
                     // Update Overspending Insight
@@ -368,6 +409,45 @@ if (isset($_SESSION['userID'])) {
                     if (data.oversavingInsight && data.oversavingInsight.length > 0) {
                         overSaveCateg.innerHTML = "<p>" + data.oversavingInsight + "</p>"
                     }
+
+                    // Positive Insight 
+                      let positive = document.getElementById("positive")
+                    positive.innerHTML = "";
+                    if (data.positiveInsight && data.positiveInsight.length > 0) {
+                        positive.innerHTML = "<p>" + data.positiveInsight + "</p>"
+                    }
+                         // Positive Insight 
+                      let positiveSaving = document.getElementById("positiveSaving")
+                    positiveSaving.innerHTML = "";
+                    if (data.positiveSavingInsight && data.positiveSavingInsight.length > 0) {
+                         positiveSaving.innerHTML +="<b>Saving Goals:</b>"
+                        positiveSaving.innerHTML += "<p>" + data.positiveSavingInsight + "</p>"
+                    }
+
+                         // No Saving Insight 
+                      let noSaving = document.getElementById("noSaving")
+                    noSaving.innerHTML = "";
+                    if (data.noSavingInsight && data.noSavingInsight.length > 0) {
+                         noSaving.innerHTML += "<b>Saving Goals:</b>"
+                        noSaving.innerHTML += "<p>" + data.noSavingInsight + "</p>"
+                    }
+
+                      // Tracking Insight 
+                      let tracking = document.getElementById("tracking")
+                    tracking.innerHTML = "";
+                    if (data.trackingInsight && data.trackingInsight.length > 0) {
+                        tracking.innerHTML = "<p>" + data.trackingInsight + "</p>"
+                    }
+
+                       // Recommendation 
+                      let recommendation = document.getElementById("recommendation")
+                    recommendation.innerHTML = "";
+                    if (data.recommendationInsight&& data.recommendationInsight.length > 0) {
+                         recommendation.innerHTML += `<b>Recommendations:</b>`;
+                        recommendation.innerHTML += "<p>" + data.recommendationInsight + "</p>"
+                    }
+
+                
 
 
 

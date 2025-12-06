@@ -90,6 +90,24 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
       background-color: #44B87D;
     }
 
+    .time {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
+    .time b {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
+    .notes {
+        color: #BCBABA !important;
+        font-weight: normal !important;
+        font-size: 14px;
+    }
+
     .today-text {
       color: #FFFFFF;
       font-size: 16px;
@@ -169,6 +187,17 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 
     .iePriceContainer {
       min-width: 120px !important;
+    }
+
+    .today-text,
+    .recommendation-card h2,
+    .challenge-card h2 {
+      font-family: "Poppins", sans-serif !important;
+      font-weight: 600;
+    }
+
+    .challenge-card h2.fw-semibold {
+      font-family: "Poppins", sans-serif !important;
     }
   </style>
 
@@ -355,7 +384,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
         <!-- Recommendation Card -->
         <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
           <div class="recommendation-card p-3">
-            <h2 class="fw-semibold mb-2" style="color: #44B87D; font-size: 16px;">Recommendation</h2>
+            <h2 class="fw-semibold mb-2" style="color: #000; font-size: 16px;">Recommendation</h2>
             <div class="d-flex justify-content-center">
               <img src="../../assets/img/home/InsiteBg.png" class="recommendation-img">
             </div>
@@ -391,7 +420,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 
           <!-- Watch / Read / Apply Section -->
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">
               Watch. Read. Apply. Save Smart
             </h2>
 
@@ -450,14 +479,20 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
           ?>
 
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Daily Saving Challenge</h2>
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">Daily Saving Challenge</h2>
 
             <?php if ($dailyChallenge): ?>
               <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
                 <span class="fw-medium text-dark"><?php echo ($dailyChallenge['challengeName']); ?></span>
               </div>
             <?php else: ?>
-              <p class="text-center text-muted">No daily challenges available.</p>
+              <div style="text-align:center;">
+                <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
+                <p style="font-family:Roboto, sans-serif; font-weight:600; color:#000; font-size:14px; margin:0;">
+                  No daily challenges yet to show
+                </p>
+              </div>
+
             <?php endif; ?>
 
             <div class="text-end mt-2">
@@ -484,67 +519,71 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
           ?>
 
           <div class="challenge-card p-3">
-            <h2 class="fw-semibold mb-3" style="color: #44B87D; font-size: 16px;">Weekly Saving Challenge</h2>
+            <h2 class="fw-semibold mb-3" style="color: #000; font-size: 16px;">Weekly Saving Challenge</h2>
 
             <?php if ($weeklyChallenge): ?>
               <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill mb-2" style="height: 45px;">
                 <span class="fw-medium text-dark"><?php echo ($weeklyChallenge['challengeName']); ?></span>
               </div>
             <?php else: ?>
-              <p class="text-center text-muted">No weekly challenges available.</p>
-            <?php endif; ?>
+              <div style="text-align:center;">
+                <img src="../../assets/img/challenge/ch_empty.png" style="width:70px; margin-bottom:5px;">
+                <p style="font-family:Roboto, sans-serif; font-weight:600; color:#44B87D; font-size:14px; margin:0;">
+                  No weekly challenges yet to show
+                </p>
+              <?php endif; ?>
 
-            <div class="text-end mt-2">
-              <a href="../challenge/challengeMain.php" class="text-success fw-semibold text-decoration-none">See
-                more...</a>
-            </div>
-          </div>
-
-          <!-- Bottom Nav Bar -->
-          <div class="tab-bar d-flex align-items-center">
-            <div class="tab-item">
-              <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
-                <img src="../../assets/img/home/cointrol_Icon.png" class="tab-icon">
-                <div class="tab-label">Cointrol</div>
-              </a>
+              <div class="text-end mt-2">
+                <a href="../challenge/challengeMain.php" class="text-success fw-semibold text-decoration-none">See
+                  more...</a>
+              </div>
             </div>
 
-            <div class="tab-item">
-              <a href="../home/calculator.php" class="text-decoration-none text-dark d-block">
-                <img src="../../assets/img/home/calculator.png" class="tab-icon">
-                <div class="tab-label">Calculator</div>
-              </a>
+            <!-- Bottom Nav Bar -->
+            <div class="tab-bar d-flex align-items-center">
+              <div class="tab-item">
+                <a href="../cointrol/cointrol.php" class="text-decoration-none text-dark d-block">
+                  <img src="../../assets/img/home/cointrol_Icon.png" class="tab-icon">
+                  <div class="tab-label">Cointrol</div>
+                </a>
+              </div>
+
+              <div class="tab-item">
+                <a href="../home/calculator.php" class="text-decoration-none text-dark d-block">
+                  <img src="../../assets/img/home/calculator.png" class="tab-icon">
+                  <div class="tab-label">Calculator</div>
+                </a>
+              </div>
             </div>
-          </div>
 
-          <!-- Plus btn -->
-          <button id="plusBtn" data-bs-toggle="modal" data-bs-target="#plusModal">
-            <img src="../../assets/img/shared/plus.png" style="width:24px;height:24px;">
-          </button>
+            <!-- Plus btn -->
+            <button id="plusBtn" data-bs-toggle="modal" data-bs-target="#plusModal">
+              <img src="../../assets/img/shared/plus.png" style="width:24px;height:24px;">
+            </button>
 
-          <!-- Modal -->
-          <div class="modal fade" id="plusModal" tabindex="-1" aria-labelledby="addIncomeExpenseModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="addIncomeExpenseModalLabel">Add Income or Expense</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex justify-content-center align-items-center">
-                  <a href="../income&expenses/addIncome.php">
-                    <button type="button" class="btn custom-btn btn-lg addIncomebtn mx-3"><b>Add Income</b></button>
-                  </a>
-                  <a href="../income&expenses/addExpenses.php">
-                    <button type="button" class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button>
-                  </a>
+            <!-- Modal -->
+            <div class="modal fade" id="plusModal" tabindex="-1" aria-labelledby="addIncomeExpenseModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addIncomeExpenseModalLabel">Add Income or Expense</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body d-flex justify-content-center align-items-center">
+                    <a href="../income&expenses/addIncome.php">
+                      <button type="button" class="btn custom-btn btn-lg addIncomebtn mx-3"><b>Add Income</b></button>
+                    </a>
+                    <a href="../income&expenses/addExpenses.php">
+                      <button type="button" class="btn custom-btn btn-lg addExpensebtn mx-3"><b>Add Expense</b></button>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Bootstrap JS -->
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
