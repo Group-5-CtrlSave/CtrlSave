@@ -3,6 +3,10 @@ if (session_status() === PHP_SESSION_NONE)
     session_start();
 include '../../assets/shared/connect.php';
 
+// Currency from session
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+
 if (!isset($_SESSION['userID'])) {
     header("Location: ../login.php");
     exit();
@@ -112,7 +116,7 @@ if ($isCustomRule && $savingsAlloc) {
 ----------------------------------------------------------- */
 function clean_currency($v)
 {
-    return preg_replace('/[,\s₱$]/u', '', $v);
+    return preg_replace('/[^0-9.]/', '', $v);
 }
 
 /* ----------------------------------------------------------
@@ -606,7 +610,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div id="balanceBox"
                 style="padding:12px;margin-bottom:15px;border:2px solid #F6D25B;border-radius:12px;background:white;">
                 <strong>Current Balance:</strong>
-                <span id="currentBalance" style="color:green;">₱0</span>
+                <span id="currentBalance" style="color:green;"><?php echo $symbol; ?>0</span>
             </div>
 
 
@@ -729,6 +733,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 
     <script>
+        const currencySymbol = "<?= $symbol ?>";
+    </script>
+
+    <script>
         document.addEventListener("DOMContentLoaded", () => {
 
             // Total income output by backend in percentageBE.php
@@ -760,7 +768,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     }
                 });
 
-                balanceEl.innerText = "₱" + remaining.toLocaleString();
+                balanceEl.innerText = currencySymbol + remaining.toLocaleString();
 
                 balanceEl.style.color = (remaining < 0) ? "red" : "green";
             }

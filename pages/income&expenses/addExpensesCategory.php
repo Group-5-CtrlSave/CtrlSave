@@ -1,5 +1,12 @@
 <?php include("../../assets/shared/connect.php") ?>
 <?php session_start(); ?>
+
+<?php
+//Currency from session
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+?>
+
 <?php include("process/addexpensecategory.php") ?>
 
 <?php $getExpenseCategoriesIconQuery = "SELECT `icon` FROM `tbl_defaultcategories` WHERE type = 'expense' ";
@@ -119,7 +126,8 @@ $expenseCategoriesIconResult = executeQuery($getExpenseCategoriesIconQuery);
             <div class="container my-2">
                 <label class="form-check-label" for="percentage"><b>Target Limit:</b></label>
                 <input type="text" class="form-control form-control-lg forms" id="targetlimit"
-                    placeholder="e.g 2,000 PHP" name="targetLimit" required>
+                    placeholder="e.g <?php echo $symbol; ?>2,000" name="targetLimit" required>
+
             </div>
 
             <!-- Save Button -->
@@ -139,6 +147,9 @@ $expenseCategoriesIconResult = executeQuery($getExpenseCategoriesIconQuery);
     <!-- Bootstrap-Select JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
 
+    <script>
+        const currencySymbol = "<?= $symbol ?>";
+    </script>
 
 
     <script>

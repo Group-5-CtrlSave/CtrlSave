@@ -10,6 +10,10 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = $_SESSION['userID'];
 
+// Currency (from session, fallback to PHP)
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'USD') ? '$' : '₱';
+
 // date today
 $todayDate = date('Y-m-d');
 $displayToday = "Today, " . date('M d D');
@@ -228,7 +232,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
               <span class="text-danger" style="font-size: 25px;">↓</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Expenses</span>
               <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
-                ₱<?php echo number_format($todayExpense, 2); ?>
+                <?php echo $symbol . number_format($todayExpense, 2); ?>
               </div>
             </div>
             <div class="vertical-divider"></div>
@@ -236,7 +240,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
               <span class="text-success" style="font-size: 25px;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Income</span>
               <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
-                ₱<?php echo number_format($todayIncome, 2); ?>
+                <?php echo $symbol . number_format($todayIncome, 2); ?>
               </div>
             </div>
             <div class="vertical-divider"></div>
@@ -244,7 +248,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
               <span style="font-size: 25px; visibility: hidden;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Balance</span>
               <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
-                ₱<?php echo number_format($todayBalance, 2); ?>
+                <?php echo $symbol . number_format($todayBalance, 2); ?>
               </div>
             </div>
           </div>
@@ -363,7 +367,13 @@ LIMIT 3
                     <!-- Price + Time -->
                     <div class="container iePriceContainer p-1">
                       <h5 class="price m-0">
-                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], 2); ?>
+                        <?php
+                        echo ($item['type'] == 'income'
+                          ? '+ ' . $symbol
+                          : '- ' . $symbol
+                        ) . number_format($item['amount'], decimals: 2);
+                        ?>
+
                       </h5>
 
                       <p class="time m-0">

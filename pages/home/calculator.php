@@ -1,3 +1,10 @@
+<?php
+session_start();
+
+// Currency from session
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,16 +19,19 @@
 
   <!-- Top Navbar -->
   <nav class="d-flex align-items-center justify-content-between px-3">
-  <a href="../home/home.php" class="text-decoration-none d-flex align-items-center">
-    <img src="../../assets/img/shared/backArrow.png" alt="Back">
-  </a>
-  <h1 class="calculator-title mb-0 text-center flex-grow-1">Calculator</h1>
-  <div style="width: 25px;"></div> 
-</nav>
+    <a href="../home/home.php" class="text-decoration-none d-flex align-items-center">
+      <img src="../../assets/img/shared/backArrow.png" alt="Back">
+    </a>
+    <h1 class="calculator-title mb-0 text-center flex-grow-1">Calculator</h1>
+    <div style="width: 25px;"></div> 
+  </nav>
 
   <!-- Calculator Card -->
   <div class="calculator-container">
-    <div class="display" id="display">0</div>
+    <div class="display">
+      <span id="currency-symbol"></span>
+      <span id="display">0</span>
+    </div>
 
     <div class="buttons">
       <button class="btn-calc btn-clear" onclick="clearDisplay()">C</button>
@@ -50,6 +60,10 @@
   </div>
 
   <script>
+    // Currency symbol from PHP / session
+    const currencySymbol = "<?= $symbol ?>";
+    document.getElementById('currency-symbol').textContent = currencySymbol + " ";
+
     let display = document.getElementById('display');
 
     function clearDisplay() {

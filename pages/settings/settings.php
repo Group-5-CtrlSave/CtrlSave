@@ -8,15 +8,22 @@ if (!isset($_SESSION['userID'])) {
 }
 
 include '../../assets/shared/connect.php';
+include_once '../../assets/shared/currencyConverter.php';
+
 $userID = $_SESSION['userID'];
 
-// Fetch user currency
+// Currency from session (for navbar / sidebar if needed)
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+
+// Fetch user currency from DB (source of truth)
 $userQuery = "SELECT currencyCode FROM tbl_users WHERE userID = ?";
 $stmt = $conn->prepare($userQuery);
 $stmt->bind_param("i", $userID);
 $stmt->execute();
 $result = $stmt->get_result()->fetch_assoc();
 $currentCurrency = $result['currencyCode'] ?? 'PHP';
+$stmt->close();
 
 // Check if user has a budget rule and determine its type
 $budgetRuleQuery = "SELECT ruleName FROM tbl_userbudgetrule WHERE userID = ? AND isSelected = 1";
@@ -24,33 +31,104 @@ $stmt = $conn->prepare($budgetRuleQuery);
 $stmt->bind_param("i", $userID);
 $stmt->execute();
 $budgetRuleResult = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
 $hasSuggestedRule = false;
-$hasCustomRule = false;
+$hasCustomRule   = false;
 
 if ($budgetRuleResult) {
     // Check if the rule name matches any default budget rules (suggested rules)
-    $defaultRuleCheck = "SELECT COUNT(*) as count FROM tbl_defaultbudgetrule WHERE ruleName = ?";
+    $defaultRuleCheck = "SELECT COUNT(*) AS count FROM tbl_defaultbudgetrule WHERE ruleName = ?";
     $stmtCheck = $conn->prepare($defaultRuleCheck);
     $stmtCheck->bind_param("s", $budgetRuleResult['ruleName']);
     $stmtCheck->execute();
     $checkResult = $stmtCheck->get_result()->fetch_assoc();
-    $hasSuggestedRule = ($checkResult['count'] > 0);
-    $hasCustomRule = !$hasSuggestedRule; // If not suggested, it's custom
     $stmtCheck->close();
+
+    $hasSuggestedRule = ($checkResult['count'] > 0);
+    $hasCustomRule    = !$hasSuggestedRule; // If not suggested, it's custom
 }
-$stmt->close();
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Update Currency
+    // ✅ Update Currency WITH conversion
     if (isset($_POST['updateCurrency'])) {
+
         $newCurrency = $_POST['currency'] ?? 'PHP';
+        $oldCurrency = $currentCurrency; // Always use DB currency
+
+        // Only convert if currency actually changed
+        if ($newCurrency !== $oldCurrency) {
+
+            // Get conversion rate once (1 old → new)
+            $rate = convertCurrency(1, $oldCurrency, $newCurrency); // treated as "rate"
+
+            // Validate rate before conversion
+            if ($rate !== null && is_numeric($rate) && $rate > 0 && $rate != 1) {
+
+                $conn->begin_transaction();
+
+                try {
+                    // Incomes
+                    $conn->query("
+                        UPDATE tbl_income
+                        SET amount = ROUND(amount * {$rate}, 2)
+                        WHERE userID = {$userID}
+                    ");
+
+                    // Expenses
+                    $conn->query("
+                        UPDATE tbl_expense
+                        SET amount = ROUND(amount * {$rate}, 2)
+                        WHERE userID = {$userID}
+                    ");
+
+                    // Saving goals
+                    $conn->query("
+                        UPDATE tbl_savinggoals
+                        SET targetAmount  = ROUND(targetAmount * {$rate}, 2),
+                            currentAmount = ROUND(currentAmount * {$rate}, 2)
+                        WHERE userID = {$userID}
+                    ");
+
+                    // Limits (budget allocations)
+                    $conn->query("
+                        UPDATE tbl_userallocation
+                        SET value = ROUND(value * {$rate}, 2)
+                        WHERE userBudgetRuleID IN (
+                            SELECT userBudgetRuleID
+                            FROM tbl_userbudgetrule
+                            WHERE userID = {$userID}
+                        )
+                    ");
+
+                    // Total income inside budget version
+                    $conn->query("
+                        UPDATE tbl_userbudgetversion
+                        SET totalIncome = ROUND(totalIncome * {$rate}, 2)
+                        WHERE userID = {$userID}
+                    ");
+
+                    $conn->commit();
+
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    error_log("Currency Conversion Failed: " . $e->getMessage());
+                }
+            }
+        }
+
+        // Update user's currency in DB
         $updateQuery = "UPDATE tbl_users SET currencyCode = ? WHERE userID = ?";
         $stmt = $conn->prepare($updateQuery);
         $stmt->bind_param("si", $newCurrency, $userID);
         $stmt->execute();
         $stmt->close();
+
+        // Sync to session
+        $_SESSION['currencyCode'] = $newCurrency;
+
         header("Location: settings.php");
         exit;
     }
@@ -59,32 +137,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['updateNeedsWants'])) {
         $necessities = $_POST['necessity'] ?? [];
         if (!empty($necessities)) {
-            $stmt = $conn->prepare("UPDATE tbl_usercategories SET userNecessityType = ? WHERE userCategoryID = ? AND userID = ?");
+            $stmt = $conn->prepare("
+                UPDATE tbl_usercategories 
+                SET userNecessityType = ? 
+                WHERE userCategoryID = ? AND userID = ?
+            ");
+
             foreach ($necessities as $catID => $type) {
-                if (in_array($type, ['need', 'want'])) {
+                if (in_array($type, ['need', 'want'], true)) {
                     $stmt->bind_param("sii", $type, $catID, $userID);
                     $stmt->execute();
                 }
             }
             $stmt->close();
-            header("Location: settings.php");
-            exit;
         }
-    }
-}
 
-// Update Flexible / Non-Flexible
-if (isset($_POST['updateFlexibility'])) {
-    $flex = $_POST['flexible'] ?? [];
-    if (!empty($flex)) {
-        $stmt = $conn->prepare("UPDATE tbl_usercategories SET userisFlexible = ? 
-                                WHERE userCategoryID = ? AND userID = ?");
-        foreach ($flex as $catID => $value) {
-            $flexValue = ($value === "1") ? 1 : 0;
-            $stmt->bind_param("iii", $flexValue, $catID, $userID);
-            $stmt->execute();
+        header("Location: settings.php");
+        exit;
+    }
+
+    // Update Flexible / Non-Flexible
+    if (isset($_POST['updateFlexibility'])) {
+        $flex = $_POST['flexible'] ?? [];
+        if (!empty($flex)) {
+            $stmt = $conn->prepare("
+                UPDATE tbl_usercategories 
+                SET userisFlexible = ? 
+                WHERE userCategoryID = ? AND userID = ?
+            ");
+
+            foreach ($flex as $catID => $value) {
+                $flexValue = ($value === "1") ? 1 : 0;
+                $stmt->bind_param("iii", $flexValue, $catID, $userID);
+                $stmt->execute();
+            }
+            $stmt->close();
         }
-        $stmt->close();
+
         header("Location: settings.php");
         exit;
     }
@@ -94,10 +183,12 @@ if (isset($_POST['updateFlexibility'])) {
 $currencies = ["PHP", "USD"];
 
 // Fetch expense categories for Needs & Wants
-$categoryQuery = "SELECT userCategoryID, categoryName, userNecessityType 
-                  FROM tbl_usercategories 
-                  WHERE userID = ? AND type = 'expense' AND isSelected = 1 
-                  ORDER BY categoryName ASC";
+$categoryQuery = "
+    SELECT userCategoryID, categoryName, userNecessityType 
+    FROM tbl_usercategories 
+    WHERE userID = ? AND type = 'expense' AND isSelected = 1 
+    ORDER BY categoryName ASC
+";
 $stmt = $conn->prepare($categoryQuery);
 $stmt->bind_param("i", $userID);
 $stmt->execute();
@@ -109,10 +200,12 @@ while ($row = $categoryResult->fetch_assoc()) {
 $stmt->close();
 
 // Fetch expense categories for Flexible / Non-Flexible
-$flexQuery = "SELECT userCategoryID, categoryName, userisFlexible 
-              FROM tbl_usercategories 
-              WHERE userID = ? AND type = 'expense' AND isSelected = 1
-              ORDER BY categoryName ASC";
+$flexQuery = "
+    SELECT userCategoryID, categoryName, userisFlexible 
+    FROM tbl_usercategories 
+    WHERE userID = ? AND type = 'expense' AND isSelected = 1
+    ORDER BY categoryName ASC
+";
 $stmt = $conn->prepare($flexQuery);
 $stmt->bind_param("i", $userID);
 $stmt->execute();
@@ -125,12 +218,12 @@ $stmt->close();
 
 // Cards - disable based on which rule type is active
 $cards = [
-    ["title" => "Currency", "desc" => "Select your preferred currency", "modal" => "currency"],
-    ["title" => "Needs & Wants", "desc" => "Manage spending categories", "modal" => "needsWants"],
-    ["title" => "Track or Limit", "desc" => "Manage Flexibility of your categories", "modal" => "flexibility"],
-    ["title" => "Budget Rule", "desc" => "Change preferred budgeting method", "modal" => "budgetRule"],
-    ["title" => "Suggested Budget Rule", "desc" => "Recommended budgeting method for you", "link" => "suggestedBudgetrule.php", "disabled" => $hasCustomRule],
-    ["title" => "Custom Budget Rule", "desc" => "Create your own budgeting method", "link" => "customBudgetrule.php", "disabled" => $hasSuggestedRule]
+    ["title" => "Currency",            "desc" => "Select your preferred currency",           "modal" => "currency"],
+    ["title" => "Needs & Wants",       "desc" => "Manage spending categories",              "modal" => "needsWants"],
+    ["title" => "Track or Limit",      "desc" => "Manage Flexibility of your categories",   "modal" => "flexibility"],
+    ["title" => "Budget Rule",         "desc" => "Change preferred budgeting method",       "modal" => "budgetRule"],
+    ["title" => "Suggested Budget Rule","desc" => "Recommended budgeting method for you",   "link"  => "suggestedBudgetrule.php", "disabled" => $hasCustomRule],
+    ["title" => "Custom Budget Rule",  "desc" => "Create your own budgeting method",        "link"  => "customBudgetrule.php",    "disabled" => $hasSuggestedRule]
 ];
 ?>
 <!DOCTYPE html>
@@ -152,7 +245,6 @@ $cards = [
             opacity: 0.5;
             cursor: not-allowed;
         }
-
         .settings-card.disabled .btn {
             pointer-events: none;
             opacity: 0.6;
@@ -184,7 +276,7 @@ $cards = [
                                 <div class="text-muted small"><?= htmlspecialchars($c["desc"]) ?></div>
                             </div>
                             <?php if (isset($c['link'])): ?>
-                                <?php if (isset($c['disabled']) && $c['disabled']): ?>
+                                <?php if (!empty($c['disabled'])): ?>
                                     <button class="btn btn-sm fw-semibold px-4 py-2 bg-yellow-custom"
                                         style="flex-shrink: 0; white-space: nowrap;" disabled>
                                         Edit
@@ -218,11 +310,14 @@ $cards = [
             <form method="POST" action="">
                 <select class="form-select mb-3" name="currency" required>
                     <?php foreach ($currencies as $code): ?>
-                        <option value="<?= $code ?>" <?= $currentCurrency === $code ? 'selected' : '' ?>><?= $code ?></option>
+                        <option value="<?= $code ?>" <?= $currentCurrency === $code ? 'selected' : '' ?>>
+                            <?= $code ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
-                <button type="submit" name="updateCurrency" class="btn w-100 fw-semibold bg-yellow-custom">Save
-                    Changes</button>
+                <button type="submit" name="updateCurrency" class="btn w-100 fw-semibold bg-yellow-custom">
+                    Save Changes
+                </button>
             </form>
         </div>
     </div>
@@ -242,7 +337,9 @@ $cards = [
                     </div>
                     <?php foreach ($expenseCategories as $cat): ?>
                         <div class="row align-items-center table-row">
-                            <div class="col-6 text-start fw-medium"><?= htmlspecialchars($cat['categoryName']) ?></div>
+                            <div class="col-6 text-start fw-medium">
+                                <?= htmlspecialchars($cat['categoryName']) ?>
+                            </div>
                             <div class="col-3 text-center">
                                 <input type="radio" name="necessity[<?= $cat['userCategoryID'] ?>]" value="need"
                                     <?= $cat['userNecessityType'] === 'need' ? 'checked' : '' ?>>
@@ -254,8 +351,9 @@ $cards = [
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <button type="submit" name="updateNeedsWants" class="btn w-100 fw-semibold bg-yellow-custom mt-3">Save
-                    Changes</button>
+                <button type="submit" name="updateNeedsWants" class="btn w-100 fw-semibold bg-yellow-custom mt-3">
+                    Save Changes
+                </button>
             </form>
         </div>
     </div>
@@ -267,7 +365,6 @@ $cards = [
             <h5 class="fw-bold text-white mb-3">Edit track or limit</h5>
             <form method="POST" action="">
                 <div class="needs-wants-table" style="max-height: 400px; overflow-y: auto;">
-
                     <div class="row fw-bold text-center mb-2 pb-2"
                         style="border-bottom: 2px solid #F6D25B; position: sticky; top: 0; background-color: #F0f1f6; z-index: 1;">
                         <div class="col-6 text-start">Expense</div>
@@ -280,12 +377,10 @@ $cards = [
                             <div class="col-6 text-start fw-medium">
                                 <?= htmlspecialchars($cat['categoryName']) ?>
                             </div>
-
                             <div class="col-3 text-center">
                                 <input type="radio" name="flexible[<?= $cat['userCategoryID'] ?>]" value="1"
                                     <?= $cat['userisFlexible'] == 1 ? 'checked' : '' ?>>
                             </div>
-
                             <div class="col-3 text-center">
                                 <input type="radio" name="flexible[<?= $cat['userCategoryID'] ?>]" value="0"
                                     <?= $cat['userisFlexible'] == 0 ? 'checked' : '' ?>>
@@ -302,7 +397,6 @@ $cards = [
         </div>
     </div>
 
-
     <!-- Budget Rule Modal -->
     <div id="budgetRuleModal" class="modalOverlay" onclick="overlayClose(event,'budgetRule')"
         style="backdrop-filter: none !important; -webkit-backdrop-filter: none !important;">
@@ -311,42 +405,58 @@ $cards = [
             <div class="form-check mb-2 p-3 rounded" style="background-color:#F0F1F6;">
                 <input class="form-check-input" type="radio" name="ruleType" value="suggested" id="suggestedRule"
                     <?= $hasSuggestedRule ? 'checked' : '' ?> onchange="redirectBudgetRule()">
-                <label class="form-check-label fw-semibold text-dark" for="suggestedRule">Use Suggested Rule</label>
+                <label class="form-check-label fw-semibold text-dark" for="suggestedRule">
+                    Use Suggested Rule
+                </label>
             </div>
             <div class="form-check p-3 rounded" style="background-color:#F0F1F6;">
                 <input class="form-check-input" type="radio" name="ruleType" value="custom" id="customRule"
                     <?= $hasCustomRule ? 'checked' : '' ?> onchange="redirectBudgetRule()">
-                <label class="form-check-label fw-semibold text-dark" for="customRule">Create My Own</label>
+                <label class="form-check-label fw-semibold text-dark" for="customRule">
+                    Create My Own
+                </label>
             </div>
             <button type="button" class="btn w-100 fw-semibold bg-yellow-custom mt-3"
-                onclick="closeModal('budgetRule')">Close</button>
+                onclick="closeModal('budgetRule')">
+                Close
+            </button>
         </div>
     </div>
 
     <script>
         function openModal(type) {
             const modal = document.getElementById(type + "Modal");
-            modal.classList.add("d-flex"); modal.classList.remove("d-none");
+            modal.classList.add("d-flex");
+            modal.classList.remove("d-none");
             document.body.style.overflow = 'hidden';
         }
+
         function closeModal(type) {
             const modal = document.getElementById(type + "Modal");
-            modal.classList.remove("d-flex"); modal.classList.add("d-none");
+            modal.classList.remove("d-flex");
+            modal.classList.add("d-none");
             document.body.style.overflow = '';
         }
+
         function overlayClose(e, type) {
             if (e.target.id === type + "Modal") closeModal(type);
         }
+
         function redirectBudgetRule() {
             const suggested = document.getElementById('suggestedRule');
             const custom = document.getElementById('customRule');
-            if (suggested.checked) window.location.href = 'suggestedBudgetrule.php';
-            else if (custom.checked) window.location.href = 'customBudgetrule.php';
+            if (suggested.checked) {
+                window.location.href = 'suggestedBudgetrule.php';
+            } else if (custom.checked) {
+                window.location.href = 'customBudgetrule.php';
+            }
         }
+
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modalOverlay.d-flex').forEach(m => {
-                    m.classList.remove('d-flex'); m.classList.add('d-none');
+                    m.classList.remove('d-flex');
+                    m.classList.add('d-none');
                 });
                 document.body.style.overflow = '';
             }
