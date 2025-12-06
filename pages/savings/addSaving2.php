@@ -262,9 +262,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
             style="outline: none; font-size: 15px;">
             <option value="daily">Every Day</option>
             <option value="weekly" selected>Every Week</option>
-            <option value="biweekly">Every 2 Weeks</option>
             <option value="monthly">Every Month</option>
-            <option value="yearly">Every Year</option>
           </select>
         </div>
       </div>
