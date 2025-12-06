@@ -122,7 +122,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     .challenge-card {
       background-color: #F0F1F6;
       border-radius: 20px;
-      width: 335px;
+      width: 100%;
     }
 
     .recommendation-img {
@@ -199,6 +199,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     .challenge-card h2.fw-semibold {
       font-family: "Poppins", sans-serif !important;
     }
+
   </style>
 
 </head>
