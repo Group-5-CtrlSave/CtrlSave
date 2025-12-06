@@ -1,5 +1,10 @@
 <?php
+// Include backend logic for default budgeting rule
 include("../../pages/login&signup/process/budgetingRuleBE.php");
+
+// Currency setup (consistent with app-wide behavior)
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 ?>
 
 <!DOCTYPE html>
@@ -12,11 +17,11 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+          rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-
         body,
         html {
             background-color: #44B87D;
@@ -53,7 +58,6 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
             cursor: pointer;
             position: relative;
             border-color: #141313;
-
         }
 
         .form-check-input:checked {
@@ -104,7 +108,8 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
         }
 
         .btn:hover {
-            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
+                        0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
         .preferMineLink {
@@ -169,12 +174,14 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
                 <div class="d-flex align-items-start justify-content-start">
                     <a href="needsWants.php">
                         <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
-                            style="height: 24px;" />
+                             style="height: 24px;" />
                     </a>
                 </div>
 
                 <div class="position-absolute top-50 start-50 translate-middle">
-                    <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Budget Rule</h2>
+                    <h2 class="m-0 text-center navigationBarTitle" style="color:black;">
+                        Budget Rule
+                    </h2>
                 </div>
             </div>
         </nav>
@@ -184,7 +191,10 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
             <h2>Do you follow a budgeting rule?</h2>
 
             <!-- Description -->
-            <p class="desc mb-4">Here are some budgeting rules to help<br />you get started on your saving journey.</p>
+            <p class="desc mb-4">
+                Here are some budgeting rules to help<br />
+                you get started on your saving journey.
+            </p>
 
             <!-- Accordion for Budgeting Rules -->
             <div class="row" style="overflow:scroll; height: 290px;">
@@ -193,14 +203,21 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
                     <?php foreach ($rules as $r): ?>
                         <div class="accordion-item rule-card">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#rule<?= $r['id'] ?>" aria-expanded="false">
-                                    <input class="form-check-input me-2 ruleCheck" type="checkbox" name="ruleOption"
-                                        value="<?= $r['id'] ?>"/>
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#rule<?= $r['id'] ?>"
+                                        aria-expanded="false">
+                                    <input class="form-check-input me-2 ruleCheck"
+                                           type="checkbox"
+                                           name="ruleOption"
+                                           value="<?= $r['id'] ?>" />
                                     <?= htmlspecialchars($r['ruleName']) ?>
                                 </button>
                             </h2>
-                            <div id="rule<?= $r['id'] ?>" class="accordion-collapse collapse" data-bs-parent="#budgetingRulesAccordion">
+                            <div id="rule<?= $r['id'] ?>"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#budgetingRulesAccordion">
                                 <div class="accordion-body text-center">
                                     <canvas id="chart<?= $r['id'] ?>"></canvas>
                                     <p class="mt-3">
@@ -211,7 +228,8 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
                                         <div class="mt-2">
                                             <?php foreach ($r['allocations'] as $alloc): ?>
                                                 <p style="margin: 0; font-family:'Roboto', sans-serif;">
-                                                    <?= htmlspecialchars($alloc['category']) ?>: <?= (int)$alloc['percentage'] ?>%
+                                                    <?= htmlspecialchars($alloc['category']) ?>:
+                                                    <?= (int)$alloc['percentage'] ?>%
                                                 </p>
                                             <?php endforeach; ?>
                                         </div>
@@ -225,13 +243,27 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
                 </div>
             </div>
 
-            <!-- Button -->
+            <!-- Next (use default rule) -->
             <div class="col-12 btNext d-flex justify-content-center align-items-center">
-                <button id="nextBtn" type="submit" class="btn btn-warning mt-4" disabled>Next</button>
+                <button id="nextBtn"
+                        type="submit"
+                        name="useDefault"
+                        value="1"
+                        class="btn btn-warning mt-4"
+                        disabled>
+                    Next
+                </button>
             </div>
 
+            <!-- Prefer my own (no default saving) -->
             <div class="col-12 noAccount d-flex justify-content-center align-items-center">
-                <button type="submit" name="preferMine" value="1" class="preferMineLink" style="color: black; background:none; border:none;">I prefer mine</button>
+                <button type="submit"
+                        name="preferMine"
+                        value="1"
+                        class="preferMineLink"
+                        style="color: black; background:none; border:none;">
+                    I prefer mine
+                </button>
             </div>
         </div>
     </form>
@@ -239,28 +271,52 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Currency symbol available for any future UI needs
+        const currencySymbol = "<?= $symbol ?>";
+
         const ruleData = <?= json_encode(array_values($rules)) ?>;
         const chartInstances = {};
 
         function createPieChart(id, data) {
             if (chartInstances[id]) return;
+
             const labels = data.map(d => d.category);
             const values = data.map(d => d.percentage);
             const colors = ['#F6D25B', '#C0C0C0', '#44B87D', '#8AB4F8', '#E86C6C'];
+
             const ctx = document.getElementById('chart' + id);
             if (!ctx) return;
+
             chartInstances[id] = new Chart(ctx, {
                 type: 'pie',
-                data: { labels: labels, datasets: [{ data: values, backgroundColor: colors.slice(0, values.length) }] },
-                options: { responsive: true, plugins: { legend: { display: true, position: 'bottom' } } }
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors.slice(0, values.length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
             });
         }
 
-        document.getElementById('budgetingRulesAccordion').addEventListener('shown.bs.collapse', (event) => {
-            const id = event.target.id.replace('rule', '');
-            const rule = ruleData.find(r => r.id == id);
-            if (rule && rule.allocations) createPieChart(id, rule.allocations);
-        });
+        // Render chart when accordion item is opened
+        document.getElementById('budgetingRulesAccordion')
+            .addEventListener('shown.bs.collapse', (event) => {
+                const id = event.target.id.replace('rule', '');
+                const rule = ruleData.find(r => r.id == id);
+                if (rule && rule.allocations) {
+                    createPieChart(id, rule.allocations);
+                }
+            });
 
         // Only one checkbox allowed & enable Next button when one selected
         const checks = document.querySelectorAll('input[type="checkbox"][name="ruleOption"]');
@@ -268,18 +324,28 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
 
         checks.forEach(cb => {
             cb.addEventListener('change', () => {
-                checks.forEach(other => { if (other !== cb) other.checked = false; });
-                // Enable Next only if any checked
+                // Uncheck other checkboxes
+                checks.forEach(other => {
+                    if (other !== cb) other.checked = false;
+                });
                 const any = Array.from(checks).some(x => x.checked);
                 nextBtn.disabled = !any;
             });
         });
 
-        // Prevent form submit if none selected (server also validates)
-        document.querySelector('form').addEventListener('submit', (e) => {
-            // allow preferMine to submit
-            const prefer = document.activeElement && document.activeElement.name === 'preferMine';
-            if (prefer) return;
+        // Handle form submit: distinguish which button was used
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            const submitter = e.submitter || document.activeElement;
+
+            // 1) If "I prefer mine" clicked -> allow submit, BE will redirect to custom
+            if (submitter && submitter.name === 'preferMine') {
+                // Optional: clear rule selection so BE sees a clean POST
+                checks.forEach(cb => cb.checked = false);
+                return;
+            }
+
+            // 2) For "Next" button: require a checked rule
             const any = Array.from(checks).some(x => x.checked);
             if (!any) {
                 e.preventDefault();
@@ -290,6 +356,7 @@ include("../../pages/login&signup/process/budgetingRuleBE.php");
         function showErrorToast(msg) {
             const existing = document.getElementById('errorToast');
             if (existing) existing.remove();
+
             const toast = document.createElement('div');
             toast.id = 'errorToast';
             toast.textContent = msg;

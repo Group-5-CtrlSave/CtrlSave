@@ -1,5 +1,9 @@
 <?php
 include("../../pages/login&signup/process/balanceBE.php");
+
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'PHP') ? '₱' : '$';
+
 ?>
 
 <!DOCTYPE html>
@@ -8,11 +12,12 @@ include("../../pages/login&signup/process/balanceBE.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>CtrlSave | Set balance</title>
+    <title>CtrlSave | Set balance</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&family=Nanum+Myeongjo&family=Roboto&display=swap');
@@ -113,7 +118,8 @@ include("../../pages/login&signup/process/balanceBE.php");
     <?php } ?>
 
     <!-- Navigation Bar -->
-   <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top" style="height: 75px;">
+    <nav class="bg-white px-4 py-4 d-flex justify-content-center align-items-center shadow sticky-top"
+        style="height: 75px;">
         <div class="container-fluid position-relative">
             <div class="position-absolute top-70 start-50 translate-middle">
                 <h2 class="m-0 text-center navigationBarTitle" style="color:black;">Set Balance</h2>
@@ -135,7 +141,7 @@ include("../../pages/login&signup/process/balanceBE.php");
 
             <form method="POST" id="balanceForm"
                 class="col-12 amount mt-5 mb-5 d-flex justify-content-center align-items-center">
-                <input type="text" name="balance" id="balanceInput" placeholder="₱0" class="form-control"
+                <input type="text" name="balance" id="balanceInput" placeholder="<?= $symbol ?>0" class="form-control"
                     style="color:#000000;">
             </form>
 
@@ -148,11 +154,13 @@ include("../../pages/login&signup/process/balanceBE.php");
     </div>
 
     <script>
+        const currencySymbol = "<?= $symbol ?>";
         const input = document.getElementById("balanceInput");
+
         input.addEventListener("input", function () {
             let v = this.value.replace(/[^0-9.]/g, "");
             if (v === "") { this.value = ""; return; }
-            this.value = "₱" + Number(v).toLocaleString("en-PH");
+            this.value = currencySymbol + Number(v).toLocaleString("en-PH");
         });
     </script>
 

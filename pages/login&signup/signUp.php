@@ -430,7 +430,7 @@ include("../../pages/login&signup/process/signupBE.php");
                     <h5>Password</h5>
                     <div class="password-wrapper">
                         <input id="password" type="password" class="form-control" name="password" placeholder="Password"
-                            required pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
+                            required pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
                             title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
                         <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password"
                             title="Show password">
@@ -521,7 +521,7 @@ include("../../pages/login&signup/process/signupBE.php");
                 upper: /[A-Z]/.test(pwd),
                 lower: /[a-z]/.test(pwd),
                 number: /\d/.test(pwd),
-                special: /[@$!%*?&]/.test(pwd)
+                special: /[^A-Za-z0-9]/.test(pwd)
             };
         }
 
