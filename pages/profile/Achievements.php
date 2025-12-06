@@ -64,13 +64,28 @@ $savingCountQuery = executeQuery("
 ");
 $savingCompleted = mysqli_fetch_assoc($savingCountQuery)['total'] ?? 0;
 
-// $challengeCountQuery = executeQuery("
-//     SELECT COUNT(*) AS total
-//     FROM tbl_challengeprogress
-//     WHERE userID = '$userID' AND status = 'completed'
-// ");
-// $challengesDone = mysqli_fetch_assoc($challengeCountQuery)
+// count total daily challenges assigned today
+$totalDailyChallengesTodayQuery = executeQuery("
+    SELECT COUNT(*) AS total
+    FROM tbl_userchallenges uc
+    JOIN tbl_challenges c ON uc.challengeID = c.challengeID
+    WHERE uc.userID = '$userID'
+      AND c.type = 'daily'
+      AND DATE(uc.assignedDate) = CURDATE()
+");
+$totalDailyChallengesToday = mysqli_fetch_assoc($totalDailyChallengesTodayQuery)['total'] ?? 0;
 
+// count claimed daily challenges today
+$completedDailyChallengesTodayQuery = executeQuery("
+    SELECT COUNT(*) AS total
+    FROM tbl_userchallenges uc
+    JOIN tbl_challenges c ON uc.challengeID = c.challengeID
+    WHERE uc.userID = '$userID'
+      AND c.type = 'daily'
+      AND DATE(uc.assignedDate) = CURDATE()
+      AND uc.status = 'claimed'
+");
+$completedDailyChallengesToday = mysqli_fetch_assoc($completedDailyChallengesTodayQuery)['total'] ?? 0;
 
 //GET ALL ACHIEVEMENTS & USER CLAIM STATUS
 $query = "
@@ -122,9 +137,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                 $row['canClaim'] = ($savingCompleted >= 1);
                 break;
 
-            // case 8: // Challenge Pro
-            //     $row['canClaim'] = ($challengesDone >= 20);
-            //     break;
+            case 8: // Challenge Pro
+                // can claim if all daily challenges for today are completed
+                $row['canClaim'] = ($totalDailyChallengesToday > 0 && $completedDailyChallengesToday >= $totalDailyChallengesToday);
+                break;
 
             default:
                 $row['canClaim'] = false;
@@ -134,8 +150,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $achievements[$row['type']][] = $row;
 }
-
-
 ?>
 
 <!DOCTYPE html>
