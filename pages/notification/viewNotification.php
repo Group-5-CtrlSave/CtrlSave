@@ -28,10 +28,9 @@ if ($result->num_rows == 0) {
     die("<p style='color:white; text-align:center;'>Notification not found.</p>");
 }
 
-
 $row = $result->fetch_assoc();
 
-$formattedTime = date("h:i A | F d, Y", strtotime($row['createdAt']));
+$formattedTime = date("F d, Y | h:i A ", strtotime($row['createdAt']));
 
 $iconFile = $row['icon'];
 $iconPath = "../../assets/img/";
@@ -50,7 +49,7 @@ $paths = [
     "shared/sidebar/"
 ];
 
-//if exixts
+//if exists
 foreach ($paths as $p) {
     if (file_exists($iconPath . $p . $iconFile)) {
         $iconPath = $iconPath . $p . $iconFile;
@@ -62,6 +61,11 @@ foreach ($paths as $p) {
 if (!file_exists($iconPath)) {
     $iconPath = "../../assets/img/shared/logo_s.png";
 }
+
+// if alert. it should be shade of red
+$isAlert = (strtolower(pathinfo($iconFile, PATHINFO_FILENAME)) === "alert");
+$titleColor = $isAlert ? "#E63946" : "#44B87D";
+
 ?>
 
 
@@ -123,7 +127,6 @@ if (!file_exists($iconPath)) {
         .notifTitle {
             font-size: 20px;
             font-weight: 700;
-            color: #44B87D;
             margin-bottom: 10px;
         }
 
@@ -166,15 +169,15 @@ if (!file_exists($iconPath)) {
             <h2 class="m-0 text-center navigationBarTitle">Detail</h2>
         </div>
 
-        </div>
-
     </nav>
 
     <!-- contents (full after ...) -->
     <div class="scrollableContainer">
         <img src="<?= $iconPath ?>" alt="Icon" class="notifIcon">
 
-        <p class="notifTitle"><?= $row['notificationTitle'] ?></p>
+        <p class="notifTitle" style="color: <?= $titleColor ?>;">
+            <?= $row['notificationTitle'] ?>
+        </p>
 
         <p class="notifMessage">
             <?= nl2br($row['message']) ?>

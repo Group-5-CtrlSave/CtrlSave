@@ -31,6 +31,8 @@ if (isset($_POST['btnLogin'])) {
             $_SESSION['userID'] = $row['userID'];
             $_SESSION['userName'] = $row['userName'];
             $_SESSION['email'] = $row['email'];
+            $_SESSION['currencyCode'] = $row['currencyCode']; 
+
 
             $userID = $row['userID'];
 
