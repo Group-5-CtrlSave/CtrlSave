@@ -5,7 +5,13 @@ if (isset($_SESSION['userID'])){
     $userID = $_SESSION['userID'];
    
 }
+
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+
 ?>
+
+
 
 
 <?php

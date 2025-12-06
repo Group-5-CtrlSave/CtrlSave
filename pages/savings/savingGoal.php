@@ -8,6 +8,11 @@ if (!isset($_SESSION['userID'])) {
 }
 
 $userID = intval($_SESSION['userID']);
+
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'USD') ? '$' : '₱';
+
+
 $query = "SELECT * FROM tbl_savinggoals WHERE userID = $userID";
 $result = mysqli_query($conn, $query);
 ?>
@@ -178,8 +183,8 @@ $result = mysqli_query($conn, $query);
                 <div class="flex-grow-1">
                   <p class="mb-0 fw-semibold text-dark text-truncate"><?= $goalName ?></p>
                   <p class="mb-1 small text-truncate" style="margin-bottom: 4px;">
-                    <span class="fw-semibold" style="color: #44B87D;">P <?= number_format($currentAmount, 2) ?></span>
-                    <span class="text-muted"> / P<?= number_format($targetAmount, 2) ?></span>
+                    <span class="fw-semibold" style="color: #44B87D;"><?= $symbol . number_format($currentAmount, 2) ?></span>
+                    <span class="text-muted"> / <?= $symbol . number_format($targetAmount, 2) ?></span>
                   </p>
                   <div class="progress" style="height: 8px; background-color: #e9ecef; width: 150px;">
                     <div class="progress-bar" role="progressbar"

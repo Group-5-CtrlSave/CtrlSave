@@ -2,6 +2,11 @@
 <?php session_start() ?>
 <?php include("process/addIncomeprocess.php"); ?>
 
+<?php
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,7 +88,10 @@
                     <div class="container py-2">
                         <label class="form-check-label label" for="amount"><b>Amount:</b></label>
                         <div class="input-group input-group-lg">
-                            <span class="input-group-text">₱</span>
+                            <span class="input-group-text">
+                                <?php echo htmlspecialchars($currencySymbol); ?>
+                            </span>
+
                             <input type="number" step="0.01" inputmode="decimal" class="form-control form-control-lg"
                                 id="amount" placeholder="Enter amount" name="amount" required>
                         </div>
@@ -200,7 +208,7 @@
         date.setAttribute('max', today);
     </script>
 
-      <script>
+    <script>
         setTimeout(function () {
             var alertElement = document.getElementById('myAlert');
             var alert = new bootstrap.Alert(alertElement);

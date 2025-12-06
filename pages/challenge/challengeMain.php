@@ -5,6 +5,12 @@ include("process/challengeProgress.php");
 
 // ensure we have a user id
 $userID = isset($_SESSION['userID']) ? intval($_SESSION['userID']) : 0;
+
+// Currency symbol based on session
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'USD') ? '$' : '₱';
+
+
 ?>
 
 <?php
@@ -523,8 +529,8 @@ if ($userID) {
 
                 <!-- Dynamic total -->
                 <div id="totalSaved" style="position:absolute; top:70%; left:48%; transform:translate(-50%,-50%);
-                       font-weight:bold; font-size:16px; color:#333;">
-                    ₱<?= $currentAmount ?>/<?= $targetAmount ?>
+                    font-weight:bold; font-size:16px; color:#333;">
+                    <?= $symbol . $currentAmount ?> / <?= $symbol . $targetAmount ?>
                 </div>
             </div>
 
@@ -675,7 +681,8 @@ if ($userID) {
         const addBtn = document.getElementById("addSelectedBtn");
 
         // Update Display
-        totalDisplay.textContent = `₱${totalSaved}/${targetAmount}`;
+        const currencySymbol = "<?= $symbol ?>";
+        totalDisplay.textContent = `${currencySymbol}${totalSaved}/${currencySymbol}${targetAmount}`;
 
         // =============================
         // Build Slot UI

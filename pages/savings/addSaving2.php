@@ -13,6 +13,10 @@ if (!isset($_SESSION['userID'])) {
 }
 
 $userID = intval($_SESSION['userID']);
+
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$symbol = ($currencyCode === 'USD') ? '$' : '₱';
+
 $createdAt = date('Y-m-d H:i:s');
 $goalName = $_SESSION['goalName'] ?? '';
 $goalIcon = $_SESSION['goalIcon'] ?? '';
@@ -66,9 +70,9 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
   }
 
   if ($currentAmount > $availableBalance) {
-    echo "<script>alert('Insufficient balance! Your available balance is ₱" . number_format($availableBalance, 2) . "'); window.history.back();</script>";
+    echo "<script>alert('Insufficient balance! Your available balance is " . $symbol . number_format($availableBalance, 2) . "'); window.history.back();</script>";
     exit();
-  }
+}
 
   mysqli_begin_transaction($conn);
 
@@ -205,7 +209,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
         <!-- Available Balance Display -->
         <div class="balance-info text-center mb-3">
           <small class="text-white">Available Balance</small>
-          <h5 class="text-white fw-bold mb-0">₱<?php echo number_format($availableBalance, 2); ?></h5>
+          <h5 class="text-white fw-bold mb-0"><?= $symbol . number_format($availableBalance, 2); ?></h5>
         </div>
 
         <input type="hidden" name="goalName" value="<?= htmlspecialchars($goalName) ?>">
@@ -216,7 +220,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
           style="height: 50px;" id="goalAmountWrapper">
           <input type="number" name="goalAmount" id="goalAmount" placeholder="Enter amount" step="0.01"
             class="border-0 bg-transparent fw-semibold flex-grow-1" style="outline: none; font-size: 15px;" required>
-          <span class="text-warning fw-bold">PHP</span>
+          <span class="text-warning fw-bold"><?= $symbol ?></span>
         </div>
 
         <label class="fw-semibold text-white mb-2" style="font-size: 14px;">Current Balance</label>
@@ -225,7 +229,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
           <input type="number" name="currentBalance" id="currentBalance" placeholder="Enter balance" step="0.01"
             max="<?php echo $availableBalance; ?>" class="border-0 bg-transparent fw-semibold flex-grow-1"
             style="outline: none; font-size: 15px;" required>
-          <span class="text-warning fw-bold">PHP</span>
+          <span class="text-warning fw-bold"><?= $symbol ?></span>
         </div>
         <div id="balanceError" class="error-message" style="display:none;">Current balance cannot exceed goal amount</div>
         <div id="insufficientBalanceError" class="error-message" style="display:none;">
@@ -363,7 +367,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
 
       if (current > availableBalance) {
         e.preventDefault();
-        alert("Insufficient balance! Your available balance is ₱" + availableBalance.toFixed(2));
+        alert("Insufficient balance! Your available balance is <?= $symbol ?>" + availableBalance.toFixed(2));
         return;
       }
 

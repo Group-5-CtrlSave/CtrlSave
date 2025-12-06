@@ -1,5 +1,11 @@
 <?php include("../../assets/shared/connect.php") ?>
-<?php session_start();?>
+<?php session_start(); ?>
+
+<?php
+$currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
+$currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
+?>
+
 <?php include("process/incomeandexpenseprocess.php"); ?>
 <?php include("process/viewincomeandexpenseprocess.php") ?>
 <?php include("process/editIncomeExpense.php") ?>
@@ -71,7 +77,7 @@
 
                         </div>
                         <div class="modal-body d-flex justify-content-center align-items-center">
-                            <a href="edit.php?type=<?php echo $type?>&id=<?php echo $id?>"><button type="button"
+                            <a href="edit.php?type=<?php echo $type ?>&id=<?php echo $id ?>"><button type="button"
                                     class="btn btn-lg yesButton m-3"><b>Yes</b></button> </a>
                             <button type="button" class="btn btn-lg btn-secondary m-3"
                                 data-bs-dismiss="modal"><b>Cancel</b></button>
@@ -96,7 +102,10 @@
             </div>
             <div class="container py-3">
                 <h2 class="m-0">Amount:</h2>
-                <p class="details m-0"><?php echo ($type == 'income') ? '+' : '-' ?>₱<?php echo $amount ?></p>
+                <p class="details m-0">
+                    <?php echo ($type == 'income' ? '+ ' : '- ') . $currencySymbol . number_format($amount, 2); ?>
+                </p>
+
             </div>
 
             <?php if ($dueDate != '') { ?>
