@@ -91,21 +91,21 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     }
 
     .time {
-        color: #BCBABA !important;
-        font-weight: normal !important;
-        font-size: 14px;
+      color: #BCBABA !important;
+      font-weight: normal !important;
+      font-size: 14px;
     }
 
     .time b {
-        color: #BCBABA !important;
-        font-weight: normal !important;
-        font-size: 14px;
+      color: #BCBABA !important;
+      font-weight: normal !important;
+      font-size: 14px;
     }
 
     .notes {
-        color: #BCBABA !important;
-        font-weight: normal !important;
-        font-size: 14px;
+      color: #BCBABA !important;
+      font-weight: normal !important;
+      font-size: 14px;
     }
 
     .today-text {
@@ -199,7 +199,6 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
     .challenge-card h2.fw-semibold {
       font-family: "Poppins", sans-serif !important;
     }
-
   </style>
 
 </head>
@@ -261,54 +260,73 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
           <div class="row justify-content-center">
 
             <?php
-            // SQL for income and expense limit by 3
+            // SQL for income and expense (including recurring w/ dueDate)
             $recentQuery = "
-      (
-          SELECT 
-              i.incomeID AS id,
-              i.amount,
-              i.note,
-              uc.icon AS icon,
-              uc.categoryName AS categoryName,
-              'income' AS type,
-              i.dateReceived AS dateCreated
-          FROM tbl_income i
-          JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
-          WHERE i.userID = '$userID'
-      )
-      UNION ALL
-      (
-          SELECT 
-              e.expenseID AS id,
-              e.amount,
-              e.note,
-              uc.icon AS icon,
-              uc.categoryName AS categoryName,
-              'expense' AS type,
-              e.dateAdded AS dateCreated
-          FROM tbl_expense e
-          JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
-          WHERE e.userID = '$userID'
-      )
-      ORDER BY dateCreated DESC
-      LIMIT 3
-    ";
+(
+    SELECT 
+        i.incomeID AS id,
+        i.amount,
+        i.note,
+        uc.icon AS icon,
+        uc.categoryName AS categoryName,
+        'income' AS type,
+        i.dateReceived AS dateCreated,
+        NULL AS dueDate
+    FROM tbl_income i
+    JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
+    WHERE i.userID = '$userID'
+)
+UNION ALL
+(
+    SELECT 
+        e.expenseID AS id,
+        e.amount,
+        e.note,
+        uc.icon AS icon,
+        uc.categoryName AS categoryName,
+        'expense' AS type,
+        e.dateAdded AS dateCreated,
+        e.dueDate
+    FROM tbl_expense e
+    JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
+    WHERE e.userID = '$userID'
+)
+ORDER BY 
+    CASE 
+        WHEN dueDate IS NOT NULL THEN dueDate
+        ELSE dateCreated
+    END DESC
+LIMIT 3
+";
 
             $recentResult = executeQuery($recentQuery);
 
-            function formatDateTimeDisplay($dateCreated)
+            function formatDateTimeDisplay($dateCreated, $dueDate = null)
             {
               $now = new DateTime();
+
+              if ($dueDate) {
+                $due = new DateTime($dueDate);
+                $diff = $now->diff($due);
+
+                if ($diff->invert) {
+                  return "Past due";
+                } else {
+                  return ($diff->days + 1) . " days left";
+                }
+
+              }
+
               $created = new DateTime($dateCreated);
 
-              // If same day → show "x hours ago"
+              // ____ ago
               if ($created->format('Y-m-d') == $now->format('Y-m-d')) {
-                $diff = $now->getTimestamp() - $created->getTimestamp();
+                $diffSec = $now->getTimestamp() - $created->getTimestamp();
 
-                if ($diff < 60)
+                if ($diffSec < 60)
                   return "Just now";
 
-                $minutes = floor($diff / 60);
+                $minutes = floor($diffSec / 60);
                 if ($minutes < 60)
                   return $minutes . "m ago";
 
@@ -316,7 +334,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
                 return $hours . "h ago";
               }
 
-              // If NOT today → show MM/DD/YYYY
+              // date
               return $created->format("n/j/Y");
             }
 
@@ -324,7 +342,6 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
             if (mysqli_num_rows($recentResult) > 0) {
               while ($item = mysqli_fetch_assoc($recentResult)) {
 
-                // path (income / expense)
                 $folder = $item['type'] == 'income' ? 'income' : 'expense';
                 ?>
 
@@ -346,11 +363,11 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
                     <!-- Price + Time -->
                     <div class="container iePriceContainer p-1">
                       <h5 class="price m-0">
-                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], decimals: 2); ?>
+                        <?php echo ($item['type'] == 'income' ? '+ ₱' : '- ₱') . number_format($item['amount'], 2); ?>
                       </h5>
 
                       <p class="time m-0">
-                        <b><?php echo formatDateTimeDisplay($item['dateCreated']); ?></b>
+                        <b><?php echo formatDateTimeDisplay($item['dateCreated'], $item['dueDate']); ?></b>
                       </p>
 
                     </div>
@@ -377,6 +394,7 @@ $todayBalance = $todayIncome - $todayExpense - $totalSavings;
               <?php
             }
             ?>
+
 
           </div>
         </div>
