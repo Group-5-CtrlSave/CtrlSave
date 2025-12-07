@@ -1,24 +1,20 @@
 function calculateRemainingDays(dueDate) {
-    const now = new Date();
-    const date = new Date(dueDate);
+    const today = new Date();
+    const target = new Date(dueDate);
 
-    if (isNaN(date)) {
-        return 'Invalid date';
-    }
+    if (isNaN(target)) return 'Invalid date';
 
-    const diff = date - now;
+    // Create dates at midnight without mutating originals
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const diffTime = targetMidnight - todayMidnight; // difference in ms
+    const days = diffTime / (1000 * 60 * 60 * 24);   // convert to days
 
-    if (diff < 0) {
-        return 'Expired';
-    } else if (days === 0) {
-        return 'Today';
-    } else if (days === 1) {
-        return '1 day left';
-    } else {
-        return `${days} days left`;
-    }
+    if (days < 0) return 'Expired';
+    if (days === 0) return 'Today';
+    if (days === 1) return '1 day left';
+    return `${days} days left`;
 }
 
 function calculateDays() {
