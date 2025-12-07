@@ -23,14 +23,11 @@ if (isset($_POST['submit'])) {
     // Validation
     if ($clean === "") {
         $error = "Please enter your starting balance.";
-    } 
-    else if (!is_numeric($clean)) {
+    } else if (!is_numeric($clean)) {
         $error = "Balance must be a valid number.";
-    } 
-    else if (floatval($clean) <= 0) {
+    } else if (floatval($clean) <= 0) {
         $error = "Balance must be greater than 0.";
-    } 
-    else {
+    } else {
 
         $balance = floatval($clean);
 
@@ -95,8 +92,7 @@ if (isset($_POST['submit'])) {
 
         if (!$rCategory || $rCategory->num_rows === 0) {
             $error = "System error: 'Allowance' category was not created at signup.";
-        } 
-        else {
+        } else {
 
             $catRow = $rCategory->fetch_assoc();
             $allowanceCategoryID = (int) $catRow['userCategoryID'];
@@ -105,17 +101,21 @@ if (isset($_POST['submit'])) {
             // STEP 3: INSERT STARTING BALANCE AS INCOME
             // ======================================================
             $note = "Allowance";
+            
+            // Set MySQL session timezone to Manila
+            $conn->query("SET time_zone = '+08:00'");
 
             $stmt = $conn->prepare("
                 INSERT INTO tbl_income 
                 (userID, amount, note, userCategoryID, userBudgetversionID)
                 VALUES (?, ?, ?, ?, ?)
             ");
-            $stmt->bind_param("idsii", 
-                $userID, 
-                $balance, 
-                $note, 
-                $allowanceCategoryID, 
+            $stmt->bind_param(
+                "idsii",
+                $userID,
+                $balance,
+                $note,
+                $allowanceCategoryID,
                 $userBudgetversionID
             );
             $incomeSuccess = $stmt->execute();

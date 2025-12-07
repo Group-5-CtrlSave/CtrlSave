@@ -10,6 +10,9 @@ $userID = isset($_SESSION['userID']) ? intval($_SESSION['userID']) : 0;
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'USD') ? '$' : '₱';
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
+
 
 ?>
 
@@ -35,7 +38,7 @@ if ($userID) {
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Challenges</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">

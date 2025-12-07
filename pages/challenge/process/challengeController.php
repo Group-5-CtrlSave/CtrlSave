@@ -1,7 +1,11 @@
 <?php
 
 // EXPENSE CHALLENGES
-function updateExpenseChallenges($userID, $conn) {
+function updateExpenseChallenges($userID, $conn)
+{
+
+    // Set MySQL session timezone to Manila
+    $conn->query("SET time_zone = '+08:00'");
 
     // DAILY: Add 1 expense today
     $dailyID = 2;
@@ -52,7 +56,8 @@ function updateExpenseChallenges($userID, $conn) {
 
 
 // INCOME CHALLENGES
-function updateIncomeChallenges($userID, $conn) {
+function updateIncomeChallenges($userID, $conn)
+{
 
     // WEEKLY: Add 1 income
     $weeklyIncomeID = 10;
@@ -81,7 +86,8 @@ function updateIncomeChallenges($userID, $conn) {
 
 
 // SAVING STRATEGY CHALLENGES
-function updateSavingVideoChallenge($userID, $conn) {
+function updateSavingVideoChallenge($userID, $conn)
+{
     $challengeID = 3;
 
     mysqli_query($conn, "
@@ -94,7 +100,8 @@ function updateSavingVideoChallenge($userID, $conn) {
     ");
 }
 
-function updateSavingArticleChallenge($userID, $conn) {
+function updateSavingArticleChallenge($userID, $conn)
+{
     $challengeID = 8;
 
     mysqli_query($conn, "
@@ -110,7 +117,8 @@ function updateSavingArticleChallenge($userID, $conn) {
 
 
 // SAVING GOAL DAILY
-function updateSavingGoalDailyChallenge($userID, $conn) {
+function updateSavingGoalDailyChallenge($userID, $conn)
+{
     $challengeID = 4;
 
     mysqli_query($conn, "
@@ -126,7 +134,8 @@ function updateSavingGoalDailyChallenge($userID, $conn) {
 
 
 // DAILY SAVING CHALLENGE (Add at least 10 pesos today)
-function updateSavingDaily10Peso($userID, $conn) {
+function updateSavingDaily10Peso($userID, $conn)
+{
     $challengeID = 5;
 
     // Sum amount saved today
@@ -155,7 +164,8 @@ function updateSavingDaily10Peso($userID, $conn) {
 
 
 // WEEKLY SAVING CHALLENGE — Complete ANY full row of 5 slots
-function updateSavingWeeklyRow($userID, $conn) {
+function updateSavingWeeklyRow($userID, $conn)
+{
     $challengeID = 7;
 
     // Load user challenge to access slotData
@@ -165,12 +175,14 @@ function updateSavingWeeklyRow($userID, $conn) {
         WHERE userID = $userID AND status='active'
         LIMIT 1
     ");
-    if (!$q || mysqli_num_rows($q) === 0) return;
+    if (!$q || mysqli_num_rows($q) === 0)
+        return;
 
     $data = mysqli_fetch_assoc($q);
     $slots = json_decode($data['slotData'], true);
 
-    if (!$slots || count($slots) != 20) return;
+    if (!$slots || count($slots) != 20)
+        return;
 
     // Break into rows of 5
     $rows = array_chunk($slots, 5);

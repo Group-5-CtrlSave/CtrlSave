@@ -6,6 +6,8 @@ if (isset($_POST['btnLogin'])) {
 
     $emailUsername = trim($_POST['emailUsername']);
     $password = trim($_POST['password']);
+    // Set MySQL session timezone to Manila
+    $conn->query("SET time_zone = '+08:00'");
 
     // Escape inputs to avoid SQL injection
     $emailUsernameEsc = $conn->real_escape_string($emailUsername);
@@ -31,7 +33,7 @@ if (isset($_POST['btnLogin'])) {
             $_SESSION['userID'] = $row['userID'];
             $_SESSION['userName'] = $row['userName'];
             $_SESSION['email'] = $row['email'];
-            $_SESSION['currencyCode'] = $row['currencyCode']; 
+            $_SESSION['currencyCode'] = $row['currencyCode'];
 
 
             $userID = $row['userID'];
@@ -44,7 +46,7 @@ if (isset($_POST['btnLogin'])) {
             WHERE userID = $userID
             AND DATE(loginDate) = '$today'
             LIMIT 1";
-            
+
             $resultLogin = $conn->query($checkLogin);
 
             if ($resultLogin && $resultLogin->num_rows === 0) {

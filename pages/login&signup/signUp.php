@@ -8,6 +8,7 @@ include("../../pages/login&signup/process/signupBE.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Signup</title>
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -149,7 +150,7 @@ include("../../pages/login&signup/process/signupBE.php");
             cursor: pointer;
             text-decoration: none;
             border: none;
-            margin-top: 40px;
+            margin-top: 20px;
         }
 
         .btn:hover {
@@ -547,6 +548,57 @@ include("../../pages/login&signup/process/signupBE.php");
             }
         });
     </script>
+
+    <script>
+        (function () {
+            const formRow = document.querySelector(".formRow");
+            const body = document.body;
+
+            let lastScrollTop = 0;
+            let keyboardOpen = false;
+
+            document.querySelectorAll("input, textarea").forEach(input => {
+
+                input.addEventListener("focus", () => {
+                    keyboardOpen = true;
+                    body.style.overflowY = "auto";
+
+                    // Save current scroll before adjusting
+                    lastScrollTop = formRow.scrollTop;
+
+                    setTimeout(() => {
+                        const rect = input.getBoundingClientRect();
+                        const viewport = window.innerHeight;
+
+                        // Input is being covered by keyboard?
+                        if (rect.bottom > viewport - 120) {
+                            const scrollUp = rect.bottom - (viewport - 140);
+
+                            formRow.scrollTo({
+                                top: formRow.scrollTop + scrollUp,
+                                behavior: "smooth"
+                            });
+                        }
+                    }, 250);
+                });
+
+                input.addEventListener("blur", () => {
+                    keyboardOpen = false;
+                    body.style.overflowY = "hidden";
+
+                    setTimeout(() => {
+                        if (!keyboardOpen) {
+                            formRow.scrollTo({
+                                top: lastScrollTop,
+                                behavior: "smooth"
+                            });
+                        }
+                    }, 350);
+                });
+            });
+        })();
+    </script>
+
 
 
 

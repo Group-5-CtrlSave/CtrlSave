@@ -4,6 +4,9 @@ include("../../../assets/shared/connect.php");
 
 header("Content-Type: application/json; charset=UTF-8");
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
+
 // 1. Validate POST
 if (!isset($_POST['challengeID'])) {
     echo json_encode(["status" => "error", "message" => "No challenge ID"]);
@@ -77,7 +80,8 @@ $lvl = intval($user['lvl']);
 $exp = intval($user['exp']);
 $leveledUp = false;
 
-function xpRequired($level) {
+function xpRequired($level)
+{
     return 100 + (($level - 1) * 20);
 }
 
@@ -96,9 +100,9 @@ mysqli_query($conn, "
 
 // Return success
 echo json_encode([
-    "status"    => "success",
-    "exp"       => $expReward,
-    "type"      => $type,
+    "status" => "success",
+    "exp" => $expReward,
+    "type" => $type,
     "leveledUp" => $leveledUp
 ]);
 exit;

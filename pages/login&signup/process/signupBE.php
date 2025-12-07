@@ -2,6 +2,9 @@
 session_start();
 include("../../assets/shared/connect.php");
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
+
 $error = "";
 
 if (isset($_POST['signup'])) {

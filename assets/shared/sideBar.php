@@ -22,7 +22,7 @@ $userResult = $stmtUser->get_result();
 $user = $userResult->fetch_assoc() ?? ['userName' => 'User', 'email' => '', 'displayedBadges' => '', 'profilePicture' => 'profile_Pic.png'];
 $stmtUser->close();
 
-$stmtLevel = $conn->prepare("SELECT exp, lvl FROM tbl_userLvl WHERE userID = ? LIMIT 1");
+$stmtLevel = $conn->prepare("SELECT exp, lvl FROM tbl_userlvl WHERE userID = ? LIMIT 1");
 $stmtLevel->bind_param("i", $userID);
 $stmtLevel->execute();
 $levelResult = $stmtLevel->get_result();
@@ -45,7 +45,7 @@ $progressPercent = min(100, ($currentXP / $xpNeeded) * 100);
 // --- Fetch all claimed achievements for auto-equip logic ---
 $stmtAllAchievements = $conn->prepare("
   SELECT a.icon, a.achievementName, a.type, ua.date
-  FROM tbl_userAchievements ua
+  FROM tbl_userachievements ua
   JOIN tbl_achievements a ON ua.achievementID = a.achievementID
   WHERE ua.userID = ? AND ua.isClaimed = 1
   ORDER BY ua.date ASC

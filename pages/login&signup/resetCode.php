@@ -86,58 +86,136 @@ $remainingSeconds = $remainingTime % 60;
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Reset Code</title>
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
-        body { background-color: #44B87D; }
-        .toast-message { position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 10px 18px; border-radius: 20px; width: 300px;
-            font-family: "Poppins", sans-serif; font-size: 14px; font-weight: 600;
-            z-index: 9999; text-align: center;
+        body {
+            background-color: #44B87D;
         }
-        .toast-error { background-color: #E63946; color: white; }
-        .toast-success { background-color: #F6D25B; color: black; }
-        h2 { font-family: "Poppins", sans-serif; font-weight: bold; color: #fff; text-align: center; }
+
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 18px;
+            border-radius: 20px;
+            width: 300px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 9999;
+            text-align: center;
+        }
+
+        .toast-error {
+            background-color: #E63946;
+            color: white;
+        }
+
+        .toast-success {
+            background-color: #F6D25B;
+            color: black;
+        }
+
+        h2 {
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+        }
+
         .form-control {
-            border: 2px solid #F6D25B; height: 50px;
-            font-family: "Roboto", sans-serif; background-color: #F0F1F6; border-radius: 15px;
+            border: 2px solid #F6D25B;
+            height: 50px;
+            font-family: "Roboto", sans-serif;
+            background-color: #F0F1F6;
+            border-radius: 15px;
         }
-        .label { color: #fff; font-family: "Poppins", sans-serif; font-weight: 600; margin-top: 15px; margin-bottom: 5px; }
+
+        .label {
+            color: #fff;
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
         .btn {
-            background-color: #F6D25B; color: black; width: 125px; font-size: 20px;
-            font-weight: bold; font-family: "Poppins", sans-serif; border-radius: 27px;
-            border: none; margin-top: 30px;
+            background-color: #F6D25B;
+            color: black;
+            width: 125px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            border-radius: 27px;
+            border: none;
+            margin-top: 30px;
         }
-        .btn:hover { box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24); }
-        .password-wrapper { position: relative; }
-        .password-wrapper input.form-control { padding-right: 48px; }
+
+        .btn:hover {
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input.form-control {
+            padding-right: 48px;
+        }
+
         .toggle-password {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            background: transparent; border: none; cursor: pointer; color: #44B87D;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #44B87D;
         }
+
         .timer {
-            background-color: rgba(255, 255, 255, 0.2); color: white;
-            padding: 8px 16px; border-radius: 20px; font-family: "Poppins", sans-serif;
-            font-size: 14px; font-weight: 600; margin-top: 10px; display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
         }
-        .attempts-info { color: #FFC107; font-family: "Poppins", sans-serif; font-size: 12px; margin-top: 5px; }
+
+        .attempts-info {
+            color: #FFC107;
+            font-family: "Poppins", sans-serif;
+            font-size: 12px;
+            margin-top: 5px;
+        }
     </style>
 </head>
+
 <body>
     <?php if (isset($_SESSION['msg']['error'])) { ?>
         <div class="toast-message toast-error">
-            <?php echo htmlspecialchars($_SESSION['msg']['error']); unset($_SESSION['msg']['error']); ?>
+            <?php echo htmlspecialchars($_SESSION['msg']['error']);
+            unset($_SESSION['msg']['error']); ?>
         </div>
     <?php } ?>
 
     <?php if (isset($_SESSION['msg']['success'])) { ?>
         <div class="toast-message toast-success">
-            <?php echo htmlspecialchars($_SESSION['msg']['success']); unset($_SESSION['msg']['success']); ?>
+            <?php echo htmlspecialchars($_SESSION['msg']['success']);
+            unset($_SESSION['msg']['success']); ?>
         </div>
     <?php } ?>
 
@@ -145,7 +223,8 @@ $remainingSeconds = $remainingTime % 60;
         <div class="container-fluid position-relative">
             <div class="d-flex align-items-start justify-content-start">
                 <a href="resetPassword.php">
-                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;" />
+                    <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back"
+                        style="height: 24px;" />
                 </a>
             </div>
             <div class="position-absolute top-50 start-50 translate-middle">
@@ -161,24 +240,58 @@ $remainingSeconds = $remainingTime % 60;
                 Expires in: <?php echo sprintf("%02d:%02d", $remainingMinutes, $remainingSeconds); ?>
             </div>
             <p class="attempts-info">
-                Attempts: <?php echo $_SESSION['reset_data']['max_attempts'] - $_SESSION['reset_data']['attempts']; ?>/<?php echo $_SESSION['reset_data']['max_attempts']; ?>
+                Attempts:
+                <?php echo $_SESSION['reset_data']['max_attempts'] - $_SESSION['reset_data']['attempts']; ?>/<?php echo $_SESSION['reset_data']['max_attempts']; ?>
             </p>
         </div>
 
         <form method="POST">
             <label class="label">Reset Code (Check your email)</label>
-            <input type="text" name="reset_code" class="form-control" placeholder="6-digit code" maxlength="6" pattern="[0-9]{6}" required>
+            <input type="text" name="reset_code" class="form-control" placeholder="6-digit code" maxlength="6"
+                pattern="[0-9]{6}" required>
 
             <label class="label">New Password</label>
             <div class="password-wrapper">
-                <input id="new_password" type="password" name="new_password" class="form-control" placeholder="Min 8 characters" minlength="8" required>
-                <button type="button" id="toggleNew" class="toggle-password">👁️</button>
+                <input id="new_password" type="password" name="new_password" class="form-control"
+                    placeholder="Min 8 characters" minlength="8" required>
+                <button type="button" id="toggleNew" class="toggle-password">
+                    <svg id="eyeOpenNew" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display:none;">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+
+                    <svg id="eyeClosedNew" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3-11-8
+                1.13-3.15 3.67-5.67 6.6-6.77"></path>
+                        <path d="M1 1l22 22"></path>
+                    </svg>
+                </button>
             </div>
 
             <label class="label">Confirm Password</label>
             <div class="password-wrapper">
-                <input id="confirm_password" type="password" name="confirm_password" class="form-control" placeholder="Confirm password" minlength="8" required>
-                <button type="button" id="toggleConfirm" class="toggle-password">👁️</button>
+                <input id="confirm_password" type="password" name="confirm_password" class="form-control"
+                    placeholder="Confirm password" minlength="8" required>
+                <button type="button" id="toggleConfirm" class="toggle-password">
+                    <svg id="eyeOpenConfirm" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display:none;">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+
+                    <svg id="eyeClosedConfirm" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3-11-8
+                1.13-3.15 3.67-5.67 6.6-6.77"></path>
+                        <path d="M1 1l22 22"></path>
+                    </svg>
+                </button>
             </div>
 
             <div class="d-flex justify-content-center">
@@ -202,15 +315,46 @@ $remainingSeconds = $remainingTime % 60;
             timerEl.textContent = `Expires in: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }, 1000);
 
-        document.getElementById('toggleNew').addEventListener('click', function() {
-            const pwd = document.getElementById('new_password');
-            pwd.type = pwd.type === 'password' ? 'text' : 'password';
-        });
+    </script>
 
-        document.getElementById('toggleConfirm').addEventListener('click', function() {
-            const pwd = document.getElementById('confirm_password');
-            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    <script>
+        const newPwd = document.getElementById("new_password");
+        const newToggle = document.getElementById("toggleNew");
+        const eyeOpenNew = document.getElementById("eyeOpenNew");
+        const eyeClosedNew = document.getElementById("eyeClosedNew");
+
+        newToggle.addEventListener("click", () => {
+            if (newPwd.type === "password") {
+                newPwd.type = "text";
+                eyeOpenNew.style.display = "block";
+                eyeClosedNew.style.display = "none";
+            } else {
+                newPwd.type = "password";
+                eyeOpenNew.style.display = "none";
+                eyeClosedNew.style.display = "block";
+            }
         });
     </script>
+
+    <script>
+        const confirmPwd = document.getElementById("confirm_password");
+        const confirmToggle = document.getElementById("toggleConfirm");
+        const eyeOpenConfirm = document.getElementById("eyeOpenConfirm");
+        const eyeClosedConfirm = document.getElementById("eyeClosedConfirm");
+
+        confirmToggle.addEventListener("click", () => {
+            if (confirmPwd.type === "password") {
+                confirmPwd.type = "text";
+                eyeOpenConfirm.style.display = "block";
+                eyeClosedConfirm.style.display = "none";
+            } else {
+                confirmPwd.type = "password";
+                eyeOpenConfirm.style.display = "none";
+                eyeClosedConfirm.style.display = "block";
+            }
+        });
+    </script>
+
 </body>
+
 </html>

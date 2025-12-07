@@ -1,4 +1,6 @@
 <?php
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
 
 function getChallengeProgress($userID, $challengeId, $conn)
 {
@@ -19,7 +21,8 @@ function getChallengeProgress($userID, $challengeId, $conn)
         case 7: // Weekly: Complete ANY full row of saving challenge
 
             // 1. Get active challenge (to read slotData)
-            $q = mysqli_query($conn,
+            $q = mysqli_query(
+                $conn,
                 "SELECT userSavingChallengeID, slotData 
                  FROM tbl_usersavingchallenge 
                  WHERE userID=$userID AND status='active' LIMIT 1"
@@ -43,7 +46,8 @@ function getChallengeProgress($userID, $challengeId, $conn)
 
             // 4. Get saved progress indexes
             $saved = [];
-            $res = mysqli_query($conn,
+            $res = mysqli_query(
+                $conn,
                 "SELECT itemIndex FROM tbl_savingchallenge_progress
                  WHERE userID=$userID"
             );
