@@ -2,6 +2,8 @@
 session_start();
 include("../../assets/shared/connect.php");
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
 if (!isset($_SESSION['goalName']) || !isset($_SESSION['goalIcon'])) {
   header("Location: addsaving1.php");
   exit();
@@ -132,7 +134,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Add Saving — Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>

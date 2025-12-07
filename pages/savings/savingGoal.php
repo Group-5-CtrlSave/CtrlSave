@@ -23,7 +23,7 @@ $result = mysqli_query($conn, $query);
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>CtrlSave | Savings Goals</title>
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
