@@ -111,14 +111,13 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
                     <input class="checkBox" type="checkbox" id="recurringPayment" value="1" name="recurringPayment">
                     <label class="checkBoxLabel" for="recurringPayment">Recurring Payment</label>
                 </div>
-                <div class="container py-1">
-                    <select class="form-select" id="frequencySelect" name="frequency" disabled required>
 
-                        <option value=" " disabled selected hidden>Choose Frequency</option>
+                <div class="container py-1">
+                    <select class="form-select" id="frequencySelect" name="frequency" disabled>
+                        <option value="" disabled selected hidden>Choose Frequency</option>
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
-
                     </select>
                 </div>
 
@@ -201,13 +200,14 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
         recurringPayment.addEventListener("change", function () {
             if (recurringPayment.checked) {
                 frequencySelect.removeAttribute('disabled');
+                frequencySelect.setAttribute('required', 'required');
             } else {
                 frequencySelect.setAttribute('disabled', true);
+                frequencySelect.removeAttribute('required');
+                frequencySelect.selectedIndex = 0; // optional: reset selection
             }
-        })
-
+        });
     </script>
-
     <script>
         setTimeout(function () {
             var alertElement = document.getElementById('myAlert');
