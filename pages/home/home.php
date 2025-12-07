@@ -52,6 +52,24 @@ $totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings
 $todayBalance = $todayIncome - $todayExpense - $totalSavings;
 ?>
 
+<!-- Get Spending Insights -->
+
+<?php
+$insight = [];
+$getSpendingInsights = "SELECT `message`, `date`
+    FROM `tbl_spendinginsights`
+    WHERE userID = $userID
+      AND insightType != 'correlation';
+";
+
+$spendingInsightsResult = executeQuery($getSpendingInsights);
+if (mysqli_num_rows($spendingInsightsResult) > 0) {
+  while ($spendingInsightRow = mysqli_fetch_assoc($spendingInsightsResult)) {
+    $insight[] = $spendingInsightRow['message'];
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -409,16 +427,26 @@ LIMIT 3
           </div>
         </div>
 
-        <!-- HARDCODED PA -->
         <!-- Recommendation Card -->
-        <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
-          <div class="recommendation-card p-3">
-            <h2 class="fw-semibold mb-2" style="color: #000; font-size: 16px;">Recommendation</h2>
-            <div class="d-flex justify-content-center">
-              <img src="../../assets/img/home/InsiteBg.png" class="recommendation-img">
+        <?php
+        if (!empty($insight)) {
+          ?>
+          <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
+            <div class="recommendation-card p-3">
+              <h2 class="fw-semibold mb-2" style="color: #000; font-size: 16px;">Recommendation</h2>
+              <div class="d-flex justify-content-center">
+                <div id="recommendationCart" class="container recommendationCart"
+                  style="font-family: 'Roboto', sans-serif; background: url('../../assets/img/home/InsiteBg.png') center/cover no-repeat; border-radius: 20px; padding: 20px; text-align:center;">
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+
+
+          <?php
+        }
+        ?>
+
 
         <?php
         $types = ['video', 'article', 'book'];
@@ -613,6 +641,25 @@ LIMIT 3
 
             <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+            <script>
+
+              const insights = <?php echo json_encode($insight); ?>;
+              let index = 0;
+              const div = document.getElementById("recommendationCart");
+
+              function showInsight() {
+                div.innerHTML = `<p>${insights[index]}</p>`;
+                index = (index + 1) % insights.length; 
+              }
+
+             
+              showInsight();
+
+          
+              setInterval(showInsight, 3000);
+            </script>
 
 </body>
 

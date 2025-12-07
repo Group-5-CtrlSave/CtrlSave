@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2025 at 08:06 AM
+-- Generation Time: Dec 07, 2025 at 07:21 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,7 +48,37 @@ INSERT INTO `tbl_achievements` (`achievementID`, `achievementName`, `icon`, `lvl
 (5, 'Newcomer', 'newcomerBadge.png', 0, 'badge', 'Login to CtrlSave'),
 (6, 'Income Badge', 'incomeproBadge.png', 0, 'badge', 'Add Income Transactions, 20 times'),
 (7, 'Saving Badge', 'savinggoalsBadge.png', 0, 'badge', 'Complete a Saving Goal'),
-(8, 'Challenge Pro', 'challengeproBadge.png', 0, 'badge', 'Complete 20 Challenges');
+(8, 'Challenge Pro', 'challengeproBadge.png', 0, 'badge', 'Complete all daily challenges in one day');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_challenges`
+--
+
+CREATE TABLE `tbl_challenges` (
+  `challengeID` int(11) NOT NULL,
+  `challengeName` varchar(255) NOT NULL,
+  `exp` int(11) NOT NULL,
+  `type` varchar(10) NOT NULL,
+  `quantity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_challenges`
+--
+
+INSERT INTO `tbl_challenges` (`challengeID`, `challengeName`, `exp`, `type`, `quantity`) VALUES
+(1, 'Login to CtrlSave', 5, 'daily', 1),
+(2, 'Add 1 expense today', 5, 'daily', 1),
+(3, 'Watch a saving strategy video', 5, 'daily', 1),
+(4, 'Add 1 to saving goal', 5, 'daily', 1),
+(5, 'Mark ₱10 coin on saving challenge', 5, 'daily', 1),
+(6, 'Login to CtrlSave for 5 days', 20, 'weekly', 5),
+(7, 'Mark 1 row in saving challenge', 20, 'weekly', 5),
+(8, 'Read an article in saving strat', 20, 'weekly', 1),
+(9, 'Added 3 expenses in a week', 20, 'weekly', 3),
+(10, 'Add an income', 20, 'weekly', 1);
 
 -- --------------------------------------------------------
 
@@ -57,7 +87,7 @@ INSERT INTO `tbl_achievements` (`achievementID`, `achievementName`, `icon`, `lvl
 --
 
 CREATE TABLE `tbl_defaultallocation` (
-  `defaultAllocationID` int(11) DEFAULT NULL,
+  `defaultAllocationID` int(11) NOT NULL,
   `defaultBudgetruleID` int(11) NOT NULL,
   `defaultnecessityType` varchar(30) NOT NULL,
   `value` int(11) NOT NULL
@@ -69,13 +99,13 @@ CREATE TABLE `tbl_defaultallocation` (
 
 INSERT INTO `tbl_defaultallocation` (`defaultAllocationID`, `defaultBudgetruleID`, `defaultnecessityType`, `value`) VALUES
 (1, 1, 'need', 50),
-(1, 1, 'want', 30),
-(1, 1, 'saving', 20),
-(2, 2, 'need', 60),
-(2, 2, 'want', 20),
-(2, 2, 'saving', 20),
-(3, 3, 'need, want', 80),
-(3, 3, 'saving', 20);
+(2, 1, 'want', 30),
+(3, 1, 'saving', 20),
+(4, 2, 'need', 60),
+(5, 2, 'want', 20),
+(6, 2, 'saving', 20),
+(7, 3, 'need, want', 80),
+(8, 3, 'saving', 20);
 
 -- --------------------------------------------------------
 
@@ -84,7 +114,7 @@ INSERT INTO `tbl_defaultallocation` (`defaultAllocationID`, `defaultBudgetruleID
 --
 
 CREATE TABLE `tbl_defaultbudgetrule` (
-  `defaultBudgetruleID` int(11) DEFAULT NULL,
+  `defaultBudgetruleID` int(11) NOT NULL,
   `ruleName` varchar(50) NOT NULL,
   `ruleDescription` varchar(200) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
@@ -156,20 +186,14 @@ CREATE TABLE `tbl_expense` (
   `userID` int(11) NOT NULL,
   `amount` decimal(15,2) NOT NULL,
   `userCategoryID` int(11) NOT NULL,
-  `dateSpent` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `dateSpent` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `dueDate` date DEFAULT NULL,
+  `dateAdded` datetime NOT NULL DEFAULT current_timestamp(),
   `isRecurring` tinyint(1) NOT NULL DEFAULT 0,
   `note` varchar(200) DEFAULT NULL,
   `recurringID` int(11) DEFAULT NULL,
   `userBudgetversionID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_expense`
---
-
-INSERT INTO `tbl_expense` (`expenseID`, `userID`, `amount`, `userCategoryID`, `dateSpent`, `dueDate`, `isRecurring`, `note`, `recurringID`, `userBudgetversionID`) VALUES
-(1, 1, 5000.00, 3, '2025-11-17 16:00:00', NULL, 0, 'Groceries for this month', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -180,11 +204,13 @@ INSERT INTO `tbl_expense` (`expenseID`, `userID`, `amount`, `userCategoryID`, `d
 CREATE TABLE `tbl_forecasts` (
   `forecastID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `forecastType` int(11) NOT NULL,
-  `categoryID` int(11) NOT NULL,
+  `forecastType` varchar(20) NOT NULL,
+  `userCategoryID` int(11) NOT NULL,
   `forecastMonth` int(11) NOT NULL,
-  `predictedAmount` int(11) NOT NULL,
-  `confidence` int(11) NOT NULL
+  `forecastYear` int(11) NOT NULL,
+  `predictedAmount` decimal(15,2) NOT NULL,
+  `confidence` float NOT NULL,
+  `dateForecast` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -201,20 +227,6 @@ CREATE TABLE `tbl_goaltransactions` (
   `date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tbl_goaltransactions`
---
-
-INSERT INTO `tbl_goaltransactions` (`goalTransactionID`, `savingGoalID`, `amount`, `transaction`, `date`) VALUES
-(1, 1, 500.00, 'Deposit', '2025-11-01 10:00:00'),
-(2, 1, 1000.00, 'Deposit', '2025-11-02 11:30:00'),
-(3, 1, 5.00, 'add', '2025-11-05 00:00:00'),
-(4, 6, 1000.00, 'add', '2025-11-15 00:00:00'),
-(5, 6, 10000.00, 'add', '2025-11-15 00:00:00'),
-(6, 6, 100.00, 'add', '2025-11-15 00:00:00'),
-(7, 6, 100.00, 'add', '2025-11-15 00:00:00'),
-(8, 6, 100.00, 'add', '2025-11-15 21:31:31');
-
 -- --------------------------------------------------------
 
 --
@@ -225,7 +237,7 @@ CREATE TABLE `tbl_income` (
   `incomeID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `amount` decimal(15,2) NOT NULL,
-  `dateReceived` timestamp NOT NULL DEFAULT current_timestamp(),
+  `dateReceived` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `note` varchar(200) DEFAULT NULL,
   `userCategoryID` int(11) NOT NULL,
   `userBudgetversionID` int(11) NOT NULL
@@ -236,7 +248,20 @@ CREATE TABLE `tbl_income` (
 --
 
 INSERT INTO `tbl_income` (`incomeID`, `userID`, `amount`, `dateReceived`, `note`, `userCategoryID`, `userBudgetversionID`) VALUES
-(25, 1, 500.00, '2025-11-18 06:59:27', 'Baon for today', 5, 1);
+(74, 11, 10002.53, '2025-12-06 17:25:34', 'Allowance', 115, 1),
+(80, 12, 10000.00, '2025-12-06 11:36:34', 'Allowance', 128, 25);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loginhistory`
+--
+
+CREATE TABLE `tbl_loginhistory` (
+  `loginID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `loginDate` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -251,7 +276,10 @@ CREATE TABLE `tbl_notifications` (
   `icon` varchar(50) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `isRead` tinyint(1) NOT NULL DEFAULT 0,
-  `userID` int(11) NOT NULL
+  `userID` int(11) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `recurringID` int(11) DEFAULT NULL,
+  `isPaid` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -268,7 +296,8 @@ CREATE TABLE `tbl_recurringtransactions` (
   `amount` decimal(15,2) NOT NULL,
   `note` varchar(200) NOT NULL,
   `frequency` varchar(20) NOT NULL,
-  `nextDuedate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `nextDuedate` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `userBudgetVersionID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -305,6 +334,20 @@ INSERT INTO `tbl_resources` (`resourceID`, `link`, `resourceType`, `title`, `des
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_savingchallenge_progress`
+--
+
+CREATE TABLE `tbl_savingchallenge_progress` (
+  `id` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `itemIndex` int(11) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `dateAdded` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_savinggoals`
 --
 
@@ -315,7 +358,7 @@ CREATE TABLE `tbl_savinggoals` (
   `icon` varchar(50) NOT NULL,
   `targetAmount` decimal(15,2) NOT NULL,
   `currentAmount` decimal(15,2) NOT NULL,
-  `deadline` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deadline` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `status` varchar(20) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `remind` tinyint(1) NOT NULL DEFAULT 0,
@@ -332,10 +375,11 @@ CREATE TABLE `tbl_savinggoals` (
 CREATE TABLE `tbl_spendinginsights` (
   `spendingInsightID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `categoryA` int(11) NOT NULL,
-  `categoryB` int(11) NOT NULL,
+  `categoryA` int(11) DEFAULT NULL,
+  `categoryB` int(11) DEFAULT NULL,
   `insightType` varchar(50) NOT NULL,
-  `message` varchar(255) NOT NULL,
+  `necessityType` varchar(20) DEFAULT NULL,
+  `message` varchar(600) NOT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -352,28 +396,6 @@ CREATE TABLE `tbl_userachievements` (
   `isClaimed` tinyint(1) NOT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_userachievements`
---
-
-INSERT INTO `tbl_userachievements` (`userAchievementID`, `achievementID`, `userID`, `isClaimed`, `date`) VALUES
-(1, 1, 2, 1, '2025-11-13 23:52:22'),
-(2, 2, 2, 1, '2025-11-13 23:53:48'),
-(3, 3, 2, 1, '2025-11-14 00:17:41'),
-(4, 4, 2, 1, '2025-11-14 01:02:24'),
-(5, 5, 2, 1, '2025-11-14 00:24:17'),
-(6, 6, 2, 1, '2025-11-14 00:18:40'),
-(7, 7, 2, 0, '2025-11-13 20:03:48'),
-(8, 8, 2, 0, '2025-11-13 22:25:26'),
-(9, 1, 3, 1, '2025-11-14 05:43:32'),
-(10, 2, 3, 1, '2025-11-14 05:43:50'),
-(11, 3, 3, 1, '2025-11-14 05:44:56'),
-(12, 4, 3, 1, '2025-11-15 01:02:36'),
-(13, 5, 3, 1, '2025-11-14 05:43:37'),
-(14, 6, 3, 1, '2025-11-14 05:43:55'),
-(15, 7, 3, 1, '2025-11-14 05:44:02'),
-(16, 8, 3, 0, '2025-11-13 23:56:40');
 
 -- --------------------------------------------------------
 
@@ -404,6 +426,14 @@ CREATE TABLE `tbl_userbudgetrule` (
   `isSelected` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbl_userbudgetrule`
+--
+
+INSERT INTO `tbl_userbudgetrule` (`userBudgetRuleID`, `userID`, `ruleName`, `createdAt`, `isSelected`) VALUES
+(7, 11, '50/30/20 Rule', '2025-12-05 10:06:13', 1),
+(9, 12, 'Custom-Rule', '2025-12-06 11:38:24', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -412,18 +442,13 @@ CREATE TABLE `tbl_userbudgetrule` (
 
 CREATE TABLE `tbl_userbudgetversion` (
   `userBudgetversionID` int(11) NOT NULL,
+  `versionNumber` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `balance` decimal(15,2) NOT NULL,
+  `userBudgetRuleID` int(11) NOT NULL,
+  `totalIncome` decimal(15,2) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `isActive` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_userbudgetversion`
---
-
-INSERT INTO `tbl_userbudgetversion` (`userBudgetversionID`, `userID`, `balance`, `createdAt`, `isActive`) VALUES
-(1, 1, 10000.00, '2025-11-05 13:21:41', 1);
 
 -- --------------------------------------------------------
 
@@ -443,18 +468,21 @@ CREATE TABLE `tbl_usercategories` (
   `isSelected` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `tbl_usercategories`
+-- Table structure for table `tbl_userchallenges`
 --
 
-INSERT INTO `tbl_usercategories` (`userCategoryID`, `categoryName`, `type`, `icon`, `userNecessityType`, `userisFlexible`, `defaultCategoryID`, `userID`, `isSelected`) VALUES
-(1, 'Dining Out', 'expense', 'Dining Out.png', 'Want', 1, 7, 1, 1),
-(2, 'Electricity', 'expense', 'Electricity.png', 'Need', 0, 8, 1, 1),
-(3, 'Groceries', 'expense', 'Groceries.png', 'Need', 1, 11, 1, 1),
-(4, 'Savings', 'savings', 'Savings.png', 'Saving', 0, 25, 1, 1),
-(5, 'Allowance', 'income', 'Allowance.png', 'unspecified', 0, 1, 1, 1),
-(6, 'Income', 'income', 'Income.png', 'unspecified', 0, 2, 1, 1),
-(7, 'Scholarship', 'income', 'Scholarship.png', 'unspecified', 0, 3, 1, 1);
+CREATE TABLE `tbl_userchallenges` (
+  `userChallengeID` int(11) NOT NULL,
+  `challengeID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'inprogress',
+  `assignedDate` date NOT NULL,
+  `completedAt` date DEFAULT NULL,
+  `claimedAt` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -489,13 +517,6 @@ CREATE TABLE `tbl_users` (
   `displayedBadges` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tbl_users`
---
-
-INSERT INTO `tbl_users` (`userID`, `userName`, `firstName`, `lastName`, `email`, `password`, `currencyCode`, `isDisabled`, `createdAt`, `profilePicture`, `displayedBadges`) VALUES
-(2, 'rown', 'Ron Gabriel', 'Ramos', 'rongabriel01.ramos@gmail.com', '$2y$10$3u9PoZjbLMPL/X.U.QQjue2DY25OU1Rlq/E5Pesa2nS.d3YWOZT8u', 'PH', 0, '2025-11-07 04:45:47', '', '');
-
 -- --------------------------------------------------------
 
 --
@@ -507,25 +528,10 @@ CREATE TABLE `tbl_user_resource_progress` (
   `userID` int(11) NOT NULL,
   `resourceID` int(11) NOT NULL,
   `isCompleted` tinyint(1) DEFAULT 0,
-  `dateCompleted` datetime DEFAULT current_timestamp()
+  `dateCompleted` datetime DEFAULT current_timestamp(),
+  `isFavorited` tinyint(1) NOT NULL DEFAULT 0,
+  `isArchived` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_user_resource_progress`
---
-
-INSERT INTO `tbl_user_resource_progress` (`id`, `userID`, `resourceID`, `isCompleted`, `dateCompleted`) VALUES
-(1, 5, 14, 0, '2025-11-11 14:53:20'),
-(2, 5, 11, 0, '2025-11-11 14:53:41'),
-(3, 5, 12, 0, '2025-11-11 14:53:58'),
-(4, 5, 16, 0, '2025-11-11 15:16:45'),
-(5, 5, 17, 0, '2025-11-11 15:16:49'),
-(6, 5, 18, 0, '2025-11-11 15:16:49'),
-(7, 5, 19, 0, '2025-11-11 15:16:51'),
-(8, 5, 15, 0, '2025-11-11 15:17:09'),
-(9, 5, 13, 0, '2025-11-11 15:17:58'),
-(10, 5, 20, 0, '2025-11-11 15:35:32'),
-(11, 5, 21, 0, '2025-11-14 19:56:49');
 
 --
 -- Indexes for dumped tables
@@ -536,6 +542,24 @@ INSERT INTO `tbl_user_resource_progress` (`id`, `userID`, `resourceID`, `isCompl
 --
 ALTER TABLE `tbl_achievements`
   ADD PRIMARY KEY (`achievementID`);
+
+--
+-- Indexes for table `tbl_challenges`
+--
+ALTER TABLE `tbl_challenges`
+  ADD PRIMARY KEY (`challengeID`);
+
+--
+-- Indexes for table `tbl_defaultallocation`
+--
+ALTER TABLE `tbl_defaultallocation`
+  ADD PRIMARY KEY (`defaultAllocationID`);
+
+--
+-- Indexes for table `tbl_defaultbudgetrule`
+--
+ALTER TABLE `tbl_defaultbudgetrule`
+  ADD PRIMARY KEY (`defaultBudgetruleID`);
 
 --
 -- Indexes for table `tbl_defaultcategories`
@@ -553,7 +577,8 @@ ALTER TABLE `tbl_expense`
 -- Indexes for table `tbl_forecasts`
 --
 ALTER TABLE `tbl_forecasts`
-  ADD PRIMARY KEY (`forecastID`);
+  ADD PRIMARY KEY (`forecastID`),
+  ADD KEY `idx_user_month_year` (`userID`,`forecastMonth`,`forecastYear`);
 
 --
 -- Indexes for table `tbl_goaltransactions`
@@ -568,10 +593,18 @@ ALTER TABLE `tbl_income`
   ADD PRIMARY KEY (`incomeID`);
 
 --
+-- Indexes for table `tbl_loginhistory`
+--
+ALTER TABLE `tbl_loginhistory`
+  ADD PRIMARY KEY (`loginID`),
+  ADD KEY `userID` (`userID`);
+
+--
 -- Indexes for table `tbl_notifications`
 --
 ALTER TABLE `tbl_notifications`
-  ADD PRIMARY KEY (`notificationID`);
+  ADD PRIMARY KEY (`notificationID`),
+  ADD KEY `userID` (`userID`);
 
 --
 -- Indexes for table `tbl_recurringtransactions`
@@ -584,6 +617,13 @@ ALTER TABLE `tbl_recurringtransactions`
 --
 ALTER TABLE `tbl_resources`
   ADD PRIMARY KEY (`resourceID`);
+
+--
+-- Indexes for table `tbl_savingchallenge_progress`
+--
+ALTER TABLE `tbl_savingchallenge_progress`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_index` (`userID`,`itemIndex`);
 
 --
 -- Indexes for table `tbl_savinggoals`
@@ -628,6 +668,12 @@ ALTER TABLE `tbl_usercategories`
   ADD PRIMARY KEY (`userCategoryID`);
 
 --
+-- Indexes for table `tbl_userchallenges`
+--
+ALTER TABLE `tbl_userchallenges`
+  ADD PRIMARY KEY (`userChallengeID`);
+
+--
 -- Indexes for table `tbl_userlvl`
 --
 ALTER TABLE `tbl_userlvl`
@@ -637,7 +683,8 @@ ALTER TABLE `tbl_userlvl`
 -- Indexes for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
-  ADD PRIMARY KEY (`userID`);
+  ADD PRIMARY KEY (`userID`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `tbl_user_resource_progress`
@@ -656,6 +703,24 @@ ALTER TABLE `tbl_achievements`
   MODIFY `achievementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT for table `tbl_challenges`
+--
+ALTER TABLE `tbl_challenges`
+  MODIFY `challengeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `tbl_defaultallocation`
+--
+ALTER TABLE `tbl_defaultallocation`
+  MODIFY `defaultAllocationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `tbl_defaultbudgetrule`
+--
+ALTER TABLE `tbl_defaultbudgetrule`
+  MODIFY `defaultBudgetruleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `tbl_defaultcategories`
 --
 ALTER TABLE `tbl_defaultcategories`
@@ -665,7 +730,7 @@ ALTER TABLE `tbl_defaultcategories`
 -- AUTO_INCREMENT for table `tbl_expense`
 --
 ALTER TABLE `tbl_expense`
-  MODIFY `expenseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `expenseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=241;
 
 --
 -- AUTO_INCREMENT for table `tbl_forecasts`
@@ -677,25 +742,31 @@ ALTER TABLE `tbl_forecasts`
 -- AUTO_INCREMENT for table `tbl_goaltransactions`
 --
 ALTER TABLE `tbl_goaltransactions`
-  MODIFY `goalTransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `goalTransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tbl_income`
 --
 ALTER TABLE `tbl_income`
-  MODIFY `incomeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `incomeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+
+--
+-- AUTO_INCREMENT for table `tbl_loginhistory`
+--
+ALTER TABLE `tbl_loginhistory`
+  MODIFY `loginID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tbl_notifications`
 --
 ALTER TABLE `tbl_notifications`
-  MODIFY `notificationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `notificationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=269;
 
 --
 -- AUTO_INCREMENT for table `tbl_recurringtransactions`
 --
 ALTER TABLE `tbl_recurringtransactions`
-  MODIFY `recurringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `recurringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `tbl_resources`
@@ -704,16 +775,22 @@ ALTER TABLE `tbl_resources`
   MODIFY `resourceID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
+-- AUTO_INCREMENT for table `tbl_savingchallenge_progress`
+--
+ALTER TABLE `tbl_savingchallenge_progress`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tbl_savinggoals`
 --
 ALTER TABLE `tbl_savinggoals`
-  MODIFY `savingGoalID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `savingGoalID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbl_spendinginsights`
 --
 ALTER TABLE `tbl_spendinginsights`
-  MODIFY `spendingInsightID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `spendingInsightID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=484;
 
 --
 -- AUTO_INCREMENT for table `tbl_userachievements`
@@ -725,25 +802,31 @@ ALTER TABLE `tbl_userachievements`
 -- AUTO_INCREMENT for table `tbl_userallocation`
 --
 ALTER TABLE `tbl_userallocation`
-  MODIFY `userAllocationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userAllocationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `tbl_userbudgetrule`
 --
 ALTER TABLE `tbl_userbudgetrule`
-  MODIFY `userBudgetRuleID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userBudgetRuleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbl_userbudgetversion`
 --
 ALTER TABLE `tbl_userbudgetversion`
-  MODIFY `userBudgetversionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `userBudgetversionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `tbl_usercategories`
 --
 ALTER TABLE `tbl_usercategories`
-  MODIFY `userCategoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `userCategoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
+
+--
+-- AUTO_INCREMENT for table `tbl_userchallenges`
+--
+ALTER TABLE `tbl_userchallenges`
+  MODIFY `userChallengeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `tbl_userlvl`
@@ -755,13 +838,13 @@ ALTER TABLE `tbl_userlvl`
 -- AUTO_INCREMENT for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `tbl_user_resource_progress`
 --
 ALTER TABLE `tbl_user_resource_progress`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
