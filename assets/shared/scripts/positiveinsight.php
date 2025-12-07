@@ -70,13 +70,34 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 $percent = ($budgetLimit > 0) ? round(($totalFlexibleSpent / $budgetLimit) * 100, 2) : 0;
                 $message = "Great job! You spent wisely: {$percent}% on $type (" . implode(', ', $categoryList) . ") this month.";
 
-                executeQuery("INSERT INTO tbl_spendinginsights 
-                    (userID, categoryA, insightType, message, date)
-                    VALUES ($userID, 0, 'positive', '$message', NOW())");
+                // INSERT INTO tbl_spendinginsights with duplicate check
+                executeQuery("
+                    INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                    SELECT $userID, 0, 'positive', '$message', NOW()
+                    FROM DUAL
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM tbl_spendinginsights
+                        WHERE userID = $userID 
+                        AND categoryA = 0
+                        AND insightType = 'positive'
+                        AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                        AND message = '$message'
+                    )
+                ");
 
-                executeQuery("INSERT INTO tbl_notifications 
-                    (notificationTitle, message, icon, userID, createdAt, type)
-                    VALUES ('Positive Insight', '$message', 'insight.png', $userID, NOW(), 'positive_insight')");
+                // INSERT INTO tbl_notifications with duplicate check
+                executeQuery("
+                    INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                    SELECT 'Positive Insight', '$message', 'insight.png', $userID, NOW(), 'positive_insight'
+                    FROM DUAL
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM tbl_notifications
+                        WHERE userID = $userID
+                        AND type = 'positive_insight'
+                        AND DATE_FORMAT(createdAt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                        AND message = '$message'
+                    )
+                ");
             }
 
             // Rigid categories → tracking only
@@ -98,7 +119,6 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 
                 if ($spent <= 0) continue;
 
-                // Calculate % based on budgetLimit for need/want rigid categories
                 $percent = ($budgetLimit > 0) ? round(($spent / $budgetLimit) * 100, 2) : 0;
                 $allTrackingParts[] = "You spent {$percent}% on {$rigidRow['categoryName']} (Track Only)";
             }
@@ -138,7 +158,6 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
             if ($actualAmount <= 0) continue;
 
             if ($userisFlexible == 1) {
-                // Flexible → positive insight
                 $budgetLimit = ($allocRow['limitType'] == 1) 
                     ? ($totalIncome * $allocRow['allocationValue'] / 100) 
                     : $allocRow['allocationValue'];
@@ -147,16 +166,36 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                     $percent = round(($actualAmount / $budgetLimit) * 100, 2);
                     $message = "Great job! You spent wisely: {$percent}% on {$categoryName} this month.";
 
-                    executeQuery("INSERT INTO tbl_spendinginsights 
-                        (userID, categoryA, insightType, message, date)
-                        VALUES ($userID, $userCategoryID, 'positive', '$message', NOW())");
+                    // INSERT INTO tbl_spendinginsights with duplicate check
+                    executeQuery("
+                        INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                        SELECT $userID, $userCategoryID, 'positive', '$message', NOW()
+                        FROM DUAL
+                        WHERE NOT EXISTS (
+                            SELECT 1 FROM tbl_spendinginsights
+                            WHERE userID = $userID 
+                            AND categoryA = $userCategoryID
+                            AND insightType = 'positive'
+                            AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                            AND message = '$message'
+                        )
+                    ");
 
-                    executeQuery("INSERT INTO tbl_notifications 
-                        (notificationTitle, message, icon, userID, createdAt, type)
-                        VALUES ('Positive Insight', '$message', 'insight.png', $userID, NOW(), 'positive_insight')");
+                    // INSERT INTO tbl_notifications with duplicate check
+                    executeQuery("
+                        INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                        SELECT 'Positive Insight', '$message', 'insight.png', $userID, NOW(), 'positive_insight'
+                        FROM DUAL
+                        WHERE NOT EXISTS (
+                            SELECT 1 FROM tbl_notifications
+                            WHERE userID = $userID
+                            AND type = 'positive_insight'
+                            AND DATE_FORMAT(createdAt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                            AND message = '$message'
+                        )
+                    ");
                 }
             } else {
-                // Rigid → TRACK ONLY, no budget limit
                 $allTrackingParts[] = "You spent ₱" . number_format($actualAmount, 2) . " on {$categoryName} (Track Only)";
             }
         }
@@ -168,13 +207,34 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
             $insightMessage = "Tracking Categories Only: " . implode(", ", $allTrackingParts) . " this month.";
             $notifMessage = implode(", ", $allTrackingParts);
 
-            executeQuery("INSERT INTO tbl_spendinginsights 
-                (userID, categoryA, insightType, message, date)
-                VALUES ($userID, 0, 'tracking', '$insightMessage', NOW())");
+            // INSERT INTO tbl_spendinginsights with duplicate check
+            executeQuery("
+                INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                SELECT $userID, 0, 'tracking', '$insightMessage', NOW()
+                FROM DUAL
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM tbl_spendinginsights
+                    WHERE userID = $userID
+                    AND categoryA = 0
+                    AND insightType = 'tracking'
+                    AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                    AND message = '$insightMessage'
+                )
+            ");
 
-            executeQuery("INSERT INTO tbl_notifications 
-                (notificationTitle, message, icon, userID, createdAt, type)
-                VALUES ('Tracking Update', '$notifMessage', 'insight.png', $userID, NOW(), 'positive_insight')");
+            // INSERT INTO tbl_notifications with duplicate check
+            executeQuery("
+                INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                SELECT 'Tracking Update', '$notifMessage', 'insight.png', $userID, NOW(), 'positive_insight'
+                FROM DUAL
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM tbl_notifications
+                    WHERE userID = $userID
+                    AND type = 'positive_insight'
+                    AND DATE_FORMAT(createdAt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+                    AND message = '$notifMessage'
+                )
+            ");
         }
     }
 }

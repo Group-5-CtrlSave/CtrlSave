@@ -1,6 +1,6 @@
 <?php include("../../assets/shared/connect.php"); ?>
 <?php session_start() ?>
-<?php include("process/addIncomeprocess.php"); ?>
+<?php include("process/addincomeprocess.php"); ?>
 
 <?php
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';

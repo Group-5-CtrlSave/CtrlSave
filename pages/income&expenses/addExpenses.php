@@ -7,7 +7,7 @@ $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 ?>
 
-<?php include('process/addExpenseprocess.php') ?>
+<?php include('process/addexpenseprocess.php') ?>
 
 
 

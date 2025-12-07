@@ -55,7 +55,6 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                  AND gt.transaction = 'add'
                                  AND DATE(gt.date) BETWEEN '$startDate' AND '$endDate'";
 
-                // If custom saving allocation, filter by savingGoalID
                 if ($userCategoryID != 0) {
                     $savingsQuery .= " AND gt.savingGoalID = $userCategoryID";
                 }
@@ -73,40 +72,33 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                                " in $currentMonth $currentYear, exceeding your budget of ₱" . number_format($budgetLimit, 2) . 
                                " (" . $oversavePercent . "%). Consider balancing savings with other needs.";
 
-                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
-                                     WHERE userID = $userID
-                                     AND insightType = 'oversaving'
-                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
-                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
-                                     LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
-                        $insertInsight = "INSERT INTO tbl_spendinginsights
-                                          (userID, categoryA, insightType, message, date)
-                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'oversaving', '$message', NOW())";
-                        executeQuery($insertInsight);
-                    }
+                    // Insert insight only if not exists
+                    $insertInsight = "INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                                      SELECT $userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'oversaving', '$message', NOW()
+                                      FROM dual
+                                      WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_spendinginsights
+                                        WHERE userID = $userID
+                                        AND insightType = 'oversaving'
+                                        AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                        AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
+                                      )";
+                    executeQuery($insertInsight);
 
                     $notifMessage = "You oversaved ₱" . number_format($totalSaved - $budgetLimit, 2) . " this month.";
 
-                    $checkNotif = "SELECT 1 FROM tbl_notifications
-                                   WHERE userID = $userID
-                                   AND message = '$notifMessage'
-                                   AND type = 'monthly_oversaving'
-                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
-                                   LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
-                        $insertNotif = "INSERT INTO tbl_notifications
-                                        (notificationTitle, message, icon, userID, createdAt, type)
-                                        VALUES ('Monthly Oversaving Alert',
-                                                '$notifMessage',
-                                                'savings.png',
-                                                $userID,
-                                                NOW(),
-                                                'monthly_oversaving')";
-                        executeQuery($insertNotif);
-                    }
+                    // Insert notification only if not exists
+                    $insertNotif = "INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                                    SELECT 'Monthly Oversaving Alert', '$notifMessage', 'savings.png', $userID, NOW(), 'monthly_oversaving'
+                                    FROM dual
+                                    WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_notifications
+                                        WHERE userID = $userID
+                                        AND message = '$notifMessage'
+                                        AND type = 'monthly_oversaving'
+                                        AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
+                                    )";
+                    executeQuery($insertNotif);
 
                 } 
                 // POSITIVE SAVING
@@ -114,80 +106,62 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                     $message = "Excellent Saver! You saved ₱" . number_format($totalSaved, 2) . 
                                " in $currentMonth $currentYear. You are staying within your planned savings budget!";
 
-                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
-                                     WHERE userID = $userID
-                                     AND insightType = 'positive_saving'
-                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
-                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
-                                     LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
-                        $insertInsight = "INSERT INTO tbl_spendinginsights
-                                          (userID, categoryA, insightType, message, date)
-                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'positive_saving', '$message', NOW())";
-                        executeQuery($insertInsight);
-                    }
+                    $insertInsight = "INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                                      SELECT $userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'positive_saving', '$message', NOW()
+                                      FROM dual
+                                      WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_spendinginsights
+                                        WHERE userID = $userID
+                                        AND insightType = 'positive_saving'
+                                        AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                        AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
+                                      )";
+                    executeQuery($insertInsight);
 
                     $notifMessage = "Congrats! You saved ₱" . number_format($totalSaved, 2) . " this month.";
 
-                    $checkNotif = "SELECT 1 FROM tbl_notifications
-                                   WHERE userID = $userID
-                                   AND message = '$notifMessage'
-                                   AND type = 'monthly_saving_positive'
-                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
-                                   LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
-                        $insertNotif = "INSERT INTO tbl_notifications
-                                        (notificationTitle, message, icon, userID, createdAt, type)
-                                        VALUES ('Savings Success',
-                                                '$notifMessage',
-                                                'savings.png',
-                                                $userID,
-                                                NOW(),
-                                                'monthly_saving_positive')";
-                        executeQuery($insertNotif);
-                    }
+                    $insertNotif = "INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                                    SELECT 'Savings Success', '$notifMessage', 'savings.png', $userID, NOW(), 'monthly_saving_positive'
+                                    FROM dual
+                                    WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_notifications
+                                        WHERE userID = $userID
+                                        AND message = '$notifMessage'
+                                        AND type = 'monthly_saving_positive'
+                                        AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
+                                    )";
+                    executeQuery($insertNotif);
 
                 } 
                 // NO SAVING
                 else if ($totalSaved == 0) {
                     $message = "You have no recorded savings for $currentMonth $currentYear. Try setting aside even a small amount to build financial stability.";
 
-                    $checkInsight = "SELECT 1 FROM tbl_spendinginsights
-                                     WHERE userID = $userID
-                                     AND insightType = 'no_saving'
-                                     AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
-                                     AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
-                                     LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkInsight)) == 0) {
-                        $insertInsight = "INSERT INTO tbl_spendinginsights
-                                          (userID, categoryA, insightType, message, date)
-                                          VALUES ($userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'no_saving', '$message', NOW())";
-                        executeQuery($insertInsight);
-                    }
+                    $insertInsight = "INSERT INTO tbl_spendinginsights (userID, categoryA, insightType, message, date)
+                                      SELECT $userID, " . ($userCategoryID == 0 ? "NULL" : $userCategoryID) . ", 'no_saving', '$message', NOW()
+                                      FROM dual
+                                      WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_spendinginsights
+                                        WHERE userID = $userID
+                                        AND insightType = 'no_saving'
+                                        AND categoryA " . ($userCategoryID == 0 ? "IS NULL" : "= $userCategoryID") . "
+                                        AND DATE_FORMAT(date, '%Y-%m') = '" . date('Y-m') . "'
+                                      )";
+                    executeQuery($insertInsight);
 
                     $notifMessage = "You did not save anything this month.";
 
-                    $checkNotif = "SELECT 1 FROM tbl_notifications
-                                   WHERE userID = $userID
-                                   AND message = '$notifMessage'
-                                   AND type = 'monthly_no_saving'
-                                   AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
-                                   LIMIT 1";
-
-                    if (mysqli_num_rows(executeQuery($checkNotif)) == 0) {
-                        $insertNotif = "INSERT INTO tbl_notifications
-                                        (notificationTitle, message, icon, userID, createdAt, type)
-                                        VALUES ('No Savings Recorded',
-                                                '$notifMessage',
-                                                'savings.png',
-                                                $userID,
-                                                NOW(),
-                                                'monthly_no_saving')";
-                        executeQuery($insertNotif);
-                    }
+                    $insertNotif = "INSERT INTO tbl_notifications (notificationTitle, message, icon, userID, createdAt, type)
+                                    SELECT 'No Savings Recorded', '$notifMessage', 'savings.png', $userID, NOW(), 'monthly_no_saving'
+                                    FROM dual
+                                    WHERE NOT EXISTS (
+                                        SELECT 1 FROM tbl_notifications
+                                        WHERE userID = $userID
+                                        AND message = '$notifMessage'
+                                        AND type = 'monthly_no_saving'
+                                        AND DATE_FORMAT(createdAt, '%Y-%m') = '" . date('Y-m') . "'
+                                    )";
+                    executeQuery($insertNotif);
                 }
 
             } // allocation loop
