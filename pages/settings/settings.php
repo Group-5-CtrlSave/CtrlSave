@@ -92,16 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE userID = {$userID}
                     ");
 
-                    // Limits (budget allocations)
-                    $conn->query("
-                        UPDATE tbl_userallocation
-                        SET value = ROUND(value * {$rate}, 2)
-                        WHERE userBudgetRuleID IN (
-                            SELECT userBudgetRuleID
-                            FROM tbl_userbudgetrule
-                            WHERE userID = {$userID}
-                        )
-                    ");
 
                     // Total income inside budget version
                     $conn->query("
