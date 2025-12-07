@@ -414,7 +414,11 @@ if (isset($_SESSION['userID'])) {
                       let positive = document.getElementById("positive")
                     positive.innerHTML = "";
                     if (data.positiveInsight && data.positiveInsight.length > 0) {
-                        positive.innerHTML = "<p>" + data.positiveInsight + "</p>"
+                         data.positiveInsight.forEach(element => {
+                            positive.innerHTML += `<p>${element}</p>`
+                            
+                        });
+               
                     }
                          // Positive Insight 
                       let positiveSaving = document.getElementById("positiveSaving")
