@@ -438,7 +438,7 @@ LIMIT 3
           ?>
           <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
             <div class="recommendation-card p-3">
-              <h2 class="fw-semibold mb-2" style="color: #000; font-size: 16px;">Recommendation</h2>
+              <h2 class="fw-semibold mb-2" style="color: #000; font-size: 14px;">Coinfessions (Where did MY Money GO?)</h2>
               <div class="d-flex justify-content-center">
                 <div id="recommendationCart" class="container recommendationCart"
                   style="font-family: 'Roboto', sans-serif; background: url('../../assets/img/home/InsiteBg.png') center/cover no-repeat; border-radius: 20px; padding: 20px; text-align:center;">

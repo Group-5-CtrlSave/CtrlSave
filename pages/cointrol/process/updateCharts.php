@@ -156,12 +156,16 @@ if (mysqli_num_rows($oversavingInsightResult) > 0) {
 }
 
 // ===== Get Spending Positive Insights =====
-$positiveInsight = ""; // default
+$positiveInsight = []; // default
 $getpositiveInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $positiveInsightResult = executeQuery($getpositiveInsightsQuery);
 if (mysqli_num_rows($positiveInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($positiveInsightResult);
-    $positiveInsight = $row['message'];
+
+    while ($row = mysqli_fetch_assoc($positiveInsightResult)){
+          $positiveInsight [] = $row['message'];
+    }
+
+  
 }
 
 // ===== Get Spending Tracking Insights =====
