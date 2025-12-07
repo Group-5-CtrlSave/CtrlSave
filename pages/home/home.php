@@ -368,39 +368,44 @@ LIMIT 3
                 ?>
 
                 <div class="col-12 col-md-8">
-                  <div class="container-fluid ieContainer d-flex align-items-center my-2">
+                  <!-- Add the link wrapper here -->
+                  <a style="text-decoration: none; color: black;"
+                     href="../income&expenses/viewIncomeExpense.php?type=<?php echo $item['type']; ?>&id=<?php echo $item['id']; ?>">
+                    
+                    <div class="container-fluid ieContainer d-flex align-items-center my-2">
 
-                    <!-- Category Image -->
-                    <div class="container categoryImgContainer p-1">
-                      <img src="../../assets/img/shared/categories/<?php echo $folder; ?>/<?php echo $item['icon']; ?>"
-                        class="img-fluid">
+                      <!-- Category Image -->
+                      <div class="container categoryImgContainer p-1">
+                        <img src="../../assets/img/shared/categories/<?php echo $folder; ?>/<?php echo $item['icon']; ?>"
+                          class="img-fluid">
+                      </div>
+
+                      <!-- Text -->
+                      <div class="container categoryTextContainer p-1">
+                        <p class="category m-0"><b><?php echo $item['categoryName']; ?></b></p>
+                        <p class="notes m-0">Notes: <?php echo $item['note']; ?></p>
+                      </div>
+
+                      <!-- Price + Time -->
+                      <div class="container iePriceContainer p-1">
+                        <h5 class="price m-0">
+                          <?php
+                          echo ($item['type'] == 'income'
+                            ? '+ ' . $symbol
+                            : '- ' . $symbol
+                          ) . number_format($item['amount'], decimals: 2);
+                          ?>
+
+                        </h5>
+
+                        <p class="time m-0">
+                          <b><?php echo formatDateTimeDisplay($item['dateCreated'], $item['dueDate']); ?></b>
+                        </p>
+
+                      </div>
+
                     </div>
-
-                    <!-- Text -->
-                    <div class="container categoryTextContainer p-1">
-                      <p class="category m-0"><b><?php echo $item['categoryName']; ?></b></p>
-                      <p class="notes m-0">Notes: <?php echo $item['note']; ?></p>
-                    </div>
-
-                    <!-- Price + Time -->
-                    <div class="container iePriceContainer p-1">
-                      <h5 class="price m-0">
-                        <?php
-                        echo ($item['type'] == 'income'
-                          ? '+ ' . $symbol
-                          : '- ' . $symbol
-                        ) . number_format($item['amount'], decimals: 2);
-                        ?>
-
-                      </h5>
-
-                      <p class="time m-0">
-                        <b><?php echo formatDateTimeDisplay($item['dateCreated'], $item['dueDate']); ?></b>
-                      </p>
-
-                    </div>
-
-                  </div>
+                  </a>
                 </div>
                 <?php
               }
@@ -639,27 +644,31 @@ LIMIT 3
               </div>
             </div>
 
-            <!-- Bootstrap JS -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
-            <script>
+  <script>
 
-              const insights = <?php echo json_encode($insight); ?>;
-              let index = 0;
-              const div = document.getElementById("recommendationCart");
+    const insights = <?php echo json_encode($insight); ?>;
+    let index = 0;
+    const div = document.getElementById("recommendationCart");
 
-              function showInsight() {
-                div.innerHTML = `<p>${insights[index]}</p>`;
-                index = (index + 1) % insights.length; 
-              }
+    function showInsight() {
+      div.innerHTML = `<p>${insights[index]}</p>`;
+      index = (index + 1) % insights.length; 
+    }
 
-             
-              showInsight();
+   
+    showInsight();
 
-          
-              setInterval(showInsight, 3000);
-            </script>
+
+    setInterval(showInsight, 3000);
+  </script>
 
 </body>
 
