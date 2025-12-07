@@ -11,7 +11,7 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Set balance</title>
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
     <link rel="icon" href="../../assets/img/shared/logo_s.png">

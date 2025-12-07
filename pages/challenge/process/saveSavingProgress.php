@@ -14,6 +14,9 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = intval($_SESSION['userID']);
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
+
 // ---------------------------
 // POST VALIDATION
 // ---------------------------

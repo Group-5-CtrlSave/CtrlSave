@@ -4,9 +4,12 @@ include("../../assets/shared/connect.php");
 
 $userID = $_SESSION['userID'] ?? 0;
 if (!$userID) {
-    echo json_encode(["daily" => [], "weekly" => []]);
-    exit;
+  echo json_encode(["daily" => [], "weekly" => []]);
+  exit;
 }
+
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
 
 // DAILY
 $daily = [];
@@ -17,7 +20,8 @@ $q1 = $conn->query("
     WHERE u.userID = $userID AND c.type='Daily'
       AND u.status IN ('in progress', 'completed')
 ");
-while ($row = $q1->fetch_assoc()) $daily[] = $row;
+while ($row = $q1->fetch_assoc())
+  $daily[] = $row;
 
 // WEEKLY
 $weekly = [];
@@ -28,7 +32,8 @@ $q2 = $conn->query("
     WHERE u.userID = $userID AND c.type='Weekly'
       AND u.status IN ('in progress', 'completed')
 ");
-while ($row = $q2->fetch_assoc()) $weekly[] = $row;
+while ($row = $q2->fetch_assoc())
+  $weekly[] = $row;
 
 echo json_encode(["daily" => $daily, "weekly" => $weekly]);
 ?>

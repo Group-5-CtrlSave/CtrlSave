@@ -1,9 +1,23 @@
 <?php
 
+// ===============================
+// Set timezone function (SAFE)
+// ===============================
+function setTimezone($conn) {
+    if ($conn) {
+        $conn->query("SET time_zone = '+08:00'");
+    }
+}
+
+// =====================================================
 // DAILY CHALLENGES
+// =====================================================
+
 // Mark Daily challenge as failed if 24 hours passed
 function expireDailyChallenges($conn, $userID)
 {
+    setTimezone($conn);
+
     mysqli_query($conn, "
         UPDATE tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
@@ -18,6 +32,8 @@ function expireDailyChallenges($conn, $userID)
 // Reassign only failed Daily challenges
 function reassignFailedDailyChallenges($conn, $userID)
 {
+    setTimezone($conn);
+
     $failed = mysqli_query($conn, "
         SELECT u.challengeID
         FROM tbl_userchallenges u
@@ -29,7 +45,7 @@ function reassignFailedDailyChallenges($conn, $userID)
 
     if (mysqli_num_rows($failed) == 0) return;
 
-    // delete failed
+    // Delete failed
     mysqli_query($conn, "
         DELETE u FROM tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
@@ -38,7 +54,7 @@ function reassignFailedDailyChallenges($conn, $userID)
           AND u.status = 'failed'
     ");
 
-    // reassign new identical daily challenges
+    // Reassign same challenges
     while ($row = mysqli_fetch_assoc($failed)) {
         $cid = intval($row['challengeID']);
         mysqli_query($conn, "
@@ -48,47 +64,50 @@ function reassignFailedDailyChallenges($conn, $userID)
     }
 }
 
-// Daily Reset Trigger (Only after 24 hours)
+// Daily Reset Trigger (After 24 hours)
 function resetDailyChallengeSetIfCompleted($conn, $userID)
 {
+    setTimezone($conn);
+
+    // One query handles everything
     $result = mysqli_query($conn, "
-        SELECT MIN(u.assignedDate) AS oldest
+        SELECT TIMESTAMPDIFF(HOUR, MIN(u.assignedDate), NOW()) AS hoursPassed
         FROM tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
         WHERE u.userID = $userID AND c.type = 'Daily'
     ");
 
     $row = mysqli_fetch_assoc($result);
-    if (!$row || !$row['oldest']) return;
 
-    $hoursPassed = (time() - strtotime($row['oldest'])) / 3600;
+    if (!$row || $row['hoursPassed'] < 24) return;
 
-    if ($hoursPassed < 24) return;
-
-    // reset full daily set
+    // Reset full daily set
     mysqli_query($conn, "
         DELETE u FROM tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
         WHERE u.userID = $userID AND c.type = 'Daily'
     ");
 
-    // assign fresh daily set
+    // Assign new daily set
     $daily = mysqli_query($conn, "SELECT challengeID FROM tbl_challenges WHERE type = 'Daily'");
     while ($d = mysqli_fetch_assoc($daily)) {
-        $cid = intval($d['challengeID']);
         mysqli_query($conn, "
             INSERT INTO tbl_userchallenges (userID, challengeID, assignedDate, status)
-            VALUES ($userID, $cid, NOW(), 'in progress')
+            VALUES ($userID, {$d['challengeID']}, NOW(), 'in progress')
         ");
     }
 }
 
 
-
+// =====================================================
 // WEEKLY CHALLENGES
+// =====================================================
+
 // Mark Weekly challenge as failed if 168 hours passed
 function expireWeeklyChallenges($conn, $userID)
 {
+    setTimezone($conn);
+
     mysqli_query($conn, "
         UPDATE tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
@@ -101,42 +120,35 @@ function expireWeeklyChallenges($conn, $userID)
 }
 
 
-// ❌ Weekly reassign removed — weekly challenges must NOT be reassigned individually
-
-
-
-// Weekly Reset Trigger (After full 168 hours)
+// Weekly Reset Trigger (After 168 hours)
 function resetWeeklyChallengeSetIfCompleted($conn, $userID)
 {
+    setTimezone($conn);
+
+    // One query handles everything
     $result = mysqli_query($conn, "
-        SELECT MIN(u.assignedDate) AS oldest
+        SELECT TIMESTAMPDIFF(HOUR, MIN(u.assignedDate), NOW()) AS hoursPassed
         FROM tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
         WHERE u.userID = $userID AND c.type = 'Weekly'
     ");
 
     $row = mysqli_fetch_assoc($result);
-    if (!$row || !$row['oldest']) return;
+    if (!$row || $row['hoursPassed'] < 168) return;
 
-    $hoursPassed = (time() - strtotime($row['oldest'])) / 3600;
-
-    // only reset after full 168 hours
-    if ($hoursPassed < 168) return;
-
-    // delete entire weekly challenge set
+    // Reset weekly set
     mysqli_query($conn, "
         DELETE u FROM tbl_userchallenges u
         JOIN tbl_challenges c ON u.challengeID = c.challengeID
         WHERE u.userID = $userID AND c.type = 'Weekly'
     ");
 
-    // assign a fresh weekly set
+    // Assign new weekly set
     $weekly = mysqli_query($conn, "SELECT challengeID FROM tbl_challenges WHERE type = 'Weekly'");
-    while ($d = mysqli_fetch_assoc($weekly)) {
-        $cid = intval($d['challengeID']);
+    while ($w = mysqli_fetch_assoc($weekly)) {
         mysqli_query($conn, "
             INSERT INTO tbl_userchallenges (userID, challengeID, assignedDate, status)
-            VALUES ($userID, $cid, NOW(), 'in progress')
+            VALUES ($userID, {$w['challengeID']}, NOW(), 'in progress')
         ");
     }
 }

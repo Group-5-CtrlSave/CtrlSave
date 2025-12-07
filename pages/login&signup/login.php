@@ -11,7 +11,8 @@ include("../../pages/login&signup/process/loginBE.php");
     <title>CtrlSave | Login</title>
     <link rel="icon" href="../../assets/img/shared/logo_s.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
@@ -297,7 +298,7 @@ include("../../pages/login&signup/process/loginBE.php");
             <?php echo $error; ?>
         </div>
     <?php } ?>
-    
+
     <!-- Logo -->
     <div class="header p-5">
         <img class="img-fluid" src="../../assets/img/shared/logoName_L.png" alt="CtrlSave Logo" class="logo">
@@ -383,6 +384,49 @@ include("../../pages/login&signup/process/loginBE.php");
             }
         });
     </script>
+
+    <script>
+        (function () {
+            const body = document.body;
+            const originalOverflow = body.style.overflow;
+            const originalScrollPos = window.scrollY;
+
+            document.querySelectorAll("input, textarea").forEach(input => {
+
+                // When user taps an input (keyboard opens)
+                input.addEventListener("focus", () => {
+
+                    // Allow page to scroll ONLY while keyboard is open
+                    body.style.overflowY = "auto";
+
+                    // Scroll the input into view smoothly
+                    setTimeout(() => {
+                        input.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+                    }, 250);
+                });
+
+                // When user finishes typing (keyboard closes)
+                input.addEventListener("blur", () => {
+
+                    // Re-lock scrolling
+                    body.style.overflowY = "hidden";
+
+                    // Smoothly return the page to its ORIGINAL position
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: originalScrollPos,
+                            behavior: "smooth"
+                        });
+                    }, 50);
+                });
+            });
+
+        })();
+    </script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

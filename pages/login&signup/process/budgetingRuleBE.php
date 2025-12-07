@@ -11,6 +11,9 @@ if (!isset($_SESSION['userID'])) {
 
 $userID = (int) $_SESSION['userID'];
 
+// Set MySQL session timezone to Manila
+$conn->query("SET time_zone = '+08:00'");
+
 // Currency setup (display only)
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
