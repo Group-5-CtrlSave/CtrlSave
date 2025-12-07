@@ -45,7 +45,7 @@ while ($row = $res->fetch_assoc()) {
     if ($row['category'] !== null) {
         $rules[$id]['allocations'][] = [
             'category' => $row['category'],
-            'percentage' => (int)$row['percentage']
+            'percentage' => (int) $row['percentage']
         ];
     }
 }
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Please select a budget rule.";
         } else {
 
-            $selectedRule = (int)$_POST['ruleOption'];
+            $selectedRule = (int) $_POST['ruleOption'];
 
             if (!isset($rules[$selectedRule])) {
                 $error = "Invalid rule selected.";
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // USER ALREADY HAS A RULE → UPDATE IT
                         $row = $result->fetch_assoc();
-                        $userBudgetRuleID = (int)$row['userBudgetRuleID'];
+                        $userBudgetRuleID = (int) $row['userBudgetRuleID'];
 
                         $upd = $conn->prepare("
                             UPDATE tbl_userbudgetrule
@@ -169,15 +169,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
                     // INSERT PERCENTAGE ALLOCATIONS
+// For default rules, userCategoryID should always be 0
                     $insertAlloc = $conn->prepare("
-                        INSERT INTO tbl_userallocation
-                            (userBudgetruleID, userCategoryID, necessityType, limitType, value)
-                        VALUES (?, NULL, ?, 1, ?)
-                    ");
+    INSERT INTO tbl_userallocation
+        (userBudgetruleID, userCategoryID, necessityType, limitType, value)
+    VALUES (?, 0, ?, 1, ?)
+");
 
                     foreach ($rules[$selectedRule]['allocations'] as $alloc) {
                         $necessity = $alloc['category'];
-                        $percent   = $alloc['percentage'];
+                        $percent = $alloc['percentage'];
 
                         $insertAlloc->bind_param("isi", $userBudgetRuleID, $necessity, $percent);
                         $insertAlloc->execute();
