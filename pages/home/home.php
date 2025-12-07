@@ -75,7 +75,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>CtrlSave | Home</title>
 
   <!-- Bootstrap & Fonts -->
@@ -315,10 +315,13 @@ UNION ALL
 )
 ORDER BY 
     CASE 
-        WHEN dueDate IS NOT NULL THEN dueDate
-        ELSE dateCreated
-    END DESC
+        WHEN dueDate IS NOT NULL THEN 0
+        ELSE 1
+    END,
+    dueDate ASC,
+    dateCreated DESC
 LIMIT 3
+
 ";
 
             $recentResult = executeQuery($recentQuery);
@@ -331,12 +334,23 @@ LIMIT 3
                 $due = new DateTime($dueDate);
                 $diff = $now->diff($due);
 
+                // Past due
                 if ($diff->invert) {
                   return "Past due";
-                } else {
-                  return ($diff->days + 1) . " days left";
                 }
 
+                // Today
+                if ($diff->days === 0) {
+                  return "Today";
+                }
+
+                // 1 day left vs plural
+                if ($diff->days === 1) {
+                  return "1 day left";
+                }
+
+                // X days left
+                return $diff->days + 1 . " days left";
               }
 
               $created = new DateTime($dateCreated);
@@ -370,8 +384,8 @@ LIMIT 3
                 <div class="col-12 col-md-8">
                   <!-- Add the link wrapper here -->
                   <a style="text-decoration: none; color: black;"
-                     href="../income&expenses/viewIncomeExpense.php?type=<?php echo $item['type']; ?>&id=<?php echo $item['id']; ?>">
-                    
+                    href="../income&expenses/viewIncomeExpense.php?type=<?php echo $item['type']; ?>&id=<?php echo $item['id']; ?>">
+
                     <div class="container-fluid ieContainer d-flex align-items-center my-2">
 
                       <!-- Category Image -->
@@ -438,7 +452,8 @@ LIMIT 3
           ?>
           <div class="d-flex justify-content-center position-relative" style="margin-top: -90px;">
             <div class="recommendation-card p-3">
-              <h2 class="fw-semibold mb-2" style="color: #000; font-size: 14px;">Coinfessions (Where did MY Money GO?)</h2>
+              <h2 class="fw-semibold mb-2" style="color: #000; font-size: 14px;">Coinfessions (Where did MY Money GO?)
+              </h2>
               <div class="d-flex justify-content-center">
                 <div id="recommendationCart" class="container recommendationCart"
                   style="font-family: 'Roboto', sans-serif; background: url('../../assets/img/home/InsiteBg.png') center/cover no-repeat; border-radius: 20px; padding: 20px; text-align:center;">
@@ -644,31 +659,31 @@ LIMIT 3
               </div>
             </div>
 
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- Bootstrap JS -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
-  <script>
+      <script>
 
-    const insights = <?php echo json_encode($insight); ?>;
-    let index = 0;
-    const div = document.getElementById("recommendationCart");
+        const insights = <?php echo json_encode($insight); ?>;
+        let index = 0;
+        const div = document.getElementById("recommendationCart");
 
-    function showInsight() {
-      div.innerHTML = `<p>${insights[index]}</p>`;
-      index = (index + 1) % insights.length; 
-    }
-
-   
-    showInsight();
+        function showInsight() {
+          div.innerHTML = `<p>${insights[index]}</p>`;
+          index = (index + 1) % insights.length;
+        }
 
 
-    setInterval(showInsight, 3000);
-  </script>
+        showInsight();
+
+
+        setInterval(showInsight, 3000);
+      </script>
 
 </body>
 
