@@ -234,7 +234,7 @@ if (!empty($displayedBadgesArray)) {
     </nav>
     <!-- Edit Profile Form -->
     <div class="container-box">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="editProfileForm">
             <input type="hidden" name="selectedProfile" id="selectedProfileInput">
             <input type="hidden" name="selectedBadges" id="selectedBadgesInput" value="<?php echo htmlspecialchars($user['displayedBadges']); ?>">
             <input type="file" name="profileUpload" id="fileInput" class="d-none" accept="image/*" onchange="previewUpload(event)">
@@ -270,30 +270,30 @@ if (!empty($displayedBadgesArray)) {
                 <div class="col-6">
                     <div class="text-start">
                         <label class="form-label">First name</label>
-                        <input type="text" class="form-control" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>">
+                        <input type="text" class="form-control" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>" required>
                     </div>
                     <div class="text-start">
                         <label class="form-label">Last name</label>
-                        <input type="text" class="form-control" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>">
+                        <input type="text" class="form-control" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>" required>
                     </div>
                     <div class="text-start">
                         <label class="form-label">Username</label>
-                        <input type="text" class="form-control" name="userName" value="<?php echo htmlspecialchars($user['userName']); ?>">
+                        <input type="text" class="form-control" name="userName" value="<?php echo htmlspecialchars($user['userName']); ?>" required>
                     </div>
                 </div>
             </div>
             <div class="text-start">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($user['email']); ?>">
+                <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
             </div>
             <button type="submit" class="btn-save">Save Changes</button>
             <div class="password-section text-start">
                 <h6 class="fw-bold">PASSWORD CHANGE</h6>
-                <p style="font-size: 13px; color: black">Leave password empty when you don’t want to change it.</p>
+                <p style="font-size: 13px; color: black; text-align: justify">Your password must be contain at least 8 characters, one uppercase letter (A–Z), one lowercase letter (a–z), one number (0–9), and one special character (@$!%*?&.)</p>
                 <label class="form-label">New Password</label>
-                <input type="password" class="form-control" name="newPassword">
+                <input type="password" class="form-control" name="newPassword" id="newPassword">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" name="confirmPassword">
+                <input type="password" class="form-control" name="confirmPassword" id="confirmPassword">
                 <button type="submit" class="btn-password">Change Password</button>
  
                 <button type="button" class="btn-password d-block mx-auto mt-3" style="background-color: #E63946; border-color: #E63946;" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
@@ -578,6 +578,39 @@ if (!empty($displayedBadgesArray)) {
                 uploadImg.style.objectFit = 'cover';
                 uploadImg.style.marginTop = '0';
                 uploadedImage = uploadImg.src;
+            }
+        });
+
+        function isPasswordValid(password) {
+            return password.length >= 8 &&
+                   /[A-Z]/.test(password) &&
+                   /[a-z]/.test(password) &&
+                   /\d/.test(password) &&
+                   /[@$!%*?&]/.test(password);
+        }
+
+        // Client-side validation for password fields
+        document.getElementById('editProfileForm').addEventListener('submit', function(event) {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword || confirmPassword) {
+                if (!newPassword || !confirmPassword) {
+                    event.preventDefault();
+                    document.getElementById('alertMessage').textContent = 'Please fill both password fields if changing password.';
+                    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+                    alertModal.show();
+                } else if (newPassword !== confirmPassword) {
+                    event.preventDefault();
+                    document.getElementById('alertMessage').textContent = 'Passwords do not match.';
+                    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+                    alertModal.show();
+                } else if (!isPasswordValid(newPassword)) {
+                    event.preventDefault();
+                    document.getElementById('alertMessage').textContent = 'Password does not meet the requirements.';
+                    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+                    alertModal.show();
+                }
             }
         });
     </script>
