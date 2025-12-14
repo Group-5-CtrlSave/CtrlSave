@@ -26,7 +26,7 @@ $budgetVersionResult = executeQuery($getBudgetVersion);
 $totalIncome = 0;
 if (mysqli_num_rows($budgetVersionResult) > 0) {
     $row = mysqli_fetch_assoc($budgetVersionResult);
-    $totalIncome = (float)$row['totalIncome']; 
+    $totalIncome = (float) $row['totalIncome'];
 }
 
 
@@ -123,85 +123,146 @@ if (!empty($expenses)) {
 
 // ===== Get Spending Correlation Insights =====
 
-$correlationInsight = [] ; // default
+$correlationInsight = []; // default
 $getCorrelationInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'correlation' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $correlationInsightResult = executeQuery($getCorrelationInsightsQuery);
 if (mysqli_num_rows($correlationInsightResult) > 0) {
-    while ($row = mysqli_fetch_assoc($correlationInsightResult)){
-            $correlationInsight[] = $row['message'];
+    while ($row = mysqli_fetch_assoc($correlationInsightResult)) {
+        $correlationInsight[] = $row['message'];
     }
 
 }
 
+$today = date('Y-m-d');
 
 // ===== Get Spending Overspending Insights =====
-
-$overspendingInsight = []; // default
+$overspendingInsight = []; // monthly
 $getOverspendingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'overspending' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $overspendingInsightResult = executeQuery($getOverspendingInsightsQuery);
 if (mysqli_num_rows($overspendingInsightResult) > 0) {
     while ($row = mysqli_fetch_assoc($overspendingInsightResult)) {
         $overspendingInsight[] = $row['message'];
     }
+}
 
+// ===== Get Recommendation Insights (Monthly) =====
+$recommendationInsight = []; // monthly
+$getRecommendationInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'recommendation' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$recommendationInsightResult = executeQuery($getRecommendationInsightsQuery);
+if (mysqli_num_rows($recommendationInsightResult) > 0) {
+    while ($row = mysqli_fetch_assoc($recommendationInsightResult)) {
+        $recommendationInsight[] = $row['message'];
+    }
+}
+
+// ===== Get Spending Daily Overspending Insights =====
+$dailyOverspending = []; // daily
+$dailyOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_overspending' AND userID = $userID AND DATE(date) = '$today'";
+$dailyOverspendingResult = executeQuery($dailyOverspendingQuery);
+if (mysqli_num_rows($dailyOverspendingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyOverspendingResult)) {
+        $dailyOverspending[] = $row['message'];
+    }
 }
 
 // ===== Get Spending Oversaving Insights =====
-$oversavingInsight = ""; // default
+$oversavingInsight = []; // monthly
 $getOversavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'oversaving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $oversavingInsightResult = executeQuery($getOversavingInsightsQuery);
 if (mysqli_num_rows($oversavingInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($oversavingInsightResult);
-    $oversavingInsight = $row['message'];
+    while ($row = mysqli_fetch_assoc($oversavingInsightResult)) {
+        $oversavingInsight[] = $row['message'];
+    }
+}
+
+// ===== Get Spending Daily Oversaving Insights =====
+$dailyOversaving = []; // daily
+$dailyOversavingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_oversaving' AND userID = $userID AND DATE(date) = '$today'";
+$dailyOversavingResult = executeQuery($dailyOversavingQuery);
+if (mysqli_num_rows($dailyOversavingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyOversavingResult)) {
+        $dailyOversaving[] = $row['message'];
+    }
 }
 
 // ===== Get Spending Positive Insights =====
-$positiveInsight = []; // default
+$positiveInsight = []; // monthly
 $getpositiveInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $positiveInsightResult = executeQuery($getpositiveInsightsQuery);
 if (mysqli_num_rows($positiveInsightResult) > 0) {
-
-    while ($row = mysqli_fetch_assoc($positiveInsightResult)){
-          $positiveInsight [] = $row['message'];
+    while ($row = mysqli_fetch_assoc($positiveInsightResult)) {
+        $positiveInsight[] = $row['message'];
     }
+}
 
-  
+// ===== Get Spending Daily Positive Insights =====
+$dailyPositive = []; // daily
+$dailyPositiveQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_positive' AND userID = $userID AND DATE(date) = '$today'";
+$dailyPositiveResult = executeQuery($dailyPositiveQuery);
+if (mysqli_num_rows($dailyPositiveResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyPositiveResult)) {
+        $dailyPositive[] = $row['message'];
+    }
 }
 
 // ===== Get Spending Tracking Insights =====
-$trackingInsight = ""; // default
+$trackingInsight = []; // monthly
 $gettrackingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'tracking' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $trackingInsightResult = executeQuery($gettrackingInsightsQuery);
 if (mysqli_num_rows($trackingInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($trackingInsightResult);
-    $trackingInsight = $row['message'];
+    while ($row = mysqli_fetch_assoc($trackingInsightResult)) {
+        $trackingInsight[] = $row['message'];
+    }
 }
 
-// ===== Get Spending Tracking Insights =====
-$recommendationInsight = ""; // default
-$getrecommendationInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'recommendation' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
-$recommendationInsightResult = executeQuery($getrecommendationInsightsQuery);
-if (mysqli_num_rows($recommendationInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($recommendationInsightResult);
-    $recommendationInsight = $row['message'];
+// ===== Get Spending Daily Tracking Insights =====
+$dailyTracking = []; // daily
+$dailyTrackingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_tracking' AND userID = $userID AND DATE(date) = '$today'";
+$dailyTrackingResult = executeQuery($dailyTrackingQuery);
+if (mysqli_num_rows($dailyTrackingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyTrackingResult)) {
+        $dailyTracking[] = $row['message'];
+    }
+}
+// Positive Saving Insight
+$positiveSavingInsight = [];
+$getpositiveInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$positiveInsightResult = executeQuery($getpositiveInsightsQuery);
+if (mysqli_num_rows($positiveInsightResult) > 0) {
+    while ($row = mysqli_fetch_assoc($positiveInsightResult)) {
+        $positiveInsight[] = $row['message'];
+    }
 }
 
-// ===== Get Spending Oversaving Insights =====
-   $positiveSavingInsight= ""; // default
-$getpositiveSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'positive_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
-$positiveSavingInsightResult = executeQuery($getpositiveSavingInsightsQuery);
-if (mysqli_num_rows($positiveSavingInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($positiveSavingInsightResult);
-    $positiveSavingInsight = $row['message'];
+// ===== Get Daily Positive Saving Insights =====
+$dailyPositiveSaving = []; // daily
+$dailyPositiveSavingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_positive_saving' AND userID = $userID AND DATE(date) = '$today'";
+$dailyPositiveSavingResult = executeQuery($dailyPositiveSavingQuery);
+if (mysqli_num_rows($dailyPositiveSavingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyPositiveSavingResult)) {
+        $dailyPositiveSaving[] = $row['message'];
+    }
 }
- $noSavingInsight= ""; // default
-$getnoSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'no_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
-$noSavingInsightResult = executeQuery($getnoSavingInsightsQuery);
+// ===== Get Spending No Saving Insights (Monthly) =====
+$noSavingInsight = []; // monthly
+$getNoSavingInsightsQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'no_saving' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
+$noSavingInsightResult = executeQuery($getNoSavingInsightsQuery);
 if (mysqli_num_rows($noSavingInsightResult) > 0) {
-    $row = mysqli_fetch_assoc($noSavingInsightResult);
-    $noSavingInsight = $row['message'];
-  
+    while ($row = mysqli_fetch_assoc($noSavingInsightResult)) {
+        $noSavingInsight[] = $row['message'];
+    }
 }
+
+// ===== Get Daily No Saving Insights =====
+$dailyNoSaving = []; // daily
+$dailyNoSavingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_no_saving' AND userID = $userID AND DATE(date) = '$today'";
+$dailyNoSavingResult = executeQuery($dailyNoSavingQuery);
+if (mysqli_num_rows($dailyNoSavingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyNoSavingResult)) {
+        $dailyNoSaving[] = $row['message'];
+    }
+}
+
 
 
 echo json_encode([
@@ -218,6 +279,14 @@ echo json_encode([
     "noSavingInsight" => $noSavingInsight,
     "trackingInsight" => $trackingInsight,
     "recommendationInsight" => $recommendationInsight,
-    "correlationInsight" => $correlationInsight
+    "correlationInsight" => $correlationInsight,
+    // Daily insights
+    "dailyOverspending" => $dailyOverspending,
+    "dailyOversaving" => $dailyOversaving,
+    "dailyPositive" => $dailyPositive,
+    "dailyTracking" => $dailyTracking,
+    // Daily saving insights
+    "dailyPositiveSaving" => $dailyPositiveSaving,
+    "dailyNoSaving" => $dailyNoSaving
 ]);
 ?>

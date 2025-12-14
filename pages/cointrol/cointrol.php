@@ -382,31 +382,29 @@ if (isset($_SESSION['userID'])) {
                         topCategories.innerHTML = "<b>Your Top Spending Categories for this month:</b><p>" + data.topCategories.join("<br>") + "</p>";
                     }
 
-                    // Update Correlation Insight 
-                    let correlationInsight = document.getElementById("correlationInsight");
-                    correlationInsight.innerHTML = "";
-                    if (data.correlationInsight && data.correlationInsight.length > 0) {
-                        data.correlationInsight.forEach(element => {
-                            correlationInsight.innerHTML += `<p> ${element} </p>`
-                        });
-
-                    }
-
-                    // Update Overspending Insight
+               
+                    // Overspending Insight
                     let overSpentCateg = document.getElementById("overSpentCateg");
                     overSpentCateg.innerHTML = "";
                     if (data.overspendingInsight && data.overspendingInsight.length > 0) {
-                        overSpentCateg.innerHTML += `<b>Your Overspending Categories:</b>`;
                         data.overspendingInsight.forEach(element => {
                             overSpentCateg.innerHTML += `<p>${element}</p>`;
                         });
+                    } else if (data.dailyOverspending && data.dailyOverspending.length > 0) {
+                        data.dailyOverspending.forEach(element => {
+                            overSpentCateg.innerHTML += `<p>Today: ${element}</p>`;
+                        });
+                    }
 
-                        // Add daily insights if available
-                        if (data.daily_overspending && data.daily_overspending.length > 0) {
-                            data.daily_overspending.forEach(element => {
-                                overSpentCateg.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
+                    // Oversaving Insight
+                    let overSaveCateg = document.getElementById("overSaveCateg");
+                    overSaveCateg.innerHTML = "";
+                    if (data.oversavingInsight && data.oversavingInsight.length > 0) {
+                        overSaveCateg.innerHTML = "<p>" + data.oversavingInsight + "</p>";
+                    } else if (data.dailyOversaving && data.dailyOversaving.length > 0) {
+                        data.dailyOversaving.forEach(element => {
+                            overSaveCateg.innerHTML += `<p>Today: ${element}</p>`;
+                        });
                     }
 
                     // Positive Insight
@@ -416,76 +414,49 @@ if (isset($_SESSION['userID'])) {
                         data.positiveInsight.forEach(element => {
                             positive.innerHTML += `<p>${element}</p>`;
                         });
-
-                        // Add daily insights if available
-                        if (data.daily_positive && data.daily_positive.length > 0) {
-                            data.daily_positive.forEach(element => {
-                                positive.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
+                    } else if (data.dailyPositive && data.dailyPositive.length > 0) {
+                        data.dailyPositive.forEach(element => {
+                            positive.innerHTML += `<p>Today: ${element}</p>`;
+                        });
                     }
 
                     // Tracking Insight
                     let tracking = document.getElementById("tracking");
                     tracking.innerHTML = "";
                     if (data.trackingInsight && data.trackingInsight.length > 0) {
-                        tracking.innerHTML = "<p>" + data.trackingInsight.join("<br>") + "</p>";
-
-                        // Add daily insights if available
-                        if (data.daily_tracking && data.daily_tracking.length > 0) {
-                            data.daily_tracking.forEach(element => {
-                                tracking.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
-                    }
-
-                    // Oversaving Insight
-                    let overSaveCateg = document.getElementById("overSaveCateg");
-                    overSaveCateg.innerHTML = "";
-                    if (data.oversavingInsight && data.oversavingInsight.length > 0) {
-                        overSaveCateg.innerHTML = "<p>" + data.oversavingInsight.join("<br>") + "</p>";
-
-                        // Add daily insights if available
-                        if (data.daily_oversaving && data.daily_oversaving.length > 0) {
-                            data.daily_oversaving.forEach(element => {
-                                overSaveCateg.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
+                        tracking.innerHTML = "<p>" + data.trackingInsight + "</p>";
+                    } else if (data.dailyTracking && data.dailyTracking.length > 0) {
+                        data.dailyTracking.forEach(element => {
+                            tracking.innerHTML += `<p>Today: ${element}</p>`;
+                        });
                     }
 
                     // Positive Saving Insight
                     let positiveSaving = document.getElementById("positiveSaving");
                     positiveSaving.innerHTML = "";
                     if (data.positiveSavingInsight && data.positiveSavingInsight.length > 0) {
-                        positiveSaving.innerHTML = "<b>Saving Goals:</b>";
-                        data.positiveSavingInsight.forEach(element => {
+                        positiveSaving.innerHTML += "<b>Saving Goals:</b>";
+                        positiveSaving.innerHTML += "<p>" + data.positiveSavingInsight + "</p>";
+                    } else if (data.dailyPositiveSaving && data.dailyPositiveSaving.length > 0) {
+                        positiveSaving.innerHTML += "<b>Today Saving Goals:</b>";
+                        data.dailyPositiveSaving.forEach(element => {
                             positiveSaving.innerHTML += `<p>${element}</p>`;
                         });
-
-                        // Add daily positive saving insights if available
-                        if (data.daily_positiveSaving && data.daily_positiveSaving.length > 0) {
-                            data.daily_positiveSaving.forEach(element => {
-                                positiveSaving.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
                     }
 
                     // No Saving Insight
                     let noSaving = document.getElementById("noSaving");
                     noSaving.innerHTML = "";
                     if (data.noSavingInsight && data.noSavingInsight.length > 0) {
-                        noSaving.innerHTML = "<b>Saving Goals:</b>";
-                        data.noSavingInsight.forEach(element => {
+                        noSaving.innerHTML += "<b>Saving Goals:</b>";
+                        noSaving.innerHTML += "<p>" + data.noSavingInsight + "</p>";
+                    } else if (data.dailyNoSaving && data.dailyNoSaving.length > 0) {
+                        noSaving.innerHTML += "<b>Today Saving Goals:</b>";
+                        data.dailyNoSaving.forEach(element => {
                             noSaving.innerHTML += `<p>${element}</p>`;
                         });
-
-                        // Add daily no saving insights if available
-                        if (data.daily_noSaving && data.daily_noSaving.length > 0) {
-                            data.daily_noSaving.forEach(element => {
-                                noSaving.innerHTML += `<p style="font-style: italic; color: #555;">(Today) ${element}</p>`;
-                            });
-                        }
                     }
+
 
 
                     // Recommendation 
@@ -494,6 +465,16 @@ if (isset($_SESSION['userID'])) {
                     if (data.recommendationInsight && data.recommendationInsight.length > 0) {
                         recommendation.innerHTML += `<b>Recommendations:</b>`;
                         recommendation.innerHTML += "<p>" + data.recommendationInsight + "</p>"
+                    }
+
+                    // Correlation Insight 
+                    let correlationInsight = document.getElementById("correlationInsight");
+                    correlationInsight.innerHTML = "";
+                    if (data.correlationInsight && data.correlationInsight.length > 0) {
+                        data.correlationInsight.forEach(element => {
+                            correlationInsight.innerHTML += `<p> ${element} </p>`
+                        });
+
                     }
 
 
