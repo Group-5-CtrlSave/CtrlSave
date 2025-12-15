@@ -1,0 +1,128 @@
+  /* Error Handling */
+
+  #errorToast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #E63946;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 20px;
+      width: 300px;
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 9999;
+      animation: fadeInOut 3s ease forwards;
+      text-align: center;
+  }
+
+  /* Fade Animation: stays visible → fades out smoothly */
+  @keyframes fadeInOut {
+      0% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-5px);
+      }
+
+      10% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+      }
+
+      70% {
+          opacity: 1;
+      }
+
+      100% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-5px);
+      }
+  }
+
+  .logoContainer {
+      min-height: 40dvh;
+
+  }
+
+  .formContainer {
+      min-height: 60dvh;
+      background-image: url("../img/login&signup/waveUpHalf.svg");
+      background-repeat: no-repeat;
+      background-size: cover;
+
+  }
+
+  .emailForm,
+  .passwordForm {
+      border-radius: 20px;
+      border-color: #F6D25B;
+      border-width: 3px;
+  }
+
+  .loginBtn {
+      background-color: #F6D25B !important;
+      min-width: 150px !important;
+      min-height: 50px !important;
+      color: black;
+      border-radius: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: "Poppins", sans-serif;
+
+
+  }
+
+  .noAccount {
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+      font-family: "Poppins", sans-serif;
+
+  }
+
+  .signUplink {
+      color: black;
+      font-weight: bold;
+      font-family: "Poppins", sans-serif;
+      font-size: 16px;
+  }
+
+  /* Password Toggle */
+  .password-wrapper {
+      position: relative;
+  }
+
+
+
+  .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #44B87D;
+      outline: none;
+  }
+
+  .toggle-password svg {
+      display: block;
+  }
+
+  .toggle-password:focus {
+      box-shadow: none;
+  }
+
+  .forgotPassword {
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      font-family: "Poppins", sans-serif;
+
+  }
