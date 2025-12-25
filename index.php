@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="refresh" content="0; url=pages/landing&ads/landingPage.html">
+  <meta http-equiv="refresh" content="0; url=pages/login&signup/login.php">
   <title>CtrlSave | Your Financial Buddy</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../CtrlSave/assets/css/sideBar.css">
-  <link rel="icon" href="../CtrlSave/assets/img/shared/ctrlsaveLogo.png">
+  <link rel="icon" href="assets/img/shared/logo_s.png">
 </head>
 
 <body>
