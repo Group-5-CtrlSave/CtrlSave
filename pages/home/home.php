@@ -109,7 +109,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
     .vertical-divider {
       width: 1.5px;
       height: 60px;
-      background-color: #44B87D;
+      background-color: #BCBABA;
     }
 
     .time {
@@ -128,6 +128,11 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
       color: #BCBABA !important;
       font-weight: normal !important;
       font-size: 14px;
+    }
+
+    .price {
+     color: #44B87D !important;
+
     }
 
     .today-text {
@@ -249,7 +254,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
             <div class="text-center">
               <span class="text-danger" style="font-size: 25px;">↓</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Expenses</span>
-              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+              <div class="fw-medium " style="font-size: 16px; font-family: 'Roboto', sans-serif; color: #44B87D;">
                 <?php echo $symbol . number_format($todayExpense, 2); ?>
               </div>
             </div>
@@ -257,7 +262,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
             <div class="text-center">
               <span class="text-success" style="font-size: 25px;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Income</span>
-              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+              <div class="fw-medium " style="font-size: 16px; font-family: 'Roboto', sans-serif; color: #44B87D;">
                 <?php echo $symbol . number_format($todayIncome, 2); ?>
               </div>
             </div>
@@ -265,7 +270,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
             <div class="text-center">
               <span style="font-size: 25px; visibility: hidden;">↑</span>
               <span class="fw-bold" style="font-size: 16px; font-family: 'Poppins', sans-serif;">Balance</span>
-              <div class="fw-medium text-warning" style="font-size: 16px; font-family: 'Roboto', sans-serif;">
+              <div class="fw-medium " style="font-size: 16px; font-family: 'Roboto', sans-serif; color: #44B87D;">
                 <?php echo $symbol . number_format($todayBalance, 2); ?>
               </div>
             </div>

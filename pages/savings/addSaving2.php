@@ -186,7 +186,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
 
   <form method="POST" id="goalForm">
     <nav class="bg-white px-4 py-4 d-flex align-items-center shadow sticky-top" style="height: 72px;">
-      <a href="javascript:window.location.href='addsaving1.php';">
+      <a href="javascript:window.location.href='addSaving1.php';">
         <img class="img-fluid" src="../../assets/img/shared/BackArrow.png" alt="Back" style="height: 24px;">
       </a>
       <h5 class="m-0 fw-bold text-dark flex-grow-1 text-center" style="transform: translateX(-15px);">Add Goal</h5>
