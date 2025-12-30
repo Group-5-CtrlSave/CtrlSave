@@ -31,7 +31,7 @@ $expenseResult = mysqli_query($conn, $expenseQuery);
 $expenseRow = mysqli_fetch_assoc($expenseResult);
 $totalExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
 
-// Get total amount in ALL savings goals
+// Get total amount in ALL savings goals (including deleted/completed ones to keep money locked)
 $savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID'";
 $savingsResult = mysqli_query($conn, $savingsQuery);
 $savingsRow = mysqli_fetch_assoc($savingsResult);
@@ -116,15 +116,19 @@ if (isset($_POST['edit_goal'])) {
   exit();
 }
 
-// Delete the goal
+// Delete the goal - mark as deleted instead of removing from database
 if (isset($_GET['delete']) && $_GET['delete'] == 1) {
   $goalQuery = mysqli_query($conn, "SELECT goalName FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID");
   $goalData = mysqli_fetch_assoc($goalQuery);
   $goalName = mysqli_real_escape_string($conn, $goalData['goalName']);
 
+  // Delete notifications related to this goal
   mysqli_query($conn, "DELETE FROM tbl_notifications WHERE userID = {$_SESSION['userID']} AND notificationTitle LIKE '%$goalName%'");
-  mysqli_query($conn, "DELETE FROM tbl_goaltransactions WHERE savingGoalID = $savingGoalID");
-  mysqli_query($conn, "DELETE FROM tbl_savinggoals WHERE savingGoalID = $savingGoalID");
+  
+  // Mark goal as deleted instead of removing it - this keeps the money locked
+  $updateQuery = "UPDATE tbl_savinggoals SET status = 'Deleted' WHERE savingGoalID = $savingGoalID";
+  mysqli_query($conn, $updateQuery);
+  
   header("Location: savingGoal.php");
   exit();
 }
