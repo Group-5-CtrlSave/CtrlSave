@@ -15,6 +15,12 @@
 
 <body>
   <div class="container-fluid mainContainer p-0 m-0">
+    <!-- Toast Message -->
+    <?php if (!empty($error)) { ?>
+      <div id="errorToast">
+        <?php echo $error; ?>
+      </div>
+    <?php } ?>
     <div class="container logoContainer d-flex justify-content-end align-items-end">
       <img class="img-fluid my-2" src="../../assets/img/shared/logo_S.png" />
     </div>
@@ -23,18 +29,19 @@
         <div class="container">
           <h3 class="signUpText">Sign Up</h3>
           <!-- Sign Up Form -->
+
           <div class="row">
             <div class="col-12">
-              <input class="form-control my-2" placeholder="Username">
+              <input class="form-control my-2" placeholder="Username" name="username" required>
             </div>
             <div class="col-12">
-              <input class="form-control my-2" placeholder="First Name">
+              <input class="form-control my-2" placeholder="First Name" name="firstname" required>
             </div>
             <div class="col-12">
-              <input class="form-control my-2" placeholder="Last Name">
+              <input class="form-control my-2" placeholder="Last Name" name="lastname" required>
             </div>
             <div class="col-12">
-              <input class="form-control my-2" placeholder="Email">
+              <input class="form-control my-2" placeholder="Email" name="email" required>
             </div>
             <div class="col-12">
               <div class="my-1" id="passwordRequirements"
@@ -69,11 +76,11 @@
 
             </div>
             <div class="col-12 d-flex flex-column justify-content-center align-items-center ">
-              <button class="btn btn-lg loginBtn my-3">Next</button>
-               <a class="backToLogin p-0 my-3" href="login.php"><- Back to Login</a>
-             
+              <button class="btn btn-lg loginBtn my-3" type="submit" id="nextBtn" disabled>Next</button>
+              <a class="backToLogin p-0 my-3" href="login.php"><- Back to Login</a>
+
             </div>
-            
+
           </div>
 
         </div>
