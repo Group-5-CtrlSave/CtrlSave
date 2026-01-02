@@ -1,0 +1,80 @@
+.logoContainer {
+    min-height: 20dvh;
+}
+
+.formContainer {
+    min-height: 80dvh;
+    background-image: url("../img/login&signup/waveUpHalf.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+.form-control {
+    border: 2px solid #F6D25B !important;
+    font-family: "Roboto", sans-serif;
+    background-color: white;
+    border-radius: 20px;
+}
+
+/* Password toggle */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input.form-control {
+    padding-right: 48px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #44B87D;
+    outline: none;
+}
+
+.toggle-password svg {
+    display: block;
+}
+
+.toggle-password:focus {
+    box-shadow: none;
+}
+
+.signUpText {
+    color: white;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+
+}
+
+.loginBtn {
+    background-color: #F6D25B !important;
+    color: black !important;
+    min-width: 125px;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    border-radius: 20px;
+
+}
+
+.btn:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.backToLogin {
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    color: white;
+
+}
