@@ -29,7 +29,7 @@ include("../../pages/login&signup/process/signupBE.php");
       <img class="img-fluid my-2" src="../../assets/img/shared/logo_s.png" />
     </div>
     <form method="POST">
-      <div class="container-fluid formContainer fixed-bottom d-flex justify-content-center align-items-center">
+      <div class="container-fluid formContainer d-flex justify-content-center align-items-center">
         <div class="container">
           <h3 class="signUpText">Sign Up</h3>
           <!-- Sign Up Form -->
