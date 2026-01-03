@@ -1,9 +1,9 @@
 .logoContainer {
-    min-height: 20dvh;
+    min-height: 40dvh;
 }
 
 .formContainer {
-    min-height: calc(100vh - 20vh);
+    min-height: calc(100vh - 60vh);
     background-image: url("../img/login&signup/waveUpHalf.svg");
     background-repeat: no-repeat;
     background-size: cover;
