@@ -12,8 +12,8 @@ $userID = intval($_SESSION['userID']);
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'USD') ? '$' : '₱';
 
-
-$query = "SELECT * FROM tbl_savinggoals WHERE userID = $userID";
+// Exclude deleted goals from display
+$query = "SELECT * FROM tbl_savinggoals WHERE userID = $userID AND status != 'Deleted' ORDER BY savingGoalID DESC";
 $result = mysqli_query($conn, $query);
 ?>
 

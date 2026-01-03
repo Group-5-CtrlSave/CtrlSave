@@ -196,7 +196,7 @@ if (isset($_POST['btnAddGoalConfirmed'])) {
       style="height: calc(100vh - 72px - 88px); padding: 1rem 1rem 20px;">
       <div>
         <p class="fw-bold text-white fs-5 mb-2">What are the details of your saving goal?</p>
-        <p class="fw-bold text-white fs-5 mb-2">Saving goal: <?= htmlspecialchars($goalName) ?></p>
+        <p class="fw-bold text-white mb-3">Saving goal: <?= htmlspecialchars($goalName) ?></p>
 
         <?php if (!empty($iconFilename)): ?>
           <div class="text-center mb-3">
