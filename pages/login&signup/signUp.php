@@ -26,7 +26,7 @@ include("../../pages/login&signup/process/signupBE.php");
       </div>
     <?php } ?>
     <div class="container logoContainer d-flex justify-content-end align-items-end">
-      <img class="img-fluid my-2" src="../../assets/img/shared/logo_S.png" />
+      <img class="img-fluid my-2" src="../../assets/img/shared/logo_s.png" />
     </div>
     <form method="POST">
       <div class="container-fluid formContainer fixed-bottom d-flex justify-content-center align-items-center">
