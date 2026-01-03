@@ -80,7 +80,7 @@ include("../../pages/login&signup/process/signupBE.php");
 
             </div>
             <div class="col-12 d-flex flex-column justify-content-center align-items-center ">
-              <button class="btn btn-lg loginBtn my-3" type="submit" id="nextBtn" name="signup" disabled>Next</button>
+              <button class="btn btn-lg signUpbtn my-3" type="submit" id="nextBtn" name="signup" disabled>Next</button>
               <a class="backToLogin p-0 my-3" href="login.php"><- Back to Login</a>
 
             </div>
