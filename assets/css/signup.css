@@ -3,7 +3,7 @@
 }
 
 .formContainer {
-    min-height: 80dvh;
+    min-height: calc(100vh - 20vh);
     background-image: url("../img/login&signup/waveUpHalf.svg");
     background-repeat: no-repeat;
     background-size: cover;
