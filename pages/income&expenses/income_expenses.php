@@ -165,6 +165,9 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
                 foreach ($mergedResults as $entry) {
                     if ($type == 'all' || $entry['type'] == $type) {
                         ?>
+                        <a style="text-decoration: none; color: black;"
+                        href="viewIncomeExpense.php?type=<?php echo $entry['type'] ?>&id=<?php echo $entry[$entry['type'] . '' . 'ID'] ?>">
+
                         <div class="container ieContainer my-3">
                             <div class="row ieRow">
                                 <div class="col-4  d-flex justify-content-center align-items-center">
@@ -201,6 +204,7 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
                                 </div>
                             </div>
                         </div>
+                        </a>
 
                         <?php
                     }
