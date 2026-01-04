@@ -124,7 +124,8 @@ if (isset($_POST['btnLogin'])) {
             }
 
             // Redirect to home
-            header("Location: ../home/home.php");
+            header("Location: ../home/home.php", true, 302);
+            header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
             exit;
 
         } else {
