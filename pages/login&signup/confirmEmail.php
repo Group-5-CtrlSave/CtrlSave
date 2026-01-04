@@ -100,71 +100,8 @@ include("../../pages/login&signup/process/signupBE.php");
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"></script>
 
-  <!-- Password Toggle -->
-  <script>
-    const pwd = document.getElementById("password");
-    const toggle = document.getElementById("togglePassword");
-    const eyeOpen = document.getElementById("eyeOpen");
-    const eyeClosed = document.getElementById("eyeClosed");
 
-    toggle.addEventListener("click", () => {
-      if (pwd.type === "password") {
-        pwd.type = "text";
-        eyeOpen.style.display = "block";   // show open eye
-        eyeClosed.style.display = "none";  // hide closed eye
-      } else {
-        pwd.type = "password";
-        eyeOpen.style.display = "none";    // hide open eye
-        eyeClosed.style.display = "block"; // show closed eye
-      }
-    });
-  </script>
 
-  <!-- Password Checker -->
-  <script>
-    const password = document.getElementById("password");
-    const nextBtn = document.getElementById("nextBtn");
-
-    // Requirement text elements
-    const reqLength = document.getElementById("reqLength");
-    const reqUpper = document.getElementById("reqUpper");
-    const reqLower = document.getElementById("reqLower");
-    const reqNumber = document.getElementById("reqNumber");
-    const reqSpecial = document.getElementById("reqSpecial");
-
-    // Validation Regex
-    function validatePassword(pwd) {
-      return {
-        length: pwd.length >= 8,
-        upper: /[A-Z]/.test(pwd),
-        lower: /[a-z]/.test(pwd),
-        number: /\d/.test(pwd),
-        special: /[^A-Za-z0-9]/.test(pwd)
-      };
-    }
-
-    // Update UI on input
-    password.addEventListener("input", () => {
-      const val = password.value;
-      const check = validatePassword(val);
-
-      // Update icons only — ✔ white, ❌ black
-      reqLength.innerHTML = (check.length ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " At least 8 characters";
-      reqUpper.innerHTML = (check.upper ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One uppercase letter (A–Z)";
-      reqLower.innerHTML = (check.lower ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One lowercase letter (a–z)";
-      reqNumber.innerHTML = (check.number ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One number (0–9)";
-      reqSpecial.innerHTML = (check.special ? "<span style='color:white;'>✔</span>" : "<span style='color:black;'>❌</span>") + " One special character (@$!%*?&)";
-
-      // Enable button only if all valid
-      if (check.length && check.upper && check.lower && check.number && check.special) {
-        nextBtn.disabled = false;
-        nextBtn.style.opacity = "1";
-      } else {
-        nextBtn.disabled = true;
-        nextBtn.style.opacity = "0.6";
-      }
-    });
-  </script>
 </body>
 
 </html>

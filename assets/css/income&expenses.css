@@ -43,10 +43,10 @@ body {
     background-color: #F3F3F3;
     height: 100px;
 }
+.ieRow{
+    height: 100px;
+}
 
-/* .opacity{
-    opacity: 80%;
-} */
 
 .categoryImgContainer {
     text-align: center;
@@ -71,22 +71,18 @@ body {
 
 
 }
-
-.iePriceContainer {
-    text-align: end;
+.iePriceContainer{
     max-width: 100px;
 }
 
 .price {
-    color: #F6D25B;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
+  color: #44B87D;
+  font-size: clamp(14px, 1vw, 18px);
+  font-weight: bold;
 }
 
 .time, .dueDate {
-    color: #44B87D;
+    color: #B5C0BB;
    
 }
 .time{

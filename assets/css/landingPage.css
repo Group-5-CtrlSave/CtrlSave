@@ -1,86 +1,8 @@
-/* Landing Page - Kissy */
-
-body {
-    min-height: 100vh;
-    background: #ffffff;
-    position: relative;
-    overflow: hidden;
-}
-
-.wave.top {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 38%;
-    background: url('../img/landing&ads/topImg.png') no-repeat center;
+.bgContainer{
+    min-height: 80dvh;
+    background-image: url("../img/landing&ads/centerImg.svg");
+    background-repeat: no-repeat;
     background-size: cover;
-}
-
-.wave.bottom {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 35%;
-    background: url('../img/landing&ads/bottomImg.png') no-repeat center;
-    background-size: cover;
-}
-
-/* Waves para di putol (landing page)*/
-@media (width: 360px) and (height: 740px) {
-    .wave.top {
-        height: 40%;
-    }
-
-    .wave.bottom {
-        height: 35%;
-    }
-}
-
-/* ADS */
-.wave {
-    position: absolute;
-    width: 100%;
-    height: 92%;
-    background: url('../img/landing&ads/centerImg.png') no-repeat center;
-    background-size: cover;
-}
-
-/* contents visibility */
-.content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-    z-index: 1;
-}
-
-.woman-img {
-    width: 100%;
-    max-width: 500px;
-    margin-bottom: 50px;
-    margin-top: -40px;
-    text-align: center;
-}
-
-.woman-img img {
-    width: 300px;
-    height: auto;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.step-text {
-    font-family: 'Poppins', sans-serif;
-    /*Poppins*/
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #ffffff;
-    margin-top: -40px;
 }
 
 .description {
@@ -88,61 +10,14 @@ body {
     /*Roboto*/
     font-size: 16px;
     color: #ffffff;
-    margin-bottom: 0px;
-    max-width: 80%;
-    margin-top: -10px;
-}
+ 
 
-.next-btn {
-    background-color: #F6D25B;
-    color: black;
-    text-align: center;
-    width: 125px;
-    font-size: 20px;
+}
+.goBtn{
+    background-color: #F6D25B !important;
+    color: black !important;
+    min-width: 125px;
     font-weight: bold;
     font-family: "Poppins", sans-serif;
-    border-radius: 27px;
-    cursor: pointer;
-    text-decoration: none;
-    border: none;
-    margin-top: 10px;
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-}
-
-.next-btn:hover {
-    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
-}
-
-/* Samsung S8+ sizing */
-@media (max-width: 428px) {
-
-    .woman-img {
-        margin-top: -30px;
-    }
-
-    .woman-img img {
-        width: 250px;
-    }
-
-    .step-text {
-        font-size: 20px;
-        margin-top: -45px;
-        margin-bottom: 15px;
-    }
-
-    .description {
-        font-size: 16px;
-        margin-top: -7px;
-        margin-bottom: 12px;
-    }
-
-    .next-btn {
-        font-size: 1.1rem;
-        padding: 8px 16px;
-        bottom: 15px;
-    }
+    border-radius: 20px;
 }
