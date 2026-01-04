@@ -21,7 +21,7 @@ function checkDailyOverspending($userID) {
             $getAllocation = "SELECT ua.userCategoryID, ua.necessityType, ua.limitType, 
                                      ua.value AS allocationValue,
                                      uc.userIsFlexible
-                              FROM tbl_userAllocation ua
+                              FROM tbl_userallocation ua
                               LEFT JOIN tbl_usercategories uc 
                                      ON ua.userCategoryID = uc.userCategoryID
                               WHERE ua.userBudgetRuleID = $userBudgetRuleID";
