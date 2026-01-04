@@ -3,10 +3,30 @@ session_start();
 include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
-if (!isset($_SESSION['userID'])) {
-  header("Location: ../../pages/login&signup/login.php");
-  exit;
+if (!isset($_SESSION['userID']) && isset($_COOKIE['remember_me'])) {
+  $token = hash('sha256', $_COOKIE['remember_me']);
+
+  $getUserTokenQuery = "SELECT u.userID, u.userName, u.email 
+  FROM tbl_usertokens t JOIN tbl_users u ON u.userID = t.userID
+   WHERE t.token = '$token' AND t.expiry > NOW() LIMIT 1";
+  $result = executeQuery($getUserTokenQuery);
+
+  if (mysqli_num_rows($result) > 0){
+    $user = mysqli_fetch_assoc($result);
+
+    $_SESSION['userID'] = $user['userID'];
+    return;
+  }
+  else {
+     setcookie("remember_me", "", time() - 3600, "/");
+
+  }
 }
+if (!isset($_SESSION['userID']) && !isset($_COOKIE['remember_me'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 
 $userID = $_SESSION['userID'];
 
@@ -689,7 +709,7 @@ LIMIT 3
 
         setInterval(showInsight, 3000);
       </script>
-
+      <!-- 
       <script>
         let exitPromptShown = false;
 
@@ -710,7 +730,7 @@ LIMIT 3
             }, 2000);
           }
         };
-      </script>
+      </script> -->
 
 
 </body>

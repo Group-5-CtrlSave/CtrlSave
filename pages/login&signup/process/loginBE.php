@@ -1,7 +1,38 @@
 <?php
 session_start();
-include("../../assets/shared/connect.php");
 
+include("../../assets/shared/connect.php");
+if (!isset($_SESSION['userID']) && isset($_COOKIE['remember_me'])) {
+
+    $token = hash('sha256', $_COOKIE['remember_me']);
+
+    $sql = "
+        SELECT u.userID, u.userName, u.email
+        FROM tbl_usertokens t
+        JOIN tbl_users u ON u.userID = t.userID
+        WHERE t.token = '$token'
+        AND t.expiry > NOW()
+        LIMIT 1
+    ";
+
+    $result = executeQuery($sql);
+
+    if ($result && mysqli_num_rows($result) === 1) {
+        $user = mysqli_fetch_assoc($result);
+
+        $_SESSION['userID'] = $user['userID'];
+        $_SESSION['userName'] = $user['userName'];
+        $_SESSION['email'] = $user['email'];
+    } else {
+        setcookie("remember_me", "", time() - 3600, "/");
+    }
+}
+
+
+if (isset($_SESSION['userID'])) {
+    header("Location: ../home/home.php");
+    exit;
+}
 if (isset($_POST['btnLogin'])) {
 
     $emailUsername = trim($_POST['emailUsername']);
@@ -14,7 +45,7 @@ if (isset($_POST['btnLogin'])) {
 
     // Query user
     $sql = "
-        SELECT userID, userName, email, password
+        SELECT userID, userName, email, password, currencyCode
         FROM tbl_users
         WHERE BINARY email = '$emailUsernameEsc'
            OR BINARY userName = '$emailUsernameEsc'
@@ -123,9 +154,20 @@ if (isset($_POST['btnLogin'])) {
                 }
             }
 
+            // Generate remember token
+            $token = bin2hex(random_bytes(32));
+            $hashedToken = hash('sha256', $token);
+            $expiry = date("Y-m-d H:i:s", strtotime("+30 days"));
+
+            //Save token in database
+            $saveToken = "INSERT INTO tbl_usertokens (userId, token, expiry) VALUES ($userID, '$hashedToken', '$expiry');";
+            $conn -> query($saveToken);
+
+            //Set cookie (30 days)
+            setcookie("remember_me", $token, time() + 30*24*60*60, "/", "", false, true);
+
             // Redirect to home
-            header("Location: ../home/home.php", true, 302);
-            header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+            header("Location: ../home/home.php");
             exit;
 
         } else {
