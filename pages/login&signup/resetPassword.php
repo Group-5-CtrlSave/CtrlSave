@@ -171,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: url('../../assets/img/login&signup/waveUpHalf.png') center top;
+            background: url('../../assets/img/login&signup/waveUpHalf.svg') center top;
             background-size: cover;
             z-index: 2;
         }
