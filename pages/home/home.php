@@ -131,7 +131,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
     }
 
     .price {
-     color: #44B87D !important;
+      color: #44B87D !important;
 
     }
 
@@ -689,6 +689,29 @@ LIMIT 3
 
         setInterval(showInsight, 3000);
       </script>
+
+      <script>
+        let exitPromptShown = false;
+
+        // Push fake history state
+        history.pushState(null, "", location.href);
+
+        window.onpopstate = function () {
+          if (!exitPromptShown) {
+            exitPromptShown = true;
+            alert("Are you sure you want to exit the app?\nPress back again to exit.");
+
+            // Push state again to stay on home
+            history.pushState(null, "", location.href);
+
+            // Reset after 2 seconds
+            setTimeout(() => {
+              exitPromptShown = false;
+            }, 2000);
+          }
+        };
+      </script>
+
 
 </body>
 
