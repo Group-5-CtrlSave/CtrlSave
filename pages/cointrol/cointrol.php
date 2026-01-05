@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 // userID
 $userID = '';
 if (isset($_SESSION['userID'])) {

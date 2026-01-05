@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 include("../../assets/shared/connect.php");
 include("process/challengeProgress.php");
 

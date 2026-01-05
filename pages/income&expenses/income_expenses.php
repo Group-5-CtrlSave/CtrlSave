@@ -8,6 +8,11 @@ error_reporting(E_ALL);
 <?php
 session_start();
 
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 $type = '';
 if (isset($_GET['type'])) {
     $type = $_GET['type'];

@@ -2,6 +2,15 @@
 // Start session
 session_start();
 
+if (isset($_COOKIE['remember_me'])) {
+    $token = hash('sha256', $_COOKIE['remember_me']);
+
+    $deleteTokenQuery = "DELETE FROM tbl_usertokens WHERE token = '$token'";
+    executeQuery($deleteTokenQuery);
+
+    setcookie("remember_me", "", time() - 3600, "/");
+}
+
 // Destroy all session data
 session_unset();
 session_destroy();

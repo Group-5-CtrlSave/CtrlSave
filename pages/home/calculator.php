@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 // Currency from session
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
 $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
