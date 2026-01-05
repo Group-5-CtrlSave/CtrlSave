@@ -26,7 +26,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 ua.limitType,
                 ua.value AS allocationValue,
                 uc.userisFlexible
-            FROM tbl_userAllocation ua
+            FROM tbl_userallocation ua
             LEFT JOIN tbl_usercategories uc 
                 ON ua.userCategoryID = uc.userCategoryID
             WHERE ua.userBudgetRuleID = $userBudgetRuleID

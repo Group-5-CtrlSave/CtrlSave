@@ -29,7 +29,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 
             $allocRes = executeQuery("
                 SELECT value AS allocationValue, limitType
-                FROM tbl_userAllocation
+                FROM tbl_userallocation
                 WHERE userBudgetRuleID = $userBudgetRuleID
                 AND userCategoryID = 0
                 AND necessityType = '$type'
@@ -129,7 +129,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         // ============================
         $customAllocRes = executeQuery("
             SELECT userCategoryID, limitType, value AS allocationValue
-            FROM tbl_userAllocation
+            FROM tbl_userallocation
             WHERE userBudgetRuleID = $userBudgetRuleID
             AND userCategoryID != 0
         ");

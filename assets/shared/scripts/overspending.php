@@ -21,7 +21,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         // ==============================
         $defaultAllocQuery = "
             SELECT necessityType, limitType, value 
-            FROM tbl_userAllocation 
+            FROM tbl_userallocation 
             WHERE userBudgetRuleID = $userBudgetRuleID
             AND userCategoryID = 0
         ";
@@ -107,7 +107,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         // ==============================
         $customAllocQuery = "
             SELECT ua.userCategoryID, ua.necessityType, ua.limitType, ua.value, uc.userisFlexible
-            FROM tbl_userAllocation ua
+            FROM tbl_userallocation ua
             LEFT JOIN tbl_usercategories uc ON ua.userCategoryID = uc.userCategoryID
             WHERE ua.userBudgetRuleID = $userBudgetRuleID
             AND ua.userCategoryID != 0
