@@ -4,7 +4,12 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 ?>
 <?php include("../../assets/shared/connect.php") ?>
-<?php session_start(); ?>
+<?php session_start(); 
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+?>
 
 <?php
 $currencyCode = $_SESSION['currencyCode'] ?? 'PHP';
@@ -169,6 +174,17 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
             alert.close();
         }, 2000); 
     </script>
+
+    <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
+
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("income_expenses.php"); // use replace to avoid stacking history
+    });
+  </script>
 
 
 

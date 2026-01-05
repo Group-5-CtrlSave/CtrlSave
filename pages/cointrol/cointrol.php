@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
 // userID
 $userID = '';
 if (isset($_SESSION['userID'])) {
@@ -382,7 +387,7 @@ if (isset($_SESSION['userID'])) {
                         topCategories.innerHTML = "<b>Your Top Spending Categories for this month:</b><p>" + data.topCategories.join("<br>") + "</p>";
                     }
 
-               
+
                     // Overspending Insight
                     let overSpentCateg = document.getElementById("overSpentCateg");
                     overSpentCateg.innerHTML = "";
@@ -593,6 +598,17 @@ if (isset($_SESSION['userID'])) {
         }
 
         getMonth();
+    </script>
+
+    <script>
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
+
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+            // Redirect to home page
+            location.replace("../../pages/home/home.php"); // use replace to avoid stacking history
+        });
     </script>
 
 

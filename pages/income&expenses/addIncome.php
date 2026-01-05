@@ -4,7 +4,14 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 ?>
 <?php include("../../assets/shared/connect.php"); ?>
-<?php session_start() ?>
+
+<?php session_start();
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../../pages/login&signup/login.php");
+    exit;
+}
+
+?>
 <?php include("process/addincomeprocess.php"); ?>
 
 <?php

@@ -3,10 +3,29 @@ session_start();
 include("../../assets/shared/connect.php");
 date_default_timezone_set('Asia/Manila');
 
-if (!isset($_SESSION['userID'])) {
+if (!isset($_SESSION['userID']) && isset($_COOKIE['remember_me'])) {
+  $token = hash('sha256', $_COOKIE['remember_me']);
+
+  $getUserTokenQuery = "SELECT u.userID, u.userName, u.email 
+  FROM tbl_usertokens t JOIN tbl_users u ON u.userID = t.userID
+   WHERE t.token = '$token' AND t.expiry > NOW() LIMIT 1";
+  $result = executeQuery($getUserTokenQuery);
+
+  if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+
+    $_SESSION['userID'] = $user['userID'];
+    return;
+  } else {
+    setcookie("remember_me", "", time() - 3600, "/");
+
+  }
+}
+if (!isset($_SESSION['userID']) && !isset($_COOKIE['remember_me'])) {
   header("Location: ../../pages/login&signup/login.php");
   exit;
 }
+
 
 $userID = $_SESSION['userID'];
 
@@ -131,7 +150,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
     }
 
     .price {
-     color: #44B87D !important;
+      color: #44B87D !important;
 
     }
 
@@ -689,6 +708,18 @@ LIMIT 3
 
         setInterval(showInsight, 3000);
       </script>
+
+     <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
+
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("home.php"); // use replace to avoid stacking history
+    });
+  </script>
+
 
 </body>
 

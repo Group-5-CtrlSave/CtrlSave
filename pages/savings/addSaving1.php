@@ -19,7 +19,7 @@ $icons = [
     "../../assets/img/shared/categories/expense/Phone.png",
     "../../assets/img/shared/categories/expense/Travel.png",
     "../../assets/img/shared/categories/expense/Car.png",
-    "../../assets/img/shared/categories/expense/Dining out.png",
+    "../../assets/img/shared/categories/expense/Dining Out.png",
     "../../assets/img/shared/categories/expense/Entertainment.png",
     "../../assets/img/shared/categories/expense/House.png",
     "../../assets/img/shared/categories/expense/Party.png",

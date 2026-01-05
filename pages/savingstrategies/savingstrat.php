@@ -58,7 +58,7 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
 <head>
   <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>CtrlSave | Saving Strategies</title>
 
   <!-- Bootstrap -->
@@ -225,16 +225,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
         <div class="container-fluid d-flex align-items-center justify-content-center p-2">
           <button type="button"
-              class="btn custom-btn sortButton allButton <?php echo ($type == 'all') ? 'selected' : '' ?>"
-              onclick="window.location.href='?type=all';"><b>All</b></button>
+            class="btn custom-btn sortButton allButton <?php echo ($type == 'all') ? 'selected' : '' ?>"
+            onclick="window.location.href='?type=all';"><b>All</b></button>
 
           <button type="button"
-              class="btn custom-btn sortButton favoriteButton <?php echo ($type == 'favorite') ? 'selected' : '' ?>"
-              onclick="window.location.href='?type=favorite';"><b>Favorite</b></button>
+            class="btn custom-btn sortButton favoriteButton <?php echo ($type == 'favorite') ? 'selected' : '' ?>"
+            onclick="window.location.href='?type=favorite';"><b>Favorite</b></button>
 
           <button type="button"
-              class="btn custom-btn sortButton archiveButton <?php echo ($type == 'archive') ? 'selected' : '' ?>"
-              onclick="window.location.href='?type=archive';"><b>Archive</b></button>
+            class="btn custom-btn sortButton archiveButton <?php echo ($type == 'archive') ? 'selected' : '' ?>"
+            onclick="window.location.href='?type=archive';"><b>Archive</b></button>
         </div>
       </header>
 
@@ -291,11 +291,14 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
               <!-- Buttons OUTSIDE the clickable card -->
               <div class="resource-actions">
-                <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
-                  <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                <button class="action-btn <?= $isFavorited ? 'active' : '' ?>"
+                  onclick="toggleFavorite(<?= $resourceID ?>);">
+                  <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i>
+                  <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
                 </button>
                 <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
-                  <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                  <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i>
+                  <?= $isArchived ? 'Unarchive' : 'Archive' ?>
                 </button>
               </div>
 
@@ -338,11 +341,15 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
                 <!-- Buttons OUTSIDE the clickable card -->
                 <div class="resource-actions">
-                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
-                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>"
+                    onclick="toggleFavorite(<?= $resourceID ?>);">
+                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i>
+                    <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
                   </button>
-                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
-                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>"
+                    onclick="toggleArchive(<?= $resourceID ?>);">
+                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i>
+                    <?= $isArchived ? 'Unarchive' : 'Archive' ?>
                   </button>
                 </div>
 
@@ -386,11 +393,15 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
 
                 <!-- Buttons OUTSIDE the clickable card -->
                 <div class="resource-actions">
-                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>" onclick="toggleFavorite(<?= $resourceID ?>);">
-                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i> <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
+                  <button class="action-btn <?= $isFavorited ? 'active' : '' ?>"
+                    onclick="toggleFavorite(<?= $resourceID ?>);">
+                    <i class="fa<?= $isFavorited ? '-solid' : '' ?> fa-heart"></i>
+                    <?= $isFavorited ? 'Unfavorite' : 'Favorite' ?>
                   </button>
-                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>" onclick="toggleArchive(<?= $resourceID ?>);">
-                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i> <?= $isArchived ? 'Unarchive' : 'Archive' ?>
+                  <button class="action-btn <?= $isArchived ? 'active' : '' ?>"
+                    onclick="toggleArchive(<?= $resourceID ?>);">
+                    <i class="fa<?= $isArchived ? '-solid' : '' ?> fa-box-archive"></i>
+                    <?= $isArchived ? 'Unarchive' : 'Archive' ?>
                   </button>
                 </div>
 
@@ -478,6 +489,16 @@ $percentage = $totalResources > 0 ? round(($completed / $totalResources) * 100) 
       });
     });
   </script>
+   <script>
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
+
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+            // Redirect to home page
+            location.replace("../../pages/home/home.php"); // use replace to avoid stacking history
+        });
+    </script>
 
 </body>
 
