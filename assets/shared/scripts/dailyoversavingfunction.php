@@ -19,7 +19,7 @@ function checkDailyOversaving($userID) {
 
             // Get allocation rows
             $getAllocation = "SELECT userCategoryID, necessityType, limitType, value as allocationValue
-                              FROM tbl_userAllocation 
+                              FROM tbl_userallocation 
                               WHERE userBudgetRuleID = $userBudgetRuleID";
             $allocationResult = executeQuery($getAllocation);
 
