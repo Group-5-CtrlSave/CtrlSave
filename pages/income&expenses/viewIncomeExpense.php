@@ -170,6 +170,17 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
         }, 2000); 
     </script>
 
+    <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
+
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("income_expenses.php"); // use replace to avoid stacking history
+    });
+  </script>
+
 
 
 </body>

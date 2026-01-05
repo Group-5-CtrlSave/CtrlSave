@@ -184,7 +184,7 @@ if (file_exists($imageServerPath)) {
 
     <button class="btn rounded-pill mb-3 align-self-end me-2 position-relative"
       style="background-color:#F6D25B; border-color:#F6D25B; color:#000;"
-      onclick="window.location.href='achievements.php'">
+      onclick="window.location.href='Achievements.php'">
       <i class="bi bi-trophy"></i> Claim Achievements
       <?php if ($unclaimedCount > 0): ?>
         <i class="fa-solid fa-circle text-danger" style="font-size: 10px; position: absolute; top: 1px; left: 0px;"></i>
