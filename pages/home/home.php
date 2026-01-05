@@ -302,7 +302,8 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
         </div>
 
         <!-- Income & Expense Items -->
-        <div class="scrollable-container mt-4" style="margin-top: 160px !important;">
+
+        <div class="container-fluid" style="margin-top: 160px">
           <div class="row justify-content-center">
 
             <?php
@@ -420,8 +421,12 @@ LIMIT 3
 
                       <!-- Text -->
                       <div class="container categoryTextContainer p-1">
-                        <p class="category m-0"><b><?php echo $item['categoryName']; ?></b></p>
-                        <p class="notes m-0">Notes: <?php echo $item['note']; ?></p>
+                        <p class="category m-0"><b>
+                            <?php echo $item['categoryName']; ?>
+                          </b></p>
+                        <p class="notes m-0">Notes:
+                          <?php echo $item['note']; ?>
+                        </p>
                       </div>
 
                       <!-- Price + Time -->
@@ -437,7 +442,9 @@ LIMIT 3
                         </h5>
 
                         <p class="time m-0">
-                          <b><?php echo formatDateTimeDisplay($item['dateCreated'], $item['dueDate']); ?></b>
+                          <b>
+                            <?php echo formatDateTimeDisplay($item['dateCreated'], $item['dueDate']); ?>
+                          </b>
                         </p>
 
                       </div>
@@ -468,7 +475,12 @@ LIMIT 3
 
 
           </div>
+
         </div>
+
+
+
+
 
         <!-- Recommendation Card -->
         <?php
@@ -709,16 +721,16 @@ LIMIT 3
         setInterval(showInsight, 3000);
       </script>
 
-     <script>
-    // Push a fake history state so back swipe hits this first
-    history.pushState(null, "", location.href);
+      <script>
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
 
-    // Handle back swipe / back button
-    window.addEventListener("popstate", function (event) {
-      // Redirect to home page
-      location.replace("home.php"); // use replace to avoid stacking history
-    });
-  </script>
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+          // Redirect to home page
+          location.replace("home.php"); // use replace to avoid stacking history
+        });
+      </script>
 
 
 </body>
