@@ -709,7 +709,7 @@ LIMIT 3
 
         setInterval(showInsight, 3000);
       </script>
-      <!-- 
+      
       <script>
         let exitPromptShown = false;
 
@@ -730,7 +730,7 @@ LIMIT 3
             }, 2000);
           }
         };
-      </script> -->
+      </script>
 
 
 </body>
