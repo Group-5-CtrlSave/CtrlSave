@@ -11,20 +11,19 @@ if (!isset($_SESSION['userID']) && isset($_COOKIE['remember_me'])) {
    WHERE t.token = '$token' AND t.expiry > NOW() LIMIT 1";
   $result = executeQuery($getUserTokenQuery);
 
-  if (mysqli_num_rows($result) > 0){
+  if (mysqli_num_rows($result) > 0) {
     $user = mysqli_fetch_assoc($result);
 
     $_SESSION['userID'] = $user['userID'];
     return;
-  }
-  else {
-     setcookie("remember_me", "", time() - 3600, "/");
+  } else {
+    setcookie("remember_me", "", time() - 3600, "/");
 
   }
 }
 if (!isset($_SESSION['userID']) && !isset($_COOKIE['remember_me'])) {
-    header("Location: ../../pages/login&signup/login.php");
-    exit;
+  header("Location: ../../pages/login&signup/login.php");
+  exit;
 }
 
 
@@ -709,27 +708,16 @@ LIMIT 3
 
         setInterval(showInsight, 3000);
       </script>
-      
-      <script>
-        let exitPromptShown = false;
 
-        // Push fake history state
+      <script>
+        // Push a fake history state so back swipe hits this first
         history.pushState(null, "", location.href);
 
-        window.onpopstate = function () {
-          if (!exitPromptShown) {
-            exitPromptShown = true;
-            alert("Are you sure you want to exit the app?\nPress back again to exit.");
-
-            // Push state again to stay on home
-            history.pushState(null, "", location.href);
-
-            // Reset after 2 seconds
-            setTimeout(() => {
-              exitPromptShown = false;
-            }, 2000);
-          }
-        };
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+          // Redirect to home
+          window.location.href = "/pages/home/home.php";
+        });
       </script>
 
 
