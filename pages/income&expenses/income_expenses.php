@@ -269,7 +269,7 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
         // Handle back swipe / back button
         window.addEventListener("popstate", function (event) {
             // Redirect to home page
-            location.replace("/pages/home/home.php"); // use replace to avoid stacking history
+            location.replace("../../pages/home/home.php"); // use replace to avoid stacking history
         });
     </script>
 

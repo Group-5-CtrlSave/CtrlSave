@@ -247,15 +247,15 @@ function formatTimeAgo($datetime)
   </script>
 
   <script>
-    // Push a fake history state so back swipe hits this first
-    history.pushState(null, "", location.href);
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
 
-    // Handle back swipe / back button
-    window.addEventListener("popstate", function (event) {
-      // Redirect to home page
-      location.replace("/pages/home/home.php"); // use replace to avoid stacking history
-    });
-  </script>
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+            // Redirect to home page
+            location.replace("../../pages/home/home.php"); // use replace to avoid stacking history
+        });
+    </script>
 </body>
 
 </html>
