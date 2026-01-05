@@ -383,7 +383,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         <form method="POST" action="">
           <div class="modal-header border-0 bg-white rounded-top">
             <button type="button" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">
-              <img src="../../assets/img/shared/backArrow.png" alt="Back" style="width: 24px; height: 24px;">
+              <img src="../../assets/img/shared/BackArrow.png" alt="Back" style="width: 24px; height: 24px;">
             </button>
             <h5 class="modal-title mx-auto fw-bold">Edit Goal</h5>
             <div style="width: 24px;"></div>
