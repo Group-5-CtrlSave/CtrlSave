@@ -7,6 +7,7 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
   <link rel="icon" href="../../assets/img/shared/logo_s.png">
   <link rel="stylesheet" href="../../assets/css/calculator.css?v=3">
 </head>
+
 <body>
 
   <!-- Top Navbar -->
@@ -23,7 +25,7 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
       <img src="../../assets/img/shared/backArrow.png" alt="Back">
     </a>
     <h1 class="calculator-title mb-0 text-center flex-grow-1">Calculator</h1>
-    <div style="width: 25px;"></div> 
+    <div style="width: 25px;"></div>
   </nav>
 
   <!-- Calculator Card -->
@@ -97,5 +99,16 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
       }
     }
   </script>
+  <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
+
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("/pages/home/home.php"); // use replace to avoid stacking history
+    });
+  </script>
 </body>
+
 </html>

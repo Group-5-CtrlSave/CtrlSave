@@ -165,10 +165,10 @@ $result = mysqli_query($conn, $query);
             $progress = 0;
           }
           $progress = min(100, max(0, $progress));
-          
+
           // Use floor to only show 100% when truly complete
           $displayProgress = floor($progress);
-          
+
           $iconFile = trim($row['icon'] ?? '');
           $iconFileEsc = $iconFile !== '' ? htmlspecialchars($iconFile) : "Default.png";
           $icon = "../../assets/img/shared/categories/expense/" . $iconFileEsc;
@@ -183,7 +183,8 @@ $result = mysqli_query($conn, $query);
                 <div class="flex-grow-1">
                   <p class="mb-0 fw-semibold text-dark text-truncate"><?= $goalName ?></p>
                   <p class="mb-1 small text-truncate" style="margin-bottom: 4px;">
-                    <span class="fw-semibold" style="color: #44B87D;"><?= $symbol . number_format($currentAmount, 2) ?></span>
+                    <span class="fw-semibold"
+                      style="color: #44B87D;"><?= $symbol . number_format($currentAmount, 2) ?></span>
                     <span class="text-muted"> / <?= $symbol . number_format($targetAmount, 2) ?></span>
                   </p>
                   <div class="progress" style="height: 8px; background-color: #e9ecef; width: 150px;">
@@ -234,16 +235,18 @@ $result = mysqli_query($conn, $query);
   </a>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-      <script>
-        // Push a fake history state so back swipe hits this first
-        history.pushState(null, "", location.href);
+  <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
 
-        // Handle back swipe / back button
-        window.addEventListener("popstate", function (event) {
-            // Redirect to home
-            window.location.href = "/pages/home/home.php";
-        });
-    </script>
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("/pages/home/home.php"); // use replace to avoid stacking history
+    });
+  </script>
+
+
 </body>
 
 </html>

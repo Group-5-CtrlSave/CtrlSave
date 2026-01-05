@@ -34,7 +34,7 @@ $budgetRuleResult = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $hasSuggestedRule = false;
-$hasCustomRule   = false;
+$hasCustomRule = false;
 
 if ($budgetRuleResult) {
     // Check if the rule name matches any default budget rules (suggested rules)
@@ -46,7 +46,7 @@ if ($budgetRuleResult) {
     $stmtCheck->close();
 
     $hasSuggestedRule = ($checkResult['count'] > 0);
-    $hasCustomRule    = !$hasSuggestedRule; // If not suggested, it's custom
+    $hasCustomRule = !$hasSuggestedRule; // If not suggested, it's custom
 }
 
 // Handle form submissions
@@ -208,12 +208,12 @@ $stmt->close();
 
 // Cards - disable based on which rule type is active
 $cards = [
-    ["title" => "Currency",            "desc" => "Select your preferred currency",           "modal" => "currency"],
-    ["title" => "Needs & Wants",       "desc" => "Manage spending categories",              "modal" => "needsWants"],
-    ["title" => "Track or Limit",      "desc" => "Manage Flexibility of your categories",   "modal" => "flexibility"],
-    ["title" => "Budget Rule",         "desc" => "Change preferred budgeting method",       "modal" => "budgetRule"],
-    ["title" => "Suggested Budget Rule","desc" => "Recommended budgeting method for you",   "link"  => "suggestedBudgetrule.php", "disabled" => $hasCustomRule],
-    ["title" => "Custom Budget Rule",  "desc" => "Create your own budgeting method",        "link"  => "customBudgetrule.php",    "disabled" => $hasSuggestedRule]
+    ["title" => "Currency", "desc" => "Select your preferred currency", "modal" => "currency"],
+    ["title" => "Needs & Wants", "desc" => "Manage spending categories", "modal" => "needsWants"],
+    ["title" => "Track or Limit", "desc" => "Manage Flexibility of your categories", "modal" => "flexibility"],
+    ["title" => "Budget Rule", "desc" => "Change preferred budgeting method", "modal" => "budgetRule"],
+    ["title" => "Suggested Budget Rule", "desc" => "Recommended budgeting method for you", "link" => "suggestedBudgetrule.php", "disabled" => $hasCustomRule],
+    ["title" => "Custom Budget Rule", "desc" => "Create your own budgeting method", "link" => "customBudgetrule.php", "disabled" => $hasSuggestedRule]
 ];
 ?>
 <!DOCTYPE html>
@@ -235,6 +235,7 @@ $cards = [
             opacity: 0.5;
             cursor: not-allowed;
         }
+
         .settings-card.disabled .btn {
             pointer-events: none;
             opacity: 0.6;
@@ -454,6 +455,16 @@ $cards = [
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
+
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+            // Redirect to home page
+            location.replace("/pages/home/home.php"); // use replace to avoid stacking history
+        });
+    </script>
 </body>
 
 </html>
