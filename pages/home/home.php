@@ -709,16 +709,16 @@ LIMIT 3
         setInterval(showInsight, 3000);
       </script>
 
-      <script>
-        // Push a fake history state so back swipe hits this first
-        history.pushState(null, "", location.href);
+     <script>
+    // Push a fake history state so back swipe hits this first
+    history.pushState(null, "", location.href);
 
-        // Handle back swipe / back button
-        window.addEventListener("popstate", function (event) {
-          // Redirect to home, replacing history so user can't go back again
-          location.replace("../../index.php");
-        });
-      </script>
+    // Handle back swipe / back button
+    window.addEventListener("popstate", function (event) {
+      // Redirect to home page
+      location.replace("/pages/home/home.php"); // use replace to avoid stacking history
+    });
+  </script>
 
 
 </body>
