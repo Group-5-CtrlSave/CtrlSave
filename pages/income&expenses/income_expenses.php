@@ -166,44 +166,44 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
                     if ($type == 'all' || $entry['type'] == $type) {
                         ?>
                         <a style="text-decoration: none; color: black;"
-                        href="viewIncomeExpense.php?type=<?php echo $entry['type'] ?>&id=<?php echo $entry[$entry['type'] . '' . 'ID'] ?>">
+                            href="viewIncomeExpense.php?type=<?php echo $entry['type'] ?>&id=<?php echo $entry[$entry['type'] . '' . 'ID'] ?>">
 
-                        <div class="container ieContainer my-3">
-                            <div class="row ieRow">
-                                <div class="col-4  d-flex justify-content-center align-items-center">
-                                    <img class="img-fluid"
-                                        src="../../assets/img/shared/categories/<?php echo $entry['type']; ?>/<?php echo $entry['icon'] ?>">
-                                </div>
-                                <div class="col-4    d-flex flex-column justify-content-center text-start">
-                                    <p class="category m-0"><b>
-                                            <?php echo $entry['categoryName'] ?>
-                                        </b></p>
-                                    <p class="notes m-0">Notes:
-                                        <?php echo $entry['note'] ?>
-                                    </p>
-
-                                </div>
-                                <div class="col-4 d-flex flex-column justify-content-center text-end">
-                                    <p class="price text-truncate m-0 ">
-                                        <?php
-                                        echo ($entry['type'] == 'income' ? '+ ' : '- ') . $currencySymbol . number_format($entry['amount'], 2);
-                                        ?>
-                
-                                    </p>
-                                    <?php if ($entry['type'] == 'expense' && $entry['dueDate'] != '') { ?>
-                                        <p class="dueDate m-0">
-                                            Due Date:
+                            <div class="container ieContainer my-3">
+                                <div class="row ieRow">
+                                    <div class="col-4  d-flex justify-content-center align-items-center">
+                                        <img class="img-fluid"
+                                            src="../../assets/img/shared/categories/<?php echo $entry['type']; ?>/<?php echo $entry['icon'] ?>">
+                                    </div>
+                                    <div class="col-4    d-flex flex-column justify-content-center text-start">
+                                        <p class="category m-0"><b>
+                                                <?php echo $entry['categoryName'] ?>
+                                            </b></p>
+                                        <p class="notes m-0">Notes:
+                                            <?php echo $entry['note'] ?>
                                         </p>
-                                        <?php
-                                    } ?>
-                                    <p class="time m-0 p-0" id='time' <?php echo ($entry['type'] == 'income') ? 'data-datetime="' . $entry['dateReceived'] . '"' : (empty($entry['dueDate']) ? 'data-datetime="' . $entry['dateSpent'] . '"' : 'data-duedate="' . $entry['dueDate'] . '"') ?>>
 
-                                    </p>
+                                    </div>
+                                    <div class="col-4 d-flex flex-column justify-content-center text-end">
+                                        <p class="price text-truncate m-0 ">
+                                            <?php
+                                            echo ($entry['type'] == 'income' ? '+ ' : '- ') . $currencySymbol . number_format($entry['amount'], 2);
+                                            ?>
+
+                                        </p>
+                                        <?php if ($entry['type'] == 'expense' && $entry['dueDate'] != '') { ?>
+                                            <p class="dueDate m-0">
+                                                Due Date:
+                                            </p>
+                                            <?php
+                                        } ?>
+                                        <p class="time m-0 p-0" id='time' <?php echo ($entry['type'] == 'income') ? 'data-datetime="' . $entry['dateReceived'] . '"' : (empty($entry['dueDate']) ? 'data-datetime="' . $entry['dateSpent'] . '"' : 'data-duedate="' . $entry['dueDate'] . '"') ?>>
+
+                                        </p>
 
 
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </a>
 
                         <?php
@@ -261,6 +261,17 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
             var alert = new bootstrap.Alert(alertElement);
             alert.close();
         }, 2000); 
+    </script>
+
+    <script>
+        // Push a fake history state so back swipe hits this first
+        history.pushState(null, "", location.href);
+
+        // Handle back swipe / back button
+        window.addEventListener("popstate", function (event) {
+            // Redirect to home
+            window.location.href = "/pages/home/home.php";
+        });
     </script>
 
 
