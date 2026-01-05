@@ -715,8 +715,8 @@ LIMIT 3
 
         // Handle back swipe / back button
         window.addEventListener("popstate", function (event) {
-          // Redirect to home
-          window.location.href = "../../index.php";
+          // Redirect to home, replacing history so user can't go back again
+          location.replace("../../index.php");
         });
       </script>
 
