@@ -149,7 +149,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         // ===============================
         // Default allocations
         $defaultAllocQuery = "SELECT necessityType, limitType, value 
-                              FROM tbl_userAllocation 
+                              FROM tbl_userallocation 
                               WHERE userBudgetRuleID = $userBudgetRuleID
                               AND userCategoryID = 0";
         $defaultAllocRes = executeQuery($defaultAllocQuery);
@@ -212,7 +212,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 
         // Custom allocations
         $customAllocQuery = "SELECT ua.userCategoryID, ua.necessityType, ua.limitType, ua.value, uc.userisFlexible, uc.categoryName
-                             FROM tbl_userAllocation ua
+                             FROM tbl_userallocation ua
                              LEFT JOIN tbl_usercategories uc ON ua.userCategoryID = uc.userCategoryID
                              WHERE ua.userBudgetRuleID = $userBudgetRuleID
                              AND ua.userCategoryID != 0";
@@ -278,7 +278,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
                 ua.value AS allocationValue,
                 uc.userisFlexible,
                 uc.categoryName
-            FROM tbl_userAllocation ua
+            FROM tbl_userallocation ua
             LEFT JOIN tbl_usercategories uc 
                 ON ua.userCategoryID = uc.userCategoryID
             WHERE ua.userBudgetRuleID = $userBudgetRuleID
@@ -474,7 +474,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 
             $allocRes = executeQuery("
                 SELECT value AS allocationValue, limitType
-                FROM tbl_userAllocation
+                FROM tbl_userallocation
                 WHERE userBudgetRuleID = $userBudgetRuleID
                 AND userCategoryID = 0
                 AND necessityType = '$type'
@@ -576,7 +576,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
         // ============================
         $customAllocRes = executeQuery("
             SELECT userCategoryID, limitType, value AS allocationValue
-            FROM tbl_userAllocation
+            FROM tbl_userallocation
             WHERE userBudgetRuleID = $userBudgetRuleID
             AND userCategoryID != 0
         ");
