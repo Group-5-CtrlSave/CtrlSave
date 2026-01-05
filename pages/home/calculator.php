@@ -27,7 +27,7 @@ $symbol = ($currencyCode === 'PHP') ? '₱' : '$';
   <!-- Top Navbar -->
   <nav class="d-flex align-items-center justify-content-between px-3">
     <a href="../home/home.php" class="text-decoration-none d-flex align-items-center">
-      <img src="../../assets/img/shared/backArrow.png" alt="Back">
+      <img src="../../assets/img/shared/BackArrow.png" alt="Back">
     </a>
     <h1 class="calculator-title mb-0 text-center flex-grow-1">Calculator</h1>
     <div style="width: 25px;"></div>
