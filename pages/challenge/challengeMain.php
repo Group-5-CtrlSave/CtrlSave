@@ -534,7 +534,7 @@ if ($userID) {
 
         <div style="text-align:center; margin-bottom:20px;">
             <div style="position:relative; display:inline-block;">
-                <img src="../../assets/img/challenge/alkansya.png" alt="Alkansya" style="width:100px;">
+                <img src="../../assets/img/challenge/alkansya.svg" alt="Alkansya" style="width:100px;">
 
                 <!-- Dynamic total -->
                 <div id="totalSaved" style="position:absolute; top:70%; left:48%; transform:translate(-50%,-50%);
