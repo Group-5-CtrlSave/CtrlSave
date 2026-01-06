@@ -303,7 +303,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
 
         <!-- Income & Expense Items -->
 
-        <div class="container-fluid" style="margin-top: 160px; margin-bottom: 50px;">
+        <div class="container-fluid" style="margin-top: 160px; margin-bottom: 100px;">
           <div class="row justify-content-center">
 
             <?php
