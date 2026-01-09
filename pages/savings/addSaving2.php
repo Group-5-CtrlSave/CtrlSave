@@ -23,23 +23,28 @@ $createdAt = date('Y-m-d H:i:s');
 $goalName = $_SESSION['goalName'] ?? '';
 $goalIcon = $_SESSION['goalIcon'] ?? '';
 
+
+$currentMonth = date('m');
+$currentYear  = date('Y');
+
+
 $iconFilename = basename($goalIcon);
 $displayIconRel = $iconFilename ? "../../assets/img/shared/categories/expense/" . $iconFilename : '';
 
 // Get user's total income
-$incomeQuery = "SELECT SUM(amount) AS totalIncome FROM tbl_income WHERE userID = '$userID'";
+$incomeQuery = "SELECT SUM(amount) AS totalIncome FROM tbl_income WHERE userID = '$userID' AND MONTH(dateReceived) = '$currentMonth' AND YEAR(dateReceived) = '$currentYear' AND isDeleted = 0";
 $incomeResult = mysqli_query($conn, $incomeQuery);
 $incomeRow = mysqli_fetch_assoc($incomeResult);
 $totalIncome = $incomeRow['totalIncome'] !== null ? $incomeRow['totalIncome'] : 0;
 
 // Get user's total expense
-$expenseQuery = "SELECT SUM(amount) AS totalExpense FROM tbl_expense WHERE userID = '$userID'";
+$expenseQuery = "SELECT SUM(amount) AS totalExpense FROM tbl_expense WHERE userID = '$userID' AND MONTH(dateSpent) = '$currentMonth' AND YEAR(dateSpent) = '$currentYear' AND isDeleted = 0";
 $expenseResult = mysqli_query($conn, $expenseQuery);
 $expenseRow = mysqli_fetch_assoc($expenseResult);
 $totalExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
 
 // Get total amount in ALL savings goals
-$savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID'";
+$savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID' AND MONTH(createdAt) = '$currentMonth' AND YEAR(createdAt) = '$currentYear' AND status != 'Deleted'";
 $savingsResult = mysqli_query($conn, $savingsQuery);
 $savingsRow = mysqli_fetch_assoc($savingsResult);
 $totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings'] : 0;

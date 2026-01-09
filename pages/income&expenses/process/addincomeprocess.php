@@ -43,8 +43,8 @@ if (isset($_POST['addIncome']) && $_POST['amount'] != 0){
         $totalIncome = (float)$row['totalIncome'];
     }
 
-    $createNewBudgetVersionQuery = "INSERT INTO `tbl_userbudgetversion`(`versionNumber`, `userID`, `userBudgetRuleID`, `totalIncome`, `isActive`) 
-    VALUES ($versionNumber + 1,'$userID','$userBudgetRuleID',$totalIncome + $amount, '1')";
+    $createNewBudgetVersionQuery = "INSERT INTO `tbl_userbudgetversion`(`versionNumber`, `userID`, `userBudgetRuleID`, `totalIncome`, `totalExpense`, `isActive`) 
+    VALUES ($versionNumber + 1,'$userID','$userBudgetRuleID',$totalIncome + $amount, 0, '1')";
     executeQuery($createNewBudgetVersionQuery);
 
     $_SESSION['userBudgetVersionID'] = mysqli_insert_id($conn) ?? $userBudgetversionID; 

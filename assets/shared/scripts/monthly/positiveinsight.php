@@ -1,5 +1,5 @@
 <?php
-include("../connect.php");
+include("../../connect.php");
 
 // Monthly mode
 $startDate = date('Y-m-01');

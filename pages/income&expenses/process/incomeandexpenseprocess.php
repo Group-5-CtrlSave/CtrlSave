@@ -20,7 +20,7 @@ $getIncomeQuery = "SELECT tbl_income.incomeID, tbl_income.amount, tbl_income.dat
 FROM tbl_income 
 LEFT JOIN tbl_usercategories 
 ON tbl_income.userCategoryID = tbl_usercategories.userCategoryID 
-WHERE tbl_income.userID = $userID";
+WHERE tbl_income.userID = $userID AND isDeleted = 0";
 
 $incomeResult = executeQuery($getIncomeQuery);
 
@@ -30,7 +30,7 @@ $incomeResult = executeQuery($getIncomeQuery);
 $getExpenseQuery = "SELECT tbl_expense.expenseID, tbl_expense.amount, tbl_expense.dateSpent, tbl_expense.dueDate, tbl_expense.isRecurring, tbl_usercategories.userCategoryID ,tbl_expense.note, tbl_expense.recurringID, tbl_usercategories.categoryName, tbl_usercategories.icon, tbl_usercategories.type   
 FROM tbl_expense LEFT JOIN tbl_usercategories 
 ON tbl_expense.userCategoryID = tbl_usercategories.userCategoryID 
-WHERE tbl_expense.userID = $userID";
+WHERE tbl_expense.userID = $userID AND isDeleted = 0";
 
 $expenseResult = executeQuery($getExpenseQuery);
 

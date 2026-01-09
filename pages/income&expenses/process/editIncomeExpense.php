@@ -1,3 +1,6 @@
+<?php include('../../assets/shared/scripts/daily/generateDailyOverspendingInsights.php') ?>
+
+
 <?php
 // Get Frequency 
 $expenseFrequency = '';
@@ -48,11 +51,12 @@ if (isset($_POST['btnPaid'])) {
 if (isset($_POST["btnDelete"])) {
     switch ($type) {
         case "income":
-            $deleteIncomeQuery = "DELETE FROM `tbl_income` WHERE incomeID = $id and userID = $userID";
-            executeQuery($deleteIncomeQuery);
+            $softDeleteIncomeQuery = "UPDATE `tbl_income` SET `isDeleted`='1' WHERE incomeID = $id and userID = $userID";
 
-             $totalUserIncome = 0;
-            $getTotalIncome = "SELECT SUM(`amount`) as income FROM `tbl_income` WHERE userID = $userID";
+            executeQuery($softDeleteIncomeQuery);
+
+            $totalUserIncome = 0;
+            $getTotalIncome = "SELECT SUM(`amount`) as income FROM `tbl_income` WHERE userID = $userID AND isDeleted = 0";
             $totalIncomeResult = executeQuery($getTotalIncome);
             if (mysqli_num_rows($totalIncomeResult)) {
                 $row = mysqli_fetch_assoc($totalIncomeResult);
@@ -62,18 +66,36 @@ if (isset($_POST["btnDelete"])) {
             $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalIncome`='$totalUserIncome' WHERE userID = $userID and isActive = 1";
             executeQuery($updateBudgetVersionQuery);
 
+            generateDailyOverspendingInsights();
 
             $_SESSION["successtag"] = "Income Successfully Deleted!";
             header("Location: income_expenses.php");
             break;
 
         case "expense":
+
             $deleteRecurringTransactionQuery = "DELETE FROM tbl_recurringtransactions WHERE recurringID = $recurringID AND userID = $userID";
             executeQuery($deleteRecurringTransactionQuery);
-            $deleteExpenseQuery = "DELETE FROM `tbl_expense` WHERE expenseID = $id and userID = $userID";
+
+            $deleteExpenseQuery = "UPDATE `tbl_expense` SET `isDeleted`='1' WHERE expenseID = $id and userID = $userID";
+            executeQuery($deleteExpenseQuery);
+
+            $getTotalExpense = "SELECT SUM(`amount`) as expense FROM `tbl_expense` WHERE userID = $userID AND isDeleted = 0";
+            $totalExpenseResult = executeQuery($getTotalExpense);
+            if (mysqli_num_rows($totalExpenseResult)) {
+                $row = mysqli_fetch_assoc($totalExpenseResult);
+                $totalUserExpense = $row['expense'];
+
+            }
+
+            $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalExpense`='$totalUserExpense' WHERE userID = $userID and isActive = 1";
+            executeQuery($updateBudgetVersionQuery);
+
+            generateDailyOverspendingInsights();
+
             $_SESSION['successtag'] = "Expense Succesfully Deleted";
             header("Location: income_expenses.php");
-            executeQuery($deleteExpenseQuery);
+
             break;
     }
 }
@@ -101,7 +123,7 @@ if (isset($_POST['saveButton'])) {
             executeQuery($updateIncomeQuery);
 
             $totalUserIncome = 0;
-            $getTotalIncome = "SELECT SUM(`amount`) as income FROM `tbl_income` WHERE userID = $userID";
+            $getTotalIncome = "SELECT SUM(`amount`) as income FROM `tbl_income` WHERE userID = $userID AND isDeleted = 0";
             $totalIncomeResult = executeQuery($getTotalIncome);
             if (mysqli_num_rows($totalIncomeResult)) {
                 $row = mysqli_fetch_assoc($totalIncomeResult);
@@ -111,9 +133,8 @@ if (isset($_POST['saveButton'])) {
             $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalIncome`='$totalUserIncome' WHERE userID = $userID and isActive = 1";
             executeQuery($updateBudgetVersionQuery);
 
+            generateDailyOverspendingInsights();
             header("Location: viewIncomeExpense.php?type=income&id=$id");
-
-
 
 
             break;
@@ -222,7 +243,21 @@ if (isset($_POST['saveButton'])) {
             }
 
 
+
             executeQuery($udpateExpenseQuery);
+
+             $getTotalExpense = "SELECT SUM(`amount`) as expense FROM `tbl_expense` WHERE userID = $userID AND isDeleted = 0";
+            $totalExpenseResult = executeQuery($getTotalExpense);
+            if (mysqli_num_rows($totalExpenseResult)) {
+                $row = mysqli_fetch_assoc($totalExpenseResult);
+                $totalUserExpense = $row['expense'];
+
+            }
+
+            $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalExpense`='$totalUserExpense' WHERE userID = $userID and isActive = 1";
+            executeQuery($updateBudgetVersionQuery);
+
+            generateDailyOverspendingInsights();
 
             header("Location: viewIncomeExpense.php?type=expense&id=$id");
             break;

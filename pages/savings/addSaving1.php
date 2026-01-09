@@ -15,21 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $icons = [
-    "../../assets/img/shared/categories/expense/Savings.png",
-    "../../assets/img/shared/categories/expense/Phone.png",
-    "../../assets/img/shared/categories/expense/Travel.png",
-    "../../assets/img/shared/categories/expense/Car.png",
-    "../../assets/img/shared/categories/expense/Dining Out.png",
-    "../../assets/img/shared/categories/expense/Entertainment.png",
-    "../../assets/img/shared/categories/expense/House.png",
-    "../../assets/img/shared/categories/expense/Party.png",
-    "../../assets/img/shared/categories/expense/Transportation.png",
-    "../../assets/img/shared/categories/expense/Gift.png",
-    "../../assets/img/shared/categories/expense/Clothes.png",
-    "../../assets/img/shared/categories/expense/Tuition.png",
-    "../../assets/img/shared/categories/expense/School Needs.png",
-    "../../assets/img/shared/categories/expense/Internet Connection.png",
-    "../../assets/img/shared/categories/expense/Shopping.png"
+    "../../assets/img/shared/categories/expense/Savings.svg",
+    "../../assets/img/shared/categories/expense/Phone.svg",
+    "../../assets/img/shared/categories/expense/Travel.svg",
+    "../../assets/img/shared/categories/expense/Car.svg",
+    "../../assets/img/shared/categories/expense/Dining Out.svg",
+    "../../assets/img/shared/categories/expense/Entertainment.svg",
+    "../../assets/img/shared/categories/expense/House.svg",
+    "../../assets/img/shared/categories/expense/Party.svg",
+    "../../assets/img/shared/categories/expense/Transportation.svg",
+    "../../assets/img/shared/categories/expense/Gift.svg",
+    "../../assets/img/shared/categories/expense/Clothes.svg",
+    "../../assets/img/shared/categories/expense/Tuition.svg",
+    "../../assets/img/shared/categories/expense/School Needs.svg",
+    "../../assets/img/shared/categories/expense/Internet Connection.svg",
+    "../../assets/img/shared/categories/expense/Shopping.svg"
 ];
 ?>
 <!DOCTYPE html>

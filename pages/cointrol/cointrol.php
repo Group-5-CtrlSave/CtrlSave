@@ -18,7 +18,7 @@ if (isset($_SESSION['userID'])) {
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Cointrol</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
@@ -116,12 +116,66 @@ if (isset($_SESSION['userID'])) {
 
                 </div>
 
+                <!-- Unallocated Budget -->
+                 <div class="container my-3" id="unallocatedBudget">
+
+                </div>
 
                 <!-- Top Spending Category -->
 
                 <div class="container my-3" id="topSpendingCateg">
 
                 </div>
+
+                
+
+                <!-- No Overspending (Positive) -->
+
+                <div class="container my-3" id="noOverSpendingMessage">
+
+                </div>
+                
+
+                <div class="container my-3" id="noOverSpending">
+
+                </div>
+
+                <!-- Overspending (Negative) -->
+
+                <div class="container my-3" id="overSpendingMessage">
+
+                </div>
+
+                <div class="container my-3" id="overSpending">
+
+                </div>
+
+                <!-- No Saving Category -->
+
+                <div class="container my-3" id="noSaving">
+
+                </div>
+
+                <!-- Positive Saving -->
+                 
+                <div class="container my-3" id="positiveSaving">
+
+                </div>
+
+                   <!-- Correlation of Categories -->
+                <div class="container my-3" id="correlationInsight">
+
+                </div>
+
+
+                <!-- Correlation of Categories -->
+                <div class="container my-3" id="recommendation">
+
+                </div>
+
+             
+
+
 
                 <!-- Positive Category -->
 
@@ -140,17 +194,10 @@ if (isset($_SESSION['userID'])) {
 
 
 
-                <!-- Positive Category -->
+       
 
-                <div class="container my-3" id="positiveSaving">
 
-                </div>
-
-                <!-- No Saving Category -->
-
-                <div class="container my-3" id="noSaving">
-
-                </div>
+        
 
 
 
@@ -166,16 +213,7 @@ if (isset($_SESSION['userID'])) {
                 </div>
 
 
-                <!-- Correlation of Categories -->
-                <div class="container my-3" id="correlationInsight">
-
-                </div>
-
-
-                <!-- Correlation of Categories -->
-                <div class="container my-3" id="recommendation">
-
-                </div>
+             
 
 
 
@@ -376,9 +414,17 @@ if (isset($_SESSION['userID'])) {
                     // Update the Total Spent
                     let monthlyTotalSpent = document.getElementById("monthlyTotalSpent");
                     monthlyTotalSpent.innerHTML = "";
-                    if (data.analysis && data.analysis.length > 0) {
-                        monthlyTotalSpent.innerHTML = "<p>" + data.analysis + "</p>"
+                    if (data.totalSpent && data.totalSpent.length > 0) {
+                        monthlyTotalSpent.innerHTML = "<p>" + data.totalSpent + "</p>"
                     }
+
+                    // Unallocated Budget message
+                    let unallocatedBudget = document.getElementById("unallocatedBudget");
+                   unallocatedBudget.innerHTML = "";
+                    if (data.unallocatedBudget && data.unallocatedBudget.length > 0) {
+                        unallocatedBudget.innerHTML = "<p>" + data.unallocatedBudget + "</p>"
+                    }
+
 
                     // Update the Top Spending Categories
                     let topCategories = document.getElementById("topSpendingCateg");
@@ -387,19 +433,62 @@ if (isset($_SESSION['userID'])) {
                         topCategories.innerHTML = "<b>Your Top Spending Categories for this month:</b><p>" + data.topCategories.join("<br>") + "</p>";
                     }
 
+                    // No Overspending Message 
+                       let noOverSpendingMessage = document.getElementById("noOverSpendingMessage");
+                   noOverSpendingMessage.innerHTML = "";
+                    if (data.noOverSpendingMessage && data.noOverSpendingMessage.length > 0) {
+                        noOverSpendingMessage.innerHTML += "<p>" + data.noOverSpendingMessage + "</p>"
+                    }
 
-                    // Overspending Insight
-                    let overSpentCateg = document.getElementById("overSpentCateg");
-                    overSpentCateg.innerHTML = "";
-                    if (data.overspendingInsight && data.overspendingInsight.length > 0) {
-                        data.overspendingInsight.forEach(element => {
-                            overSpentCateg.innerHTML += `<p>${element}</p>`;
-                        });
-                    } else if (data.dailyOverspending && data.dailyOverspending.length > 0) {
-                        data.dailyOverspending.forEach(element => {
-                            overSpentCateg.innerHTML += `<p>Today: ${element}</p>`;
+                    // No Overspending Insight
+                    let noOverSpending = document.getElementById("noOverSpending");
+                   noOverSpending.innerHTML = "";
+                    if (data.noOverSpending && data.noOverSpending.length > 0) {
+                        noOverSpending.innerHTML += "<p>" + data.noOverSpending+ "</p>"
+                    }
+
+                    // Overspending Message
+                    let overSpendingMessage = document.getElementById("overSpendingMessage");
+                    overSpendingMessage.innerHTML = "";
+                    if (data.dailyOverspendingmessage && data.dailyOverspendingmessage.length > 0) {
+                        data.dailyOverspendingmessage.forEach(element => {
+                            overSpendingMessage.innerHTML += `<p>${element}</p>`;
                         });
                     }
+
+          
+
+                    //Overspending Insight
+                    let overSpending = document.getElementById("overSpending");
+                   overSpending.innerHTML = "";
+                    if (data.dailyOverspending && data.dailyOverspending.length > 0) {
+                        overSpending.innerHTML += "<p>" + data.dailyOverspending +"</p>";
+                    }
+
+
+                       // Recommendation 
+                    let recommendation = document.getElementById("recommendation")
+                    recommendation.innerHTML = "";
+                    if (data.recommendationInsight && data.recommendationInsight.length > 0) {
+                        recommendation.innerHTML += `<b>Recommendations:</b>`;
+                        recommendation.innerHTML += "<p>" + data.recommendationInsight + "</p>"
+                    }
+
+                    // Correlation Insight 
+                    let correlationInsight = document.getElementById("correlationInsight");
+                    correlationInsight.innerHTML = "";
+                    if (data.correlationInsight && data.correlationInsight.length > 0) {
+                        data.correlationInsight.forEach(element => {
+                            correlationInsight.innerHTML += `<p> ${element} </p>`
+                        });
+
+                    }
+
+
+
+
+
+
 
                     // Oversaving Insight
                     let overSaveCateg = document.getElementById("overSaveCateg");
@@ -464,24 +553,7 @@ if (isset($_SESSION['userID'])) {
 
 
 
-                    // Recommendation 
-                    let recommendation = document.getElementById("recommendation")
-                    recommendation.innerHTML = "";
-                    if (data.recommendationInsight && data.recommendationInsight.length > 0) {
-                        recommendation.innerHTML += `<b>Recommendations:</b>`;
-                        recommendation.innerHTML += "<p>" + data.recommendationInsight + "</p>"
-                    }
-
-                    // Correlation Insight 
-                    let correlationInsight = document.getElementById("correlationInsight");
-                    correlationInsight.innerHTML = "";
-                    if (data.correlationInsight && data.correlationInsight.length > 0) {
-                        data.correlationInsight.forEach(element => {
-                            correlationInsight.innerHTML += `<p> ${element} </p>`
-                        });
-
-                    }
-
+                 
 
 
 
