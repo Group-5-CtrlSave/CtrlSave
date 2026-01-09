@@ -41,7 +41,7 @@ $displayToday = "Today, " . date('M d D');
 $incomeQuery = "
   SELECT SUM(amount) AS totalIncome
   FROM tbl_income
-  WHERE userID = '$userID'
+  WHERE userID = '$userID' AND isDeleted = 0
 ";
 $incomeResult = executeQuery($incomeQuery);
 $incomeRow = mysqli_fetch_assoc($incomeResult);
@@ -51,24 +51,15 @@ $todayIncome = $incomeRow['totalIncome'] !== null ? $incomeRow['totalIncome'] : 
 $expenseQuery = "
   SELECT SUM(amount) AS totalExpense
   FROM tbl_expense
-  WHERE userID = '$userID'
+  WHERE userID = '$userID' AND isDeleted = 0
 ";
 $expenseResult = executeQuery($expenseQuery);
 $expenseRow = mysqli_fetch_assoc($expenseResult);
 $todayExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
 
-/* 🔥 TOTAL SAVINGS (deduct but NOT counted as expense) */
-$savingsQuery = "
-  SELECT SUM(currentAmount) AS totalSavings
-  FROM tbl_savinggoals
-  WHERE userID = '$userID'
-";
-$savingsResult = executeQuery($savingsQuery);
-$savingsRow = mysqli_fetch_assoc($savingsResult);
-$totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings'] : 0;
 
-/* 🧮 FINAL BALANCE: Income – Expense – Savings */
-$todayBalance = $todayIncome - $todayExpense - $totalSavings;
+/* 🧮 FINAL BALANCE: Income – Expense */
+$todayBalance = $todayIncome - $todayExpense;
 ?>
 
 <!-- Get Spending Insights -->
@@ -293,6 +284,8 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
                 <?php echo $symbol . number_format($todayBalance, 2); ?>
               </div>
             </div>
+            
+            
           </div>
         </div>
 
@@ -321,7 +314,7 @@ if (mysqli_num_rows($spendingInsightsResult) > 0) {
         NULL AS dueDate
     FROM tbl_income i
     JOIN tbl_usercategories uc ON uc.userCategoryID = i.userCategoryID
-    WHERE i.userID = '$userID'
+    WHERE i.userID = '$userID' AND isDeleted = 0
 )
 UNION ALL
 (
@@ -336,7 +329,7 @@ UNION ALL
         e.dueDate
     FROM tbl_expense e
     JOIN tbl_usercategories uc ON uc.userCategoryID = e.userCategoryID
-    WHERE e.userID = '$userID'
+    WHERE e.userID = '$userID' AND isDeleted = 0
 )
 ORDER BY 
     CASE 

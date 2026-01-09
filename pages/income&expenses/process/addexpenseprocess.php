@@ -1,4 +1,4 @@
-<?php include('../../assets/shared/scripts/dailyoverspendingfunction.php') ?>
+<?php include('../../assets/shared/scripts/daily/generateDailyOverspendingInsights.php') ?>
 
 
 <?php
@@ -18,12 +18,14 @@ if (isset($_SESSION['userID'])) {
 
 <?php
 $userBudgetVersionID = 0;
-$selectUserBudgetVersionQuery = "SELECT `userBudgetVersionID`, `versionNumber`, `userBudgetRuleID`, `totalIncome` 
+$totalExpense = 0;
+$selectUserBudgetVersionQuery = "SELECT `userBudgetVersionID`, `versionNumber`, `userBudgetRuleID`, `totalIncome`, `totalExpense` 
     FROM `tbl_userbudgetversion` WHERE userID = $userID AND isActive = 1";
     $userBudgetVersionResult = executeQuery($selectUserBudgetVersionQuery);
     if (mysqli_num_rows($userBudgetVersionResult) > 0){
         $row = mysqli_fetch_assoc($userBudgetVersionResult);
         $userBudgetVersionID = $row['userBudgetVersionID'] ?? 0;
+        $totalExpense = $row['totalExpense'] ?? 0;
     }
 
 ?>
@@ -109,13 +111,20 @@ if (isset($_POST['addExpense']) && $_POST['amount'] != 0) {
          $addExpensesQuery = "INSERT INTO tbl_expense ( `userID`, `amount`, `userCategoryID`,`dateSpent`,`dueDate`, `isRecurring`, `note`,  `recurringID` , `userBudgetversionID`) 
         VALUES ('$userID','$amount','$categoryID',DEFAULT,NULL,'$isRecurring','$note', '$lastRecurringID' , '$userBudgetVersionID ')";
     }
+    
 
+    $totalUserExpense = $amount + $totalExpense;
+    
+    $updateBudgetVersionQuery = "UPDATE `tbl_userbudgetversion` SET `totalExpense`='$totalUserExpense' WHERE userID = $userID and isActive = 1";
+    executeQuery($updateBudgetVersionQuery);
 
 
 
 
     executeQuery($addExpensesQuery);
-    checkDailyOverspending($userID);
+
+    generateDailyOverspendingInsights();
+
 
     updateExpenseChallenges($userID, $conn);
 

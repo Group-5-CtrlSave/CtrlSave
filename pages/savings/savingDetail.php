@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../assets/shared/connect.php';
-include '../../assets/shared/scripts/dailyoversavingfunction.php';
+include('../../assets/shared/scripts/daily/checkDailyOversaving.php');
 if (!isset($_SESSION['userID'])) {
   header("Location: ../../pages/login&signup/login.php");
   exit;
@@ -20,19 +20,23 @@ if ($savingGoalID <= 0) {
   exit();
 }
 
+
+$currentMonth = date('m');
+$currentYear  = date('Y');
+
 // Get user's current balance from home (for validation only)
-$incomeQuery = "SELECT SUM(amount) AS totalIncome FROM tbl_income WHERE userID = '$userID'";
+$incomeQuery = "SELECT SUM(amount) AS totalIncome FROM tbl_income WHERE userID = '$userID' AND MONTH(dateReceived) = '$currentMonth' AND YEAR(dateReceived) = '$currentYear' AND isDeleted = 0;";
 $incomeResult = mysqli_query($conn, $incomeQuery);
 $incomeRow = mysqli_fetch_assoc($incomeResult);
 $totalIncome = $incomeRow['totalIncome'] !== null ? $incomeRow['totalIncome'] : 0;
 
-$expenseQuery = "SELECT SUM(amount) AS totalExpense FROM tbl_expense WHERE userID = '$userID'";
+$expenseQuery = "SELECT SUM(amount) AS totalExpense FROM tbl_expense WHERE userID = '$userID' AND MONTH(dateSpent) = '$currentMonth' AND YEAR(dateSpent) = '$currentYear' AND isDeleted = 0";
 $expenseResult = mysqli_query($conn, $expenseQuery);
 $expenseRow = mysqli_fetch_assoc($expenseResult);
 $totalExpense = $expenseRow['totalExpense'] !== null ? $expenseRow['totalExpense'] : 0;
 
 // Get total amount in ALL savings goals (including deleted/completed ones to keep money locked)
-$savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID'";
+$savingsQuery = "SELECT SUM(currentAmount) AS totalSavings FROM tbl_savinggoals WHERE userID = '$userID' AND status != 'Deleted'";
 $savingsResult = mysqli_query($conn, $savingsQuery);
 $savingsRow = mysqli_fetch_assoc($savingsResult);
 $totalSavings = $savingsRow['totalSavings'] !== null ? $savingsRow['totalSavings'] : 0;
@@ -128,6 +132,11 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1) {
   // Mark goal as deleted instead of removing it - this keeps the money locked
   $updateQuery = "UPDATE tbl_savinggoals SET status = 'Deleted' WHERE savingGoalID = $savingGoalID";
   mysqli_query($conn, $updateQuery);
+
+  $deleteGoaltransactions = "DELETE FROM `tbl_goaltransactions` WHERE savingGoalID = $savingGoalID";
+  mysqli_query($conn, $deleteGoaltransactions);
+
+  checkDailyOversaving($userID);
   
   header("Location: savingGoal.php");
   exit();

@@ -52,10 +52,6 @@ $currencySymbol = ($currencyCode === 'USD') ? '$' : '₱';
     </nav>
 
 
-
-
-
-
     <!-- Content -->
 
     <div class="container-fluid mainContainer">

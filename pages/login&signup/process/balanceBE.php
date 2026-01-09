@@ -51,8 +51,8 @@ if (isset($_POST['submit'])) {
             // ======================================================
             $stmt = $conn->prepare("
                 INSERT INTO tbl_userbudgetversion
-                (versionNumber, userID, userBudgetRuleID, totalIncome, isActive)
-                VALUES (1, ?, 0, ?, 1)
+                (versionNumber, userID, userBudgetRuleID, totalIncome, totalExpense, isActive)
+                VALUES (1, ?, 0, ?, 0, 1)
             ");
             $stmt->bind_param("id", $userID, $balance);
             $stmt->execute();

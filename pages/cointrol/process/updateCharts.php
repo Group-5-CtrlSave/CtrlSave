@@ -3,6 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
+
 // userID
 $userID = '';
 if (isset($_SESSION['userID'])) {
@@ -16,7 +17,7 @@ if (isset($_SESSION['userID'])) {
 $currentMonth = isset($_GET['month']) ? $_GET['month'] : date("m");
 $currentYear = isset($_GET['year']) ? $_GET['year'] : date("Y");
 
-// Total Income
+// Get Total Income
 $getBudgetVersion = "SELECT totalIncome 
                      FROM tbl_userbudgetversion 
                      WHERE isActive = 1 AND userID = $userID";
@@ -36,7 +37,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 // ===== BAR CHART =====
 $getTotalExpensesPerMonth = "SELECT MONTH(dateSpent) AS monthNum, SUM(amount) AS totalSpending 
     FROM tbl_expense 
-    WHERE userID = $userID AND YEAR(dateSpent) = $currentYear
+    WHERE userID = $userID AND isDeleted = 0 AND YEAR(dateSpent) = $currentYear
     GROUP BY MONTH(dateSpent);";
 
 $totalExpenseResult = executeQuery($getTotalExpensesPerMonth);
@@ -56,10 +57,14 @@ $expenses = $expenses ?? [];
 $categoryNames = $categoryNames ?? [];
 $categoryAmount = $categoryAmount ?? [];
 $overallTotal = $overallTotal ?? 0;
+
+
+
 // ===== PIE CHART / TABLE =====
 $getExpenseStructureQuery = "SELECT tbl_usercategories.categoryName AS categoryName, SUM(tbl_expense.amount) AS amount 
 FROM tbl_expense JOIN tbl_usercategories ON tbl_expense.userCategoryID = tbl_usercategories.userCategoryID 
 WHERE tbl_expense.userID = $userID 
+AND isDeleted = 0
 AND YEAR(tbl_expense.dateSpent) = $currentYear 
 AND MONTH(tbl_expense.dateSpent) = $currentMonth
 GROUP BY tbl_usercategories.categoryName;
@@ -75,27 +80,49 @@ if (mysqli_num_rows($expenseStructureResult) > 0) {
         $expenses[] = $expenseRow;
     }
 }
+
+
 // ===== ANALYSIS MESSAGE =====
 if ($overallTotal) {
 
     $monthName = date("F", mktime(0, 0, 0, $currentMonth, 1));
 
-    $analysisMessage = "Based on the current financial report, you have spent a total of "
+    $totalSpentMessage = "Based on the current financial report, you have spent a total of ₱"
         . number_format($overallTotal, 2) . " pesos for the month of "
         . $monthName . ".";
 
     // ⚠️ Debt detection: expenses greater than planned income
     if ($totalIncome > 0 && $overallTotal > $totalIncome) {
-        $analysisMessage .= " You are under debt. Please review your current expenses.";
+        $totalSpentMessage .= " You are under debt. Please review your current expenses.";
     }
 
     // Optional: If totalIncome in budget version is 0
     if ($totalIncome == 0) {
-        $analysisMessage .= " No income set in your budget version.";
+        $totalSpentMessage .= " No income set in your budget version.";
     }
 
 } else {
-    $analysisMessage = "Analyzing Data...";
+    $totalSpentMessage = "Analyzing Data...";
+}
+$unallocatedMessage = '';
+if ($totalIncome > $overallTotal && $overallTotal != 0){
+    $unallocatedBudget = $totalIncome - $overallTotal;
+    $messages = [
+    "You still have ₱" . number_format($unallocatedBudget, 2) . " left in your budget. Why not give your savings a little boost?",
+    "Heads up! ₱" . number_format($unallocatedBudget, 2) . " is waiting to be assigned. Your future self will thank you!",
+    "Good news! You’ve got ₱" . number_format($unallocatedBudget, 2) . " unallocated. Time to flex that budget power!",
+    "Whoa! ₱" . number_format($unallocatedBudget, 2) . " is still free. Maybe it’s the perfect moment for a small goal or treat?",
+    "Budget check: ₱" . number_format($unallocatedBudget, 2) . " left. Don’t let it snooze—put it to work!",
+    "Nice! ₱" . number_format($unallocatedBudget, 2) . " is still floating around. Savings or fun? The choice is yours!",
+    "Look at that! ₱" . number_format($unallocatedBudget, 2) . " unallocated. Give it a job—your wallet deserves it.",
+    "Extra cash alert: ₱" . number_format($unallocatedBudget, 2) . ". Allocate it wisely, or at least wisely-ish!",
+    "You’ve got ₱" . number_format($unallocatedBudget, 2) . " leftover. A little action now makes a big difference later!",
+    "Whoa there! ₱" . number_format($unallocatedBudget, 2) . " is still unassigned. Time to boss your budget around!"
+];
+// Pick random message
+ $unallocatedMessage = $messages[array_rand($messages)];
+    
+    
 }
 
 foreach ($expenses as &$expense) {
@@ -105,7 +132,7 @@ unset($expense);
 
 
 
-// ===== TOP SPENDING CATEGORIES =====
+// ===== TOP 3 SPENDING CATEGORIES =====
 $topCategories = [];
 if (!empty($expenses)) {
     // Sort expenses by amount descending
@@ -121,6 +148,57 @@ if (!empty($expenses)) {
     }
 }
 
+
+$today = date('Y-m-d');
+
+// No overspending message
+$dailyNoOverSpendingMessage = []; // daily
+$dailyNoOverspendingMessageQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_nooverspending_message' AND userID = $userID AND DATE(date) = '$today'";
+$dailyNoOverspendingMessageResult = executeQuery($dailyNoOverspendingMessageQuery);
+if (mysqli_num_rows($dailyNoOverspendingMessageResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyNoOverspendingMessageResult)) {
+        $dailyNoOverSpendingMessage[] = $row['message'];
+    }
+}
+
+
+// No overspending Insight
+$dailyNoOverspending = []; // daily
+$dailyNoOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_nooverspending' AND userID = $userID AND DATE(date) = '$today'";
+$dailyNoOverspendingResult = executeQuery($dailyNoOverspendingQuery);
+if (mysqli_num_rows($dailyNoOverspendingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyNoOverspendingResult)) {
+        $dailyNoOverspending[] = $row['message'];
+    }
+}
+
+
+// Overspending Message
+$dailyOverspendingmessage = []; // daily
+$dailyOverspendingmessageQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType NOT IN ('daily_overspending', 'daily_nooverspending', 'daily_nooverspending_message', 'correlation', 'recommendation', 'daily_positive_saving', 'daily_no_saving') AND userID = $userID AND DATE(date) = '$today'";
+$dailyOverspendingmessageResult = executeQuery($dailyOverspendingmessageQuery);
+if (mysqli_num_rows($dailyOverspendingmessageResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyOverspendingmessageResult)) {
+        $dailyOverspendingmessage[] = $row['message'];
+    }
+}
+
+// Overspending Insight
+$dailyOverspending = []; // daily
+$dailyOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_overspending' AND userID = $userID AND DATE(date) = '$today'";
+$dailyOverspendingResult = executeQuery($dailyOverspendingQuery);
+if (mysqli_num_rows($dailyOverspendingResult) > 0) {
+    while ($row = mysqli_fetch_assoc($dailyOverspendingResult)) {
+        $dailyOverspending[] = $row['message'];
+    }
+}
+
+
+
+
+
+
+
 // ===== Get Spending Correlation Insights =====
 
 $correlationInsight = []; // default
@@ -133,7 +211,7 @@ if (mysqli_num_rows($correlationInsightResult) > 0) {
 
 }
 
-$today = date('Y-m-d');
+
 
 // ===== Get Spending Overspending Insights =====
 $overspendingInsight = []; // monthly
@@ -155,15 +233,7 @@ if (mysqli_num_rows($recommendationInsightResult) > 0) {
     }
 }
 
-// ===== Get Spending Daily Overspending Insights =====
-$dailyOverspending = []; // daily
-$dailyOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_overspending' AND userID = $userID AND DATE(date) = '$today'";
-$dailyOverspendingResult = executeQuery($dailyOverspendingQuery);
-if (mysqli_num_rows($dailyOverspendingResult) > 0) {
-    while ($row = mysqli_fetch_assoc($dailyOverspendingResult)) {
-        $dailyOverspending[] = $row['message'];
-    }
-}
+
 
 // ===== Get Spending Oversaving Insights =====
 $oversavingInsight = []; // monthly
@@ -270,18 +340,31 @@ echo json_encode([
     "pieChartLabels" => $categoryNames,
     "pieChartData" => $categoryAmount,
     "tableData" => $expenses,
-    "analysis" => $analysisMessage,
+    "totalSpent" => $totalSpentMessage,
+    "unallocatedBudget" =>  $unallocatedMessage,
     "topCategories" => $topCategories,
+    // Overspending
+    "noOverSpending" => $dailyNoOverspending,
+    "noOverSpendingMessage" => $dailyNoOverSpendingMessage,
+    "dailyOverspending" => $dailyOverspending,
+    "dailyOverspendingmessage" => $dailyOverspendingmessage,
+
+
+    //  Correlation
+    "recommendationInsight" => $recommendationInsight,
+    "correlationInsight" => $correlationInsight,
+    
+    
+    // Insights
     "overspendingInsight" => $overspendingInsight,
     "oversavingInsight" => $oversavingInsight,
     "positiveInsight" => $positiveInsight,
     "positiveSavingInsight" => $positiveSavingInsight,
     "noSavingInsight" => $noSavingInsight,
     "trackingInsight" => $trackingInsight,
-    "recommendationInsight" => $recommendationInsight,
-    "correlationInsight" => $correlationInsight,
+    
     // Daily insights
-    "dailyOverspending" => $dailyOverspending,
+    
     "dailyOversaving" => $dailyOversaving,
     "dailyPositive" => $dailyPositive,
     "dailyTracking" => $dailyTracking,
