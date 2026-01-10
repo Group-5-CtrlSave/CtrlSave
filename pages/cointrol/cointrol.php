@@ -18,7 +18,7 @@ if (isset($_SESSION['userID'])) {
 
 <head>
     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>CtrlSave | Cointrol</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/sideBar.css">
@@ -111,13 +111,25 @@ if (isset($_SESSION['userID'])) {
 
 
                 </div>
+                <!-- Forecasting -->
+                <div class="container my-3" id="forecastingDecrease">
+
+                </div>
+                <div class="container my-3" id="forecastingIncrease">
+
+                </div>
+                <div class="container my-3" id="forecastingStable">
+
+                </div>
+
+
                 <!-- Total Spent -->
                 <div class="container my-3" id="monthlyTotalSpent">
 
                 </div>
 
                 <!-- Unallocated Budget -->
-                 <div class="container my-3" id="unallocatedBudget">
+                <div class="container my-3" id="unallocatedBudget">
 
                 </div>
 
@@ -127,14 +139,14 @@ if (isset($_SESSION['userID'])) {
 
                 </div>
 
-                
+
 
                 <!-- No Overspending (Positive) -->
 
                 <div class="container my-3" id="noOverSpendingMessage">
 
                 </div>
-                
+
 
                 <div class="container my-3" id="noOverSpending">
 
@@ -157,12 +169,12 @@ if (isset($_SESSION['userID'])) {
                 </div>
 
                 <!-- Positive Saving -->
-                 
+
                 <div class="container my-3" id="positiveSaving">
 
                 </div>
 
-                   <!-- Correlation of Categories -->
+                <!-- Correlation of Categories -->
                 <div class="container my-3" id="correlationInsight">
 
                 </div>
@@ -173,7 +185,7 @@ if (isset($_SESSION['userID'])) {
 
                 </div>
 
-             
+
 
 
 
@@ -194,10 +206,10 @@ if (isset($_SESSION['userID'])) {
 
 
 
-       
 
 
-        
+
+
 
 
 
@@ -213,7 +225,7 @@ if (isset($_SESSION['userID'])) {
                 </div>
 
 
-             
+
 
 
 
@@ -374,42 +386,136 @@ if (isset($_SESSION['userID'])) {
             let fetchMonth = mnth;
             let fetchYear = yr;
 
-            fetch(`process/updateCharts.php?month=${fetchMonth}&year=${fetchYear}`)
+
+            fetch(`process/updateCharts.php?month=${fetchMonth}&year=${fetchYear}&count=${count}`)
                 .then(response => response.json())
                 .then(data => {
 
+                    actualBarData = data.barChartData;
+                    forecastBarData = data.forecastBarData;
 
-                    // Update the Bar Chart
-                    monthlyBarChart.data.datasets[0].data = data.barChartData;
-                    monthlyBarChart.update();
+                    console.log(count);
+
+                    if (count > 0) {
+                        // Update the Bar Chart
+                        monthlyBarChart.data.datasets[0].data = data.forecastBarData;
+                        monthlyBarChart.update();
+                    } else {
+                        monthlyBarChart.data.datasets[0].data = data.barChartData;
+                        monthlyBarChart.update();
+                    }
+
+
+
 
                     // Update the Pie Chart
 
-                    const catNum = data.pieChartLabels.length;
-                    monthlyPieChart.data.labels = data.pieChartLabels;
-                    monthlyPieChart.data.datasets[0].data = data.pieChartData;
-                    monthlyPieChart.data.datasets[0].backgroundColor = generateRandomColors(catNum);
-                    monthlyPieChart.update();
+                    // Update the Pie Chart ONLY if count == 0 (actual month)
+                    const pieChartContainer = document.querySelector('.expensesChart');
+
+                    if (count === 0 && data.pieChartLabels && data.pieChartLabels.length > 0) {
+                        pieChartContainer.style.display = "block"; // show
+                        const catNum = data.pieChartLabels.length;
+                        monthlyPieChart.data.labels = data.pieChartLabels;
+                        monthlyPieChart.data.datasets[0].data = data.pieChartData;
+                        monthlyPieChart.data.datasets[0].backgroundColor = generateRandomColors(catNum);
+                        monthlyPieChart.update();
+                    } else {
+                        pieChartContainer.style.display = "none"; // hide when forecast
+                    }
 
                     // Update the Table
 
                     const tbody = document.querySelector("#monthlyTable tbody");
                     tbody.innerHTML = '';
 
-                    if (!data.tableData || data.tableData.length === 0) {
-                        tbody.innerHTML = `<tr class="text-center"><td colspan=3>No Data Available</td></tr>`;
-                    } else {
-                        data.tableData.forEach(expense => {
+                    if (count > 0) {
+                        // === FORECAST MODE ===
+                        let actualData = data.barChartData;      // actual data for comparison
+                        let forecastData = data.forecastBarData; // forecasted values
+
+                        // Find the last actual month before forecast
+                        let lastActualIndex = actualData.findIndex(v => v > 0);
+                        if (lastActualIndex === -1) lastActualIndex = 0;
+
+                        for (let i = 0; i < 12; i++) {
+                            if (forecastData[i] === 0) continue; // skip months without forecast
+
+                            let monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i];
+
+                            // Determine previous month value for percentage comparison
+                            let prevValue;
+                            if (i === 0 || actualData[i - 1] === 0) {
+                                // Use last available actual month if no previous month
+                                prevValue = actualData[lastActualIndex] || forecastData[i];
+                            } else {
+                                prevValue = actualData[i - 1];
+                            }
+
+                            let currValue = forecastData[i];
+
+                            // Calculate percentage change safely
+                            let percentChange = '-';
+                            if (prevValue && prevValue != 0) {
+                                percentChange = ((currValue - prevValue) / prevValue) * 100;
+                                percentChange = percentChange.toFixed(1);
+                            }
+
                             const row = document.createElement('tr');
                             row.classList.add('text-center');
                             row.innerHTML = `
-                            <td><strong>${expense.categoryName}<strong></td> 
-                            <td>${expense.amount}</td> 
-                            <td>${expense.percentage}%</td> 
-                            `;
+            <td><strong>${monthName} ${(new Date().getFullYear())}</strong></td>
+            <td>${currValue}</td>
+            <td>${percentChange}%</td>
+        `;
                             tbody.appendChild(row);
-                        });
+                        }
+
+                        if (!tbody.hasChildNodes()) {
+                            tbody.innerHTML = `<tr class="text-center"><td colspan=3>No Data Available</td></tr>`;
+                        }
+
+                    } else {
+                        // === ACTUAL DATA MODE ===
+                        if (!data.tableData || data.tableData.length === 0) {
+                            tbody.innerHTML = `<tr class="text-center"><td colspan=3>No Data Available</td></tr>`;
+                        } else {
+                            data.tableData.forEach(expense => {
+                                const row = document.createElement('tr');
+                                row.classList.add('text-center');
+                                row.innerHTML = `
+                <td><strong>${expense.categoryName}</strong></td> 
+                <td>${expense.amount}</td> 
+                <td>${expense.percentage}%</td> 
+            `;
+                                tbody.appendChild(row);
+                            });
+                        }
                     }
+                    // Forecasting
+                    let forecastingDecrease = document.getElementById("forecastingDecrease");
+
+                    // Hide first by default
+                    forecastingDecrease.style.display = "none";
+                    forecastingDecrease.innerHTML = "";
+
+                    // Show only for 1-month forecast
+                    if (count === 1 && data.forecastingDecrease && data.forecastingDecrease.length > 0) {
+                        forecastingDecrease.style.display = "block";
+
+                        // Only show the first message
+                        forecastingDecrease.innerHTML = `<p>${data.forecastingDecrease[0]}</p>`;
+                    }  else if (count === 2 && data.forecastingDecrease && data.forecastingDecrease.length > 0) {
+                        forecastingDecrease.style.display = "block";
+
+                        // Only show the first message
+                        forecastingDecrease.innerHTML = `<p>${data.forecastingDecrease[1]}</p>`;
+                    } else if (count === 3 && data.forecastingDecrease && data.forecastingDecrease.length > 0) {
+                        forecastingDecrease.style.display = "block";
+
+                        // Only show the first message
+                        forecastingDecrease.innerHTML = `<p>${data.forecastingDecrease[2]}</p>`;
+                    } 
 
                     // Update the Total Spent
                     let monthlyTotalSpent = document.getElementById("monthlyTotalSpent");
@@ -420,7 +526,7 @@ if (isset($_SESSION['userID'])) {
 
                     // Unallocated Budget message
                     let unallocatedBudget = document.getElementById("unallocatedBudget");
-                   unallocatedBudget.innerHTML = "";
+                    unallocatedBudget.innerHTML = "";
                     if (data.unallocatedBudget && data.unallocatedBudget.length > 0) {
                         unallocatedBudget.innerHTML = "<p>" + data.unallocatedBudget + "</p>"
                     }
@@ -434,17 +540,17 @@ if (isset($_SESSION['userID'])) {
                     }
 
                     // No Overspending Message 
-                       let noOverSpendingMessage = document.getElementById("noOverSpendingMessage");
-                   noOverSpendingMessage.innerHTML = "";
+                    let noOverSpendingMessage = document.getElementById("noOverSpendingMessage");
+                    noOverSpendingMessage.innerHTML = "";
                     if (data.noOverSpendingMessage && data.noOverSpendingMessage.length > 0) {
                         noOverSpendingMessage.innerHTML += "<p>" + data.noOverSpendingMessage + "</p>"
                     }
 
                     // No Overspending Insight
                     let noOverSpending = document.getElementById("noOverSpending");
-                   noOverSpending.innerHTML = "";
+                    noOverSpending.innerHTML = "";
                     if (data.noOverSpending && data.noOverSpending.length > 0) {
-                        noOverSpending.innerHTML += "<p>" + data.noOverSpending+ "</p>"
+                        noOverSpending.innerHTML += "<p>" + data.noOverSpending + "</p>"
                     }
 
                     // Overspending Message
@@ -456,17 +562,17 @@ if (isset($_SESSION['userID'])) {
                         });
                     }
 
-          
+
 
                     //Overspending Insight
                     let overSpending = document.getElementById("overSpending");
-                   overSpending.innerHTML = "";
+                    overSpending.innerHTML = "";
                     if (data.dailyOverspending && data.dailyOverspending.length > 0) {
-                        overSpending.innerHTML += "<p>" + data.dailyOverspending +"</p>";
+                        overSpending.innerHTML += "<p>" + data.dailyOverspending + "</p>";
                     }
 
 
-                       // Recommendation 
+                    // Recommendation 
                     let recommendation = document.getElementById("recommendation")
                     recommendation.innerHTML = "";
                     if (data.recommendationInsight && data.recommendationInsight.length > 0) {
@@ -553,7 +659,7 @@ if (isset($_SESSION['userID'])) {
 
 
 
-                 
+
 
 
 

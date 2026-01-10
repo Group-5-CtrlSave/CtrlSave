@@ -34,6 +34,7 @@ if (mysqli_num_rows($budgetVersionResult) > 0) {
 
 
 
+
 // ===== BAR CHART =====
 $getTotalExpensesPerMonth = "SELECT MONTH(dateSpent) AS monthNum, SUM(amount) AS totalSpending 
     FROM tbl_expense 
@@ -57,6 +58,35 @@ $expenses = $expenses ?? [];
 $categoryNames = $categoryNames ?? [];
 $categoryAmount = $categoryAmount ?? [];
 $overallTotal = $overallTotal ?? 0;
+
+
+// ===== FORECAST =====
+
+$count = isset($_GET['count']) ? (int)$_GET['count'] : 0;
+
+// Decide forecast type
+$forecastType = '';
+if ($count === 1) $forecastType = 'expense_1m';
+elseif ($count === 2) $forecastType = 'expense_3m';
+elseif ($count === 3) $forecastType = 'expense_6m';
+
+$getForecastQuery = "SELECT forecastMonth, forecastYear, SUM(predictedAmount) AS totalForecast
+                     FROM tbl_forecasts
+                     WHERE userID = $userID
+                     AND forecastType = '$forecastType' -- change as needed for 1m, 3m, etc.
+                     AND forecastYear >= $currentYear
+                     GROUP BY forecastYear, forecastMonth";
+
+$forecastResult = executeQuery($getForecastQuery);
+
+$forecastData = array_fill(0, 12, 0);
+
+if (mysqli_num_rows($forecastResult) > 0) {
+    while ($row = mysqli_fetch_assoc($forecastResult)) {
+        $monthNum = (int) $row['forecastMonth'];
+        $forecastData[$monthNum - 1] = (float) $row['totalForecast'];
+    }
+}
 
 
 
@@ -102,7 +132,13 @@ if ($overallTotal) {
     }
 
 } else {
-    $totalSpentMessage = "Analyzing Data...";
+    if ($count > 0){
+        $totalSpentMessage = "";
+    }else{
+        $totalSpentMessage = "Analyzing Data...";
+
+    }
+    
 }
 $unallocatedMessage = '';
 if ($totalIncome > $overallTotal && $overallTotal != 0){
@@ -175,7 +211,7 @@ if (mysqli_num_rows($dailyNoOverspendingResult) > 0) {
 
 // Overspending Message
 $dailyOverspendingmessage = []; // daily
-$dailyOverspendingmessageQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType NOT IN ('daily_overspending', 'daily_nooverspending', 'daily_nooverspending_message', 'correlation', 'recommendation', 'daily_positive_saving', 'daily_no_saving') AND userID = $userID AND DATE(date) = '$today'";
+$dailyOverspendingmessageQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType NOT IN ('daily_overspending', 'daily_nooverspending', 'daily_nooverspending_message', 'correlation', 'recommendation', 'daily_positive_saving', 'daily_no_saving', 'forecast_increase', 'forecast_decrease', 'forecast_stable') AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $dailyOverspendingmessageResult = executeQuery($dailyOverspendingmessageQuery);
 if (mysqli_num_rows($dailyOverspendingmessageResult) > 0) {
     while ($row = mysqli_fetch_assoc($dailyOverspendingmessageResult)) {
@@ -185,7 +221,7 @@ if (mysqli_num_rows($dailyOverspendingmessageResult) > 0) {
 
 // Overspending Insight
 $dailyOverspending = []; // daily
-$dailyOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_overspending' AND userID = $userID AND DATE(date) = '$today'";
+$dailyOverspendingQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'daily_overspending' AND userID = $userID AND YEAR(date) = $currentYear AND MONTH(date) = $currentMonth";
 $dailyOverspendingResult = executeQuery($dailyOverspendingQuery);
 if (mysqli_num_rows($dailyOverspendingResult) > 0) {
     while ($row = mysqli_fetch_assoc($dailyOverspendingResult)) {
@@ -193,6 +229,42 @@ if (mysqli_num_rows($dailyOverspendingResult) > 0) {
     }
 }
 
+// Forecasting 
+$forecastingDecrease = []; // daily
+$forecastingDecreaseQuery = "SELECT message FROM tbl_spendinginsights WHERE insightType = 'forecast_decrease' AND userID = $userID AND DATE(date) = '$today'";
+$forecastingDecreaseResult = executeQuery($forecastingDecreaseQuery);
+if (mysqli_num_rows($forecastingDecreaseResult) > 0) {
+    while ($row = mysqli_fetch_assoc($forecastingDecreaseResult)) {
+        $forecastingDecrease[] = $row['message'];
+    }
+}
+
+$forecastingIncrease = [];
+// Increase
+$forecastingIncreaseQuery = "SELECT message 
+                             FROM tbl_spendinginsights 
+                             WHERE insightType = 'forecast_increase' 
+                               AND userID = $userID 
+                               AND DATE(date) = '$today'";
+$forecastingIncreaseResult = executeQuery($forecastingIncreaseQuery);
+if (mysqli_num_rows($forecastingIncreaseResult) > 0) {
+    while ($row = mysqli_fetch_assoc($forecastingIncreaseResult)) {
+        $forecastingIncrease[] = $row['message'];
+    }
+}
+$forecastingStable = [];
+// Stable
+$forecastingStableQuery = "SELECT message 
+                           FROM tbl_spendinginsights 
+                           WHERE insightType = 'forecast_stable' 
+                             AND userID = $userID 
+                             AND DATE(date) = '$today'";
+$forecastingStableResult = executeQuery($forecastingStableQuery);
+if (mysqli_num_rows($forecastingStableResult) > 0) {
+    while ($row = mysqli_fetch_assoc($forecastingStableResult)) {
+        $forecastingStable[] = $row['message'];
+    }
+}
 
 
 
@@ -337,6 +409,7 @@ if (mysqli_num_rows($dailyNoSavingResult) > 0) {
 
 echo json_encode([
     "barChartData" => $monthlyData,
+    "forecastBarData" => $forecastData,
     "pieChartLabels" => $categoryNames,
     "pieChartData" => $categoryAmount,
     "tableData" => $expenses,
@@ -349,7 +422,10 @@ echo json_encode([
     "dailyOverspending" => $dailyOverspending,
     "dailyOverspendingmessage" => $dailyOverspendingmessage,
 
-
+    // Forecasting 
+    "forecastingDecrease" => $forecastingDecrease,
+    "forecastingIncrease" => $forecastingIncrease,
+    "forecastingStable" => $forecastingStable,
     //  Correlation
     "recommendationInsight" => $recommendationInsight,
     "correlationInsight" => $correlationInsight,
