@@ -1,5 +1,5 @@
 <?php
-include("../../../../assets/shared/connect.php");
+include("../../connect.php");
 
 // Daily Mode
 $startDate = date('Y-m-d');
